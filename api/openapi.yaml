@@ -1,0 +1,11 @@
+openapi: 3.0.3
+info:
+  title: 作業進捗・人員配置最適化エンジン API
+  version: 0.1.0
+paths:
+  /resources:
+    get:
+      summary: /resources GET
+      responses:
+        '200':
+          description: OK
