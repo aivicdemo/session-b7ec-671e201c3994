@@ -1,0 +1,1043 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>作業管理システム - 既存システム統合・技術実現可能性検証プラットフォーム</title>
+  <style>
+:root {
+  --primary: #f59e0b;
+  --primary-hover: #d97706;
+  --bg-main: #fefdf8;
+  --bg-card: #faf8f3;
+  --bg-sidebar: #f5f1e8;
+  --top-bar-bg: #fffbf0;
+  --top-bar-border: #f3e8d8;
+  --top-bar-text: #1f2937;
+  --text: #1f2937;
+  --text-muted: #6b7280;
+  --border: #e5ddd0;
+  --border-width: 1px;
+  --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+  --font-mono: 'Courier New', monospace;
+  --space-unit: 8px;
+  --control-height: 40px;
+  --radius-card: 12px;
+  --radius-control: 8px;
+  --shadow-card: 0 2px 8px rgba(31, 41, 55, 0.08), 0 1px 3px rgba(31, 41, 55, 0.04);
+  --motion-duration: 200ms;
+  --surface-texture: linear-gradient(90deg, transparent 0%, rgba(245, 158, 11, 0.02) 50%, transparent 100%), repeating-linear-gradient(0deg, transparent 0px, rgba(245, 158, 11, 0.01) 1px, transparent 2px, transparent 4px);
+  --surface-texture-size: 100% 100%;
+  --surface-texture-position: 0 0;
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
+  --color-error: #dc2626;
+  --color-info: #3b82f6;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  font-family: var(--font-family);
+  color: var(--text);
+  background-color: var(--bg-main);
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+}
+
+[data-aivic-shell-pattern] {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.shell-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 56px;
+  background-color: var(--top-bar-bg);
+  border-bottom: var(--border-width) solid var(--top-bar-border);
+  padding: 0 calc(var(--space-unit) * 3);
+  flex-shrink: 0;
+  gap: calc(var(--space-unit) * 2);
+}
+
+.shell-header-left {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--space-unit) * 3);
+  flex: 1;
+}
+
+.shell-logo {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: -0.3px;
+  line-height: 1.2;
+}
+
+.shell-logo-system {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-weight: 400;
+  margin-top: 2px;
+  letter-spacing: -0.2px;
+}
+
+.shell-nav-top {
+  display: flex;
+  gap: calc(var(--space-unit) * 0.5);
+  align-items: center;
+}
+
+.shell-nav-item {
+  display: inline-flex;
+  align-items: center;
+  height: 32px;
+  padding: 0 calc(var(--space-unit) * 2);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--top-bar-text);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  border-radius: var(--radius-control);
+  transition: background-color var(--motion-duration), color var(--motion-duration);
+  white-space: nowrap;
+}
+
+.shell-nav-item:hover {
+  background-color: rgba(245, 158, 11, 0.1);
+}
+
+.shell-nav-item.aivic-active {
+  background-color: var(--primary);
+  color: #fff;
+}
+
+.shell-header-right {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--space-unit) * 2);
+}
+
+.shell-user-area {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--space-unit) * 1.5);
+}
+
+.shell-user-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.shell-user-name {
+  font-size: 13px;
+  color: var(--top-bar-text);
+  font-weight: 500;
+}
+
+.shell-user-logout {
+  font-size: 12px;
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: color var(--motion-duration);
+  cursor: pointer;
+}
+
+.shell-user-logout:hover {
+  color: var(--primary);
+  text-decoration: underline;
+}
+
+.shell-body {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.content-area {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background-color: var(--bg-main);
+  background-image: var(--surface-texture);
+  background-size: var(--surface-texture-size);
+  background-position: var(--surface-texture-position);
+}
+
+[data-aivic-panel] {
+  display: block;
+  min-height: 100%;
+}
+
+.shell-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  background-color: var(--bg-card);
+  border-top: var(--border-width) solid var(--border);
+  font-size: 12px;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+@media (max-width: 1024px) {
+  .shell-header {
+    padding: 0 calc(var(--space-unit) * 2);
+  }
+
+  .shell-nav-item {
+    padding: 0 calc(var(--space-unit) * 1.5);
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 640px) {
+  .shell-header {
+    padding: 0 calc(var(--space-unit) * 1.5);
+  }
+
+  .shell-header-left {
+    gap: calc(var(--space-unit) * 1.5);
+  }
+
+  .shell-logo {
+    font-size: 14px;
+  }
+
+  .shell-nav-top {
+    display: none;
+  }
+
+  .shell-user-name {
+    display: none;
+  }
+}
+  </style>
+  
+<script>
+window.AIVIC_API_URL = "https://jqykrkgdvngp7qvmavufg5tohq0xwdzb.lambda-url.us-east-1.on.aws/";
+window.AIVIC_APP_ID = "session-b7ec5d3b-8462-47a8-8302-b9ce87b1accd";
+window.AIVIC_APPLICATION_NAME = "作業管理システム";
+window.AIVIC_SYSTEM_NAME = "既存システム統合・技術実現可能性検証プラットフォーム";
+window.AIVIC_TABLES = [{"tableName":"ユーザー","purpose":"システムユーザーの認証・認可・プロフィール管理を行い、作業者・管理者・システム管理者などの役割に基づいたアクセス制御を実現する","columns":[{"name":"ユーザーID","type":"uuid","required":true,"description":"ユーザーの一意識別子"},{"name":"ユーザー名","type":"varchar(100)","required":true,"description":"ログイン時に使用するユーザー名"},{"name":"メールアドレス","type":"varchar(100)","required":true,"description":"ユーザーの連絡先メールアドレス"},{"name":"パスワードハッシュ","type":"varchar(255)","required":true,"description":"暗号化されたパスワード"},{"name":"氏名","type":"varchar(100)","required":true,"description":"ユーザーの実名"},{"name":"役割","type":"varchar(50)","required":true,"description":"ユーザーの役割（作業者・チームリーダー・管理者・システム管理者など）"},{"name":"拠点ID","type":"uuid","required":false,"description":"ユーザーが属する拠点の識別子"},{"name":"チームID","type":"uuid","required":false,"description":"ユーザーが属するチームの識別子"},{"name":"ステータス","type":"varchar(20)","required":true,"description":"ユーザーのステータス（有効・無効・休止中など）"},{"name":"最終ログイン日時","type":"timestamp","required":false,"description":"ユーザーが最後にログインした日時"},{"name":"作成日時","type":"timestamp","required":true,"description":"ユーザーレコードの作成日時"},{"name":"更新日時","type":"timestamp","required":true,"description":"ユーザーレコードの最終更新日時"},{"name":"作成者","type":"varchar(100)","required":true,"description":"ユーザーレコードを作成したユーザー"},{"name":"更新者","type":"varchar(100)","required":false,"description":"ユーザーレコードを最後に更新したユーザー"}]},{"tableName":"ユーザー権限","purpose":"ユーザーが各機能・データへのアクセス権限を管理し、作業進捗・人員配置システムにおける操作可能な範囲を制御する","columns":[{"name":"ユーザー権限ID","type":"uuid","required":true,"description":"ユーザー権限レコードの一意識別子"},{"name":"ユーザーID","type":"uuid","required":true,"description":"権限が付与されるユーザーの外部キー参照"},{"name":"拠点ID","type":"uuid","required":false,"description":"権限が適用される拠点の外部キー参照、NULLの場合は全拠点対象"},{"name":"チームID","type":"uuid","required":false,"description":"権限が適用されるチームの外部キー参照、NULLの場合は全チーム対象"},{"name":"権限種別","type":"varchar(100)","required":true,"description":"付与される権限の種類（例：作業指示作成、進捗確認、人員配置編集、レポート閲覧等）"},{"name":"操作可能","type":"boolean","required":true,"description":"権限が有効か無効かを示すフラグ"},{"name":"有効開始日時","type":"timestamp","required":false,"description":"権限の有効期間開始日時"},{"name":"有効終了日時","type":"timestamp","required":false,"description":"権限の有効期間終了日時"},{"name":"作成日時","type":"timestamp","required":true,"description":"権限レコードの作成日時"},{"name":"更新日時","type":"timestamp","required":true,"description":"権限レコードの最終更新日時"},{"name":"作成者","type":"varchar(100)","required":true,"description":"権限レコードを作成したユーザーの識別子"},{"name":"更新者","type":"varchar(100)","required":false,"description":"権限レコードを最後に更新したユーザーの識別子"}]},{"tableName":"システム","purpose":"既存システムの統合対象となるシステム情報を管理し、技術実現可能性検証の対象システムを一元管理するマスタテーブル","columns":[{"name":"システムID","type":"uuid","required":true,"description":"システムを一意に識別するプライマリキー"},{"name":"システム名","type":"varchar(100)","required":true,"description":"システムの名称"},{"name":"説明","type":"text","required":false,"description":"システムの詳細説明や概要"},{"name":"ベンダー名","type":"varchar(100)","required":false,"description":"システムの提供ベンダー名"},{"name":"バージョン","type":"varchar(100)","required":false,"description":"システムのバージョン情報"},{"name":"ステータス","type":"varchar(100)","required":true,"description":"システムの状態(稼働中/廃止予定/検証中等)"},{"name":"技術スタック","type":"text","required":false,"description":"使用されている技術やプラットフォーム情報"},{"name":"統合優先度","type":"integer","required":false,"description":"統合の優先度レベル(数値が小さいほど優先度が高い)"},{"name":"実現可能性評価","type":"varchar(100)","required":false,"description":"技術実現可能性の評価結果(高/中/低等)"},{"name":"作成日時","type":"timestamp","required":true,"description":"レコード作成日時"},{"name":"更新日時","type":"timestamp","required":true,"description":"レコード最終更新日時"},{"name":"作成者ID","type":"uuid","required":true,"description":"レコード作成者のユーザーID"},{"name":"更新者ID","type":"uuid","required":true,"description":"レコード最終更新者のユーザーID"}]},{"tableName":"API仕様書","purpose":"既存システムのAPI仕様情報を管理し、技術実現可能性検証時に参照・比較するためのマスタテーブル","columns":[{"name":"api_spec_id","type":"uuid","required":true,"description":"API仕様書の一意識別子"},{"name":"system_id","type":"uuid","required":true,"description":"関連するシステムの識別子（システムテーブルへの外部キー）"},{"name":"api_name","type":"varchar(100)","required":true,"description":"API名称"},{"name":"api_endpoint","type":"varchar(100)","required":true,"description":"APIエンドポイントURL"},{"name":"http_method","type":"varchar(100)","required":true,"description":"HTTPメソッド（GET、POST、PUT、DELETE等）"},{"name":"description","type":"text","required":false,"description":"API仕様の詳細説明"},{"name":"request_format","type":"text","required":false,"description":"リクエストフォーマット仕様"},{"name":"response_format","type":"text","required":false,"description":"レスポンスフォーマット仕様"},{"name":"authentication_type","type":"varchar(100)","required":false,"description":"認証方式（OAuth、API Key、Basic等）"},{"name":"rate_limit","type":"varchar(100)","required":false,"description":"レート制限情報"},{"name":"version","type":"varchar(100)","required":false,"description":"APIバージョン"},{"name":"status","type":"varchar(100)","required":true,"description":"API仕様の状態（有効、廃止予定、廃止等）"},{"name":"created_at","type":"timestamp","required":true,"description":"作成日時"},{"name":"created_by","type":"uuid","required":true,"description":"作成者ユーザーID"},{"name":"updated_at","type":"timestamp","required":true,"description":"更新日時"},{"name":"updated_by","type":"uuid","required":true,"description":"更新者ユーザーID"}]},{"tableName":"連携ガイドライン","purpose":"既存システムとの連携方法、技術仕様、実装手順、注意事項を一元管理し、統合プロジェクトの実装ガイドとして機能するマスタテーブル","columns":[{"name":"ガイドラインID","type":"uuid","required":true,"description":"連携ガイドラインの一意識別子"},{"name":"システムID","type":"uuid","required":true,"description":"連携対象システムへの外部キー参照"},{"name":"API仕様書ID","type":"uuid","required":false,"description":"関連するAPI仕様書への外部キー参照"},{"name":"ガイドライン名","type":"varchar(100)","required":true,"description":"連携ガイドラインの名称"},{"name":"説明","type":"text","required":false,"description":"連携ガイドラインの詳細説明"},{"name":"連携方式","type":"varchar(100)","required":true,"description":"連携方式の種類（REST、SOAP、ファイル転送等）"},{"name":"実装手順","type":"text","required":false,"description":"実装時の具体的な手順やステップ"},{"name":"注意事項","type":"text","required":false,"description":"実装時の注意点や制限事項"},{"name":"セキュリティ要件","type":"text","required":false,"description":"認証、暗号化等のセキュリティ要件"},{"name":"パフォーマンス要件","type":"text","required":false,"description":"レスポンスタイム、スループット等の要件"},{"name":"ステータス","type":"varchar(100)","required":true,"description":"ガイドラインのステータス（ドラフト、承認済み、廃止等）"},{"name":"バージョン","type":"integer","required":true,"description":"ガイドラインのバージョン番号"},{"name":"作成日時","type":"timestamp","required":true,"description":"ガイドラインの作成日時"},{"name":"作成者ID","type":"uuid","required":true,"description":"ガイドラインを作成したユーザーへの外部キー参照"},{"name":"更新日時","type":"timestamp","required":true,"description":"ガイドラインの最終更新日時"},{"name":"更新者ID","type":"uuid","required":true,"description":"ガイドラインを最後に更新したユーザーへの外部キー参照"}]},{"tableName":"統合可能性検証結果","purpose":"既存システムとの統合可能性を検証し、技術的実現可能性の評価結果を記録・管理するテーブル","columns":[{"name":"検証結果ID","type":"uuid","required":true,"description":"統合可能性検証結果の一意識別子"},{"name":"ユーザーID","type":"uuid","required":true,"description":"検証を実施したユーザーの識別子"},{"name":"システムID","type":"uuid","required":true,"description":"検証対象となる既存システムの識別子"},{"name":"API仕様書ID","type":"uuid","required":true,"description":"検証に使用したAPI仕様書の識別子"},{"name":"連携ガイドラインID","type":"uuid","required":false,"description":"参照した連携ガイドラインの識別子"},{"name":"検証ステータス","type":"varchar(100)","required":true,"description":"検証状態を示す値(未実施/実施中/完了/却下)"},{"name":"技術的実現可能性","type":"varchar(100)","required":true,"description":"技術的実現可能性の評価結果(可能/条件付き可能/不可能)"},{"name":"実現可能性スコア","type":"integer","required":false,"description":"技術的実現可能性を数値化したスコア(0-100)"},{"name":"検証コメント","type":"text","required":false,"description":"検証結果に関する詳細なコメントや所見"},{"name":"課題事項","type":"text","required":false,"description":"統合時に想定される課題や制限事項"},{"name":"推奨事項","type":"text","required":false,"description":"統合実現に向けた推奨事項や改善提案"},{"name":"検証日時","type":"timestamp","required":true,"description":"検証を実施した日時"},{"name":"作成日時","type":"timestamp","required":true,"description":"検証結果レコードが作成された日時"},{"name":"更新日時","type":"timestamp","required":true,"description":"検証結果レコードが最後に更新された日時"},{"name":"作成者","type":"uuid","required":true,"description":"検証結果レコードを作成したユーザーの識別子"}]},{"tableName":"連携テスト仕様","purpose":"既存システムとの連携テストの仕様を定義・管理し、API仕様書と連携ガイドラインに基づいたテストケースの実行可能性を検証するためのマスタテーブル","columns":[{"name":"連携テスト仕様ID","type":"uuid","required":true,"description":"連携テスト仕様の一意識別子"},{"name":"システムID","type":"uuid","required":true,"description":"連携対象システムへの外部キー参照"},{"name":"API仕様書ID","type":"uuid","required":true,"description":"テスト対象のAPI仕様書への外部キー参照"},{"name":"連携ガイドラインID","type":"uuid","required":false,"description":"適用される連携ガイドラインへの外部キー参照"},{"name":"テスト仕様名","type":"varchar(100)","required":true,"description":"テスト仕様の名称"},{"name":"テスト仕様説明","type":"text","required":false,"description":"テスト仕様の詳細説明"},{"name":"テストケース数","type":"integer","required":true,"description":"この仕様に含まれるテストケースの総数"},{"name":"テスト対象範囲","type":"varchar(100)","required":true,"description":"テスト対象の範囲（例：認証、データ連携、エラーハンドリング）"},{"name":"実行可能性検証済み","type":"boolean","required":true,"description":"技術実現可能性検証が完了したかどうか"},{"name":"検証ステータス","type":"varchar(100)","required":true,"description":"検証状態（未検証、検証中、検証完了、検証失敗）"},{"name":"作成日時","type":"timestamp","required":true,"description":"テスト仕様の作成日時"},{"name":"作成者","type":"uuid","required":true,"description":"テスト仕様を作成したユーザーへの外部キー参照"},{"name":"更新日時","type":"timestamp","required":true,"description":"テスト仕様の最終更新日時"},{"name":"更新者","type":"uuid","required":false,"description":"テスト仕様を最後に更新したユーザーへの外部キー参照"}]},{"tableName":"テスト実行履歴","purpose":"連携テスト仕様に基づいて実行されたテストの実行結果、ステータス、詳細情報を記録し、統合可能性検証の進捗管理と履歴追跡を実現する","columns":[{"name":"テスト実行履歴ID","type":"uuid","required":true,"description":"テスト実行履歴の一意識別子"},{"name":"連携テスト仕様ID","type":"uuid","required":true,"description":"実行対象の連携テスト仕様への外部キー参照"},{"name":"統合可能性検証結果ID","type":"uuid","required":true,"description":"親となる統合可能性検証結果への外部キー参照"},{"name":"実行ステータス","type":"varchar(100)","required":true,"description":"テスト実行状態(未実行/実行中/成功/失敗/スキップ等)"},{"name":"実行開始日時","type":"timestamp","required":true,"description":"テスト実行の開始日時"},{"name":"実行終了日時","type":"timestamp","required":false,"description":"テスト実行の終了日時"},{"name":"実行結果","type":"text","required":false,"description":"テスト実行の詳細結果、エラーメッセージ、ログ情報"},{"name":"実行時間(ミリ秒)","type":"integer","required":false,"description":"テスト実行にかかった時間(ミリ秒単位)"},{"name":"実行者ID","type":"uuid","required":true,"description":"テストを実行したユーザーへの外部キー参照"},{"name":"作成日時","type":"timestamp","required":true,"description":"テスト実行履歴レコードの作成日時"},{"name":"更新日時","type":"timestamp","required":true,"description":"テスト実行履歴レコードの最終更新日時"}]},{"tableName":"進捗管理","purpose":"既存システム統合プロジェクトの進捗状況を追跡・管理し、各統合タスクの実行状況、完了度、ステータス変更を記録するテーブル","columns":[{"name":"進捗管理ID","type":"uuid","required":true,"description":"進捗管理レコードの一意識別子"},{"name":"統合プロジェクトID","type":"uuid","required":true,"description":"関連する統合プロジェクトの識別子、複数の統合タスクをグループ化"},{"name":"タスク名","type":"varchar(100)","required":true,"description":"進捗管理対象のタスク名称"},{"name":"ステータス","type":"varchar(100)","required":true,"description":"タスクの現在のステータス（未開始、進行中、完了、保留、失敗等）"},{"name":"完了度","type":"integer","required":true,"description":"タスクの完了度をパーセンテージで表示（0-100）"},{"name":"予定開始日","type":"timestamp","required":false,"description":"タスク実行予定の開始日時"},{"name":"予定完了日","type":"timestamp","required":false,"description":"タスク実行予定の完了日時"},{"name":"実績開始日","type":"timestamp","required":false,"description":"タスク実行の実際の開始日時"},{"name":"実績完了日","type":"timestamp","required":false,"description":"タスク実行の実際の完了日時"},{"name":"担当者ID","type":"uuid","required":false,"description":"タスク担当者のユーザーID"},{"name":"備考","type":"text","required":false,"description":"進捗状況に関する補足情報や課題の記述"},{"name":"作成日時","type":"timestamp","required":true,"description":"進捗管理レコード作成日時"},{"name":"更新日時","type":"timestamp","required":true,"description":"進捗管理レコード最終更新日時"},{"name":"作成者ID","type":"uuid","required":true,"description":"進捗管理レコード作成者のユーザーID"}]},{"tableName":"操作ログ","purpose":"ユーザーがシステム内で実行した操作を記録し、監査証跡、トラブルシューティング、セキュリティ監視に利用するトランザクションテーブル","columns":[{"name":"操作ログID","type":"uuid","required":true,"description":"操作ログの一意識別子"},{"name":"ユーザーID","type":"uuid","required":true,"description":"操作を実行したユーザーの識別子、ユーザーテーブルへの外部キー"},{"name":"操作種別","type":"varchar(100)","required":true,"description":"実行された操作の種類(作成、更新、削除、検証実行、テスト実行、ダウンロード等)"},{"name":"対象テーブル","type":"varchar(100)","required":true,"description":"操作の対象となったテーブル名またはエンティティ名"},{"name":"対象ID","type":"uuid","required":false,"description":"操作の対象となったレコードの識別子"},{"name":"操作内容","type":"text","required":false,"description":"操作の詳細説明、変更内容、パラメータ等"},{"name":"変更前値","type":"text","required":false,"description":"更新操作の場合の変更前の値"},{"name":"変更後値","type":"text","required":false,"description":"更新操作の場合の変更後の値"},{"name":"実行結果","type":"varchar(100)","required":true,"description":"操作の実行結果(成功、失敗、エラー等)"},{"name":"エラーメッセージ","type":"text","required":false,"description":"操作が失敗した場合のエラーメッセージ"},{"name":"IPアドレス","type":"varchar(100)","required":false,"description":"操作を実行したクライアントのIPアドレス"},{"name":"セッションID","type":"varchar(100)","required":false,"description":"操作が実行されたセッションの識別子"},{"name":"作成日時","type":"timestamp","required":true,"description":"操作ログが記録された日時"}]},{"tableName":"統合エラーログ","purpose":"既存システム統合時に発生したエラーを記録・追跡し、統合の問題診断と改善に活用するための履歴管理テーブル","columns":[{"name":"エラーログID","type":"uuid","required":true,"description":"エラーログの一意識別子"},{"name":"統合可能性検証結果ID","type":"uuid","required":true,"description":"関連する統合可能性検証結果への外部キー"},{"name":"テスト実行履歴ID","type":"uuid","required":false,"description":"関連するテスト実行履歴への外部キー"},{"name":"エラーコード","type":"varchar(100)","required":true,"description":"エラーを識別するコード"},{"name":"エラーメッセージ","type":"text","required":true,"description":"エラーの詳細メッセージ"},{"name":"エラー種別","type":"varchar(100)","required":true,"description":"エラーの分類（API接続エラー、データ形式エラー、認証エラー等）"},{"name":"発生箇所","type":"varchar(100)","required":true,"description":"エラーが発生したシステム・モジュール名"},{"name":"スタックトレース","type":"text","required":false,"description":"エラーのスタックトレース情報"},{"name":"重要度","type":"varchar(100)","required":true,"description":"エラーの重要度レベル（致命的、高、中、低）"},{"name":"ステータス","type":"varchar(100)","required":true,"description":"エラーの対応状況（未対応、対応中、解決済み）"},{"name":"対応内容","type":"text","required":false,"description":"エラーに対する対応内容・解決方法"},{"name":"発生日時","type":"timestamp","required":true,"description":"エラーが発生した日時"},{"name":"作成日時","type":"timestamp","required":true,"description":"エラーログレコードが作成された日時"},{"name":"更新日時","type":"timestamp","required":true,"description":"エラーログレコードが最後に更新された日時"},{"name":"作成者","type":"uuid","required":true,"description":"エラーログを作成したユーザーID"},{"name":"更新者","type":"uuid","required":false,"description":"エラーログを最後に更新したユーザーID"}]},{"tableName":"ドキュメント管理","purpose":"既存システムの統合に必要なドキュメント（API仕様書、連携ガイドライン、技術資料等）を一元管理し、バージョン管理と検索性を提供するマスタテーブル","columns":[{"name":"ドキュメントID","type":"uuid","required":true,"description":"ドキュメントの一意識別子"},{"name":"ドキュメント名","type":"varchar(100)","required":true,"description":"ドキュメントの名称"},{"name":"ドキュメント種別","type":"varchar(100)","required":true,"description":"API仕様書、連携ガイドライン、技術資料等の分類"},{"name":"関連システムID","type":"uuid","required":true,"description":"このドキュメントが関連するシステムのID"},{"name":"ファイルパス","type":"varchar(100)","required":true,"description":"ドキュメントの保存先パスまたはURL"},{"name":"バージョン","type":"varchar(100)","required":true,"description":"ドキュメントのバージョン番号"},{"name":"説明","type":"text","required":false,"description":"ドキュメントの内容説明"},{"name":"公開状態","type":"varchar(100)","required":true,"description":"公開、非公開、限定公開等のステータス"},{"name":"作成日時","type":"timestamp","required":true,"description":"ドキュメント作成日時"},{"name":"更新日時","type":"timestamp","required":true,"description":"ドキュメント最終更新日時"},{"name":"作成者ID","type":"uuid","required":true,"description":"ドキュメント作成者のユーザーID"},{"name":"更新者ID","type":"uuid","required":true,"description":"ドキュメント最終更新者のユーザーID"}]},{"tableName":"バージョン管理","purpose":"システムやAPI仕様書、連携ガイドラインなどの各種ドキュメント・設定のバージョン履歴を管理し、変更追跡と世代管理を実現するテーブル","columns":[{"name":"バージョン管理ID","type":"uuid","required":true,"description":"バージョン管理レコードの一意識別子"},{"name":"対象テーブル名","type":"varchar(100)","required":true,"description":"バージョン管理対象のテーブル名(システム、API仕様書、連携ガイドライン等)"},{"name":"対象レコードID","type":"uuid","required":true,"description":"対象テーブル内のレコードID"},{"name":"バージョン番号","type":"varchar(100)","required":true,"description":"バージョン番号(例:1.0.0、1.0.1等)"},{"name":"変更内容","type":"text","required":true,"description":"このバージョンでの変更内容の説明"},{"name":"変更前データ","type":"text","required":false,"description":"変更前のデータ内容(差分追跡用)"},{"name":"変更後データ","type":"text","required":false,"description":"変更後のデータ内容(差分追跡用)"},{"name":"リリース状態","type":"varchar(100)","required":true,"description":"バージョンの状態(草案、レビュー中、承認済み、リリース済み等)"},{"name":"作成日時","type":"timestamp","required":true,"description":"バージョンレコード作成日時"},{"name":"作成者","type":"uuid","required":true,"description":"バージョン作成者のユーザーID"},{"name":"更新日時","type":"timestamp","required":true,"description":"バージョンレコード最終更新日時"},{"name":"更新者","type":"uuid","required":false,"description":"バージョンレコード最終更新者のユーザーID"},{"name":"リリース日時","type":"timestamp","required":false,"description":"バージョンがリリースされた日時"}]}];
+window.AIVIC_PRESET_SEED = {"ユーザー":[{"ユーザーID":"rec-001","ユーザー名":"admin_system","メールアドレス":"admin@company.jp","パスワードハッシュ":"$2b$12$abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ","氏名":"山田太郎","役割":"システム管理者","拠点ID":"rec-loc-001","チームID":"rec-team-001","ステータス":"有効","最終ログイン日時":"2025-01-15T09:30:00+09:00","作成日時":"2024-04-01T10:00:00+09:00","更新日時":"2025-01-15T09:30:00+09:00","作成者":"システムセットアップ","更新者":"山田太郎"},{"ユーザーID":"rec-001","ユーザー名":"tanaka.hanako","メールアドレス":"tanaka.hanako@company.jp","パスワードハッシュ":"$2b$12$K8vN7mP9qR2xL5jF8wQ3eO1vN4mK7pL9sT2uV5xW8yZ1aB4cD7eF","氏名":"田中花子","役割":"作業者","拠点ID":"rec-tokyo-01","チームID":"rec-team-mfg-01","ステータス":"有効","最終ログイン日時":null,"作成日時":"2025-04-01T09:30:00+09:00","更新日時":"2025-04-01T09:30:00+09:00","作成者":"佐藤太郎","更新者":"佐藤太郎"},{"ユーザーID":"rec-001","ユーザー名":"tanaka.taro","メールアドレス":"tanaka.taro@company.jp","パスワードハッシュ":"$2b$12$abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQ","氏名":"田中太郎","役割":"チームリーダー","拠点ID":"rec-osaka-01","チームID":"rec-team-qa-001","ステータス":"有効","最終ログイン日時":"2025-01-15T09:30:00+09:00","作成日時":"2024-04-10T14:20:00+09:00","更新日時":"2025-01-10T16:45:00+09:00","作成者":"admin.user","更新者":"tanaka.taro"},{"ユーザーID":"rec-001","ユーザー名":"tanaka.jiro","メールアドレス":"tanaka.jiro@company.co.jp","パスワードハッシュ":"$2b$12$abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ","氏名":"田中二郎","役割":"営業担当者","拠点ID":"rec-loc-05","チームID":"rec-team-12","ステータス":"無効","最終ログイン日時":"2024-11-15 14:32:00","作成日時":"2023-04-10 09:15:00","更新日時":"2025-01-20 10:45:00","作成者":"suzuki.hanako","更新者":"yamamoto.taro"},{"ユーザーID":"rec-001","ユーザー名":"tanaka.taro","メールアドレス":"tanaka.taro@company.jp","パスワードハッシュ":"$2b$12$abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQR","氏名":"田中太郎","役割":"プロジェクト管理者","拠点ID":"rec-101","チームID":"rec-201","ステータス":"有効","最終ログイン日時":"2025-01-15 09:30:00","作成日時":"2024-11-20 14:15:00","更新日時":"2025-01-15 09:30:00","作成者":"admin","更新者":"tanaka.taro"},{"ユーザーID":"rec-001","ユーザー名":"yamada.hanako","メールアドレス":"yamada.hanako@company.jp","パスワードハッシュ":"$2b$12$abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQ","氏名":"山田花子","役割":"作業者","拠点ID":"rec-102","チームID":"rec-203","ステータス":"休止中","最終ログイン日時":"2024-08-15T14:32:00+09:00","作成日時":"2023-04-10T09:00:00+09:00","更新日時":"2024-09-01T10:15:00+09:00","作成者":"suzuki.taro","更新者":"tanaka.jiro"},{"ユーザーID":"rec-001","ユーザー名":"yamada_system_admin","メールアドレス":"yamada.taro@company.jp","パスワードハッシュ":"$2b$12$abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOP","氏名":"山田太郎","役割":"システム管理者","拠点ID":"rec-hq-001","チームID":"rec-team-it-001","ステータス":"有効","最終ログイン日時":"2025-01-15T09:30:00Z","作成日時":"2024-04-01T08:00:00Z","更新日時":"2025-01-10T14:20:00Z","作成者":"admin_init","更新者":"山田太郎"},{"ユーザーID":"rec-001","ユーザー名":"yamada.taro","メールアドレス":"yamada.taro@company.jp","パスワードハッシュ":"$2b$12$abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQ","氏名":"山田太郎","役割":"作業者","拠点ID":"rec-nagoya-01","チームID":"rec-maintenance-nagoya","ステータス":"有効","最終ログイン日時":"2025-01-15T09:30:00Z","作成日時":"2025-01-10T14:20:00Z","更新日時":"2025-01-15T09:30:00Z","作成者":"suzuki.hanako","更新者":"yamada.taro"},{"ユーザーID":"rec-001","ユーザー名":"tanaka.taro","メールアドレス":"tanaka.taro@company.jp","パスワードハッシュ":"$2b$12$abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOP","氏名":"田中太郎","役割":"管理者","拠点ID":"rec-101","チームID":"rec-201","ステータス":"無効","最終ログイン日時":"2024-11-15 17:30:00","作成日時":"2022-04-01 09:00:00","更新日時":"2025-01-20 14:45:00","作成者":"system","更新者":"佐藤花子"},{"ユーザーID":"rec-001","ユーザー名":"vendor_tanaka_2024","メールアドレス":"tanaka.taro@vendorco.jp","パスワードハッシュ":"$2b$12$abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQR","氏名":"田中太郎","役割":"外部作業者","拠点ID":"rec-002","チームID":"rec-003","ステータス":"有効","最終ログイン日時":"2025-01-15T14:32:00+09:00","作成日時":"2024-11-20T09:15:00+09:00","更新日時":"2025-01-15T14:32:00+09:00","作成者":"鈴木花子","更新者":"鈴木花子"}],"ユーザー権限":[{"ユーザー権限ID":"rec-001","ユーザーID":"rec-u-0847","拠点ID":null,"チームID":null,"権限種別":"作業指示作成","操作可能":true,"有効開始日時":"2024-04-01T00:00:00","有効終了日時":"2025-03-31T23:59:59","作成日時":"2024-03-28T14:30:00","更新日時":"2024-03-28T14:30:00","作成者":"鈴木花子","更新者":"鈴木花子"},{"ユーザー権限ID":"rec-001","ユーザーID":"rec-u-042","拠点ID":"rec-b-015","チームID":"rec-t-008","権限種別":"進捗確認","操作可能":true,"有効開始日時":"2024-04-01 09:00:00","有効終了日時":"2025-03-31 23:59:59","作成日時":"2024-03-28 14:30:00","更新日時":"2024-03-28 14:30:00","作成者":"佐藤花子","更新者":"佐藤花子"},{"ユーザー権限ID":"rec-001","ユーザーID":"rec-usr-0847","拠点ID":null,"チームID":null,"権限種別":"人員配置編集","操作可能":true,"有効開始日時":"2024-04-01T00:00:00","有効終了日時":"2025-03-31T23:59:59","作成日時":"2024-03-28T09:15:00","更新日時":"2024-03-28T09:15:00","作成者":"山田花子","更新者":"山田花子"},{"ユーザー権限ID":"rec-001","ユーザーID":"rec-u-042","拠点ID":null,"チームID":"rec-t-008","権限種別":"レポート閲覧","操作可能":true,"有効開始日時":"2024-04-01 09:00:00","有効終了日時":"2025-03-31 17:00:00","作成日時":"2024-03-28 14:30:00","更新日時":"2024-03-28 14:30:00","作成者":"田中太郎","更新者":"田中太郎"},{"ユーザー権限ID":"rec-001","ユーザーID":"rec-u-0001","拠点ID":null,"チームID":null,"権限種別":"システム管理者","操作可能":true,"有効開始日時":"2024-04-01T00:00:00","有効終了日時":"2025-03-31T23:59:59","作成日時":"2024-03-28T10:30:00","更新日時":"2024-03-28T10:30:00","作成者":"山田太郎","更新者":"山田太郎"},{"ユーザー権限ID":"rec-001","ユーザーID":"rec-usr-0042","拠点ID":"rec-loc-0008","チームID":null,"権限種別":"検査結果承認","操作可能":true,"有効開始日時":"2024-04-01T00:00:00","有効終了日時":"2025-03-31T23:59:59","作成日時":"2024-03-25T09:30:00","更新日時":"2024-03-25T09:30:00","作成者":"鈴木花子","更新者":"鈴木花子"},{"ユーザー権限ID":"rec-001","ユーザーID":"rec-u-0847","拠点ID":"rec-b-0312","チームID":"rec-t-0156","権限種別":"進捗確認","操作可能":true,"有効開始日時":"2024-04-01 00:00:00","有効終了日時":"2025-03-31 23:59:59","作成日時":"2024-03-28 10:30:00","更新日時":"2024-03-28 10:30:00","作成者":"山田花子","更新者":"山田花子"},{"ユーザー権限ID":"rec-001","ユーザーID":"rec-usr-0847","拠点ID":null,"チームID":null,"権限種別":"ダッシュボード・統計レポート閲覧","操作可能":true,"有効開始日時":"2024-04-01T00:00:00Z","有効終了日時":"2025-03-31T23:59:59Z","作成日時":"2024-03-28T14:30:00Z","更新日時":"2024-03-28T14:30:00Z","作成者":"佐藤花子","更新者":"佐藤花子"},{"ユーザー権限ID":"rec-001","ユーザーID":"rec-u-0847","拠点ID":"rec-b-0312","チームID":"rec-t-0156","権限種別":"進捗確認","操作可能":true,"有効開始日時":"2024-11-01 09:00:00","有効終了日時":"2025-01-31 23:59:59","作成日時":"2024-10-25 14:30:00","更新日時":"2024-10-25 14:30:00","作成者":"山田太郎","更新者":"山田太郎"},{"ユーザー権限ID":"rec-001","ユーザーID":"rec-u0847","拠点ID":"rec-b0302","チームID":"rec-t0156","権限種別":"進捗確認","操作可能":true,"有効開始日時":"2025-04-01 09:00:00","有効終了日時":"2025-06-30 17:00:00","作成日時":"2025-03-28 14:30:00","更新日時":"2025-03-28 14:30:00","作成者":"田中太郎","更新者":"田中太郎"}],"システム":[{"システムID":"rec-001","システム名":"受発注自動化連携モジュール","説明":"既存基幹ERPシステムとの統合により、仕入先との受発注プロセスを自動化し、手作業による発注書作成・確認業務を削減","ベンダー名":"株式会社システムインテグレーション東京","バージョン":"2.1.0","ステータス":"検証中","技術スタック":"Java/Spring Boot、PostgreSQL、REST API、EDI連携、AWS EC2","統合優先度":2,"実現可能性評価":"高","作成日時":"2024-11-15T09:30:00Z","更新日時":"2025-01-08T14:22:00Z","作成者ID":"rec-u001","更新者ID":"rec-u002"},{"システムID":"rec-001","システム名":"顧客管理システム CRMV2","説明":"既存オンプレミス顧客管理システムをAWSクラウド環境へ移行するプロジェクト","ベンダー名":"日本ソフトウェア開発","バージョン":"5.2.1","ステータス":"検証中","技術スタック":"Java 11、PostgreSQL、Apache Tomcat、AWS EC2/RDS、Docker","統合優先度":2,"実現可能性評価":"中","作成日時":"2024-11-15T09:30:00+09:00","更新日時":"2024-12-20T14:45:00+09:00","作成者ID":"rec-u001","更新者ID":"rec-u002"},{"システムID":"rec-001","システム名":"営業データ統合分析プラットフォーム","説明":"SalesForce、Pipedrive、kintoneからの売上データを一元集約し、リアルタイム分析・レポート生成を実現","ベンダー名":"データテック・ジャパン","バージョン":"2.1.0","ステータス":"稼働中","技術スタック":"Python、Apache Airflow、PostgreSQL、Tableau、AWS Lambda、RDS","統合優先度":1,"実現可能性評価":"高","作成日時":"2024-11-15T09:30:00+09:00","更新日時":"2025-01-22T14:45:00+09:00","作成者ID":"rec-u001","更新者ID":"rec-u002"},{"システムID":"rec-001","システム名":"会計給与連携システム","説明":"会計システムと給与システム間で仕訳データを自動転記し、月次決算処理の効率化を実現","ベンダー名":"日本ERPソリューションズ","バージョン":"2.1.0","ステータス":"検証中","技術スタック":"Java 17、Spring Boot 3.0、PostgreSQL 15、REST API、Apache Kafka","統合優先度":2,"実現可能性評価":"高","作成日時":"2024-11-15T09:30:00+09:00","更新日時":"2025-01-08T14:22:00+09:00","作成者ID":"rec-usr-0042","更新者ID":"rec-usr-0087"},{"システムID":"rec-001","システム名":"在庫販売連携プラットフォーム","説明":"在庫管理システムと販売管理システム間のリアルタイム同期を実現し、在庫不足の自動検知と販売予測データの反映を行う統合基盤","ベンダー名":"株式会社ロジスティクスソリューション","バージョン":"2.1.0","ステータス":"検証中","技術スタック":"Java、Spring Boot、Apache Kafka、PostgreSQL、Docker、Kubernetes","統合優先度":2,"実現可能性評価":"高","作成日時":"2024-11-15T09:30:00Z","更新日時":"2025-01-22T14:15:00Z","作成者ID":"rec-u-0847","更新者ID":"rec-u-0521"},{"システムID":"rec-001","システム名":"IoTセンサーデータ統合プラットフォーム","説明":"製造現場の温度・湿度・振動センサーからのリアルタイムデータをDWHに統合し、BI分析を可能にするシステム","ベンダー名":"日本テクノロジー株式会社","バージョン":"2.1.0","ステータス":"検証中","技術スタック":"Apache Kafka、Python、PostgreSQL、Tableau、AWS IoT Core","統合優先度":2,"実現可能性評価":"高","作成日時":"2024-11-15T09:30:00Z","更新日時":"2025-01-08T14:22:00Z","作成者ID":"rec-u001","更新者ID":"rec-u002"},{"システムID":"rec-001","システム名":"統一勤怠管理プラットフォーム","説明":"複数拠点の勤怠データを一元管理し、既存システムとAPI連携する統合プラットフォーム","ベンダー名":"株式会社ワークフロー・ソリューションズ","バージョン":"2.1.0","ステータス":"検証中","技術スタック":"Java Spring Boot、PostgreSQL、REST API、Docker、AWS EC2","統合優先度":2,"実現可能性評価":"高","作成日時":"2024-11-15T09:30:00+09:00","更新日時":"2025-01-20T14:15:00+09:00","作成者ID":"rec-u-0042","更新者ID":"rec-u-0058"},{"システムID":"rec-001","システム名":"基幹業務システム統合プラットフォーム","説明":"メインフレーム上の顧客管理・受注・請求機能をクラウドベースのマイクロサービスアーキテクチャへ段階的に移行","ベンダー名":"日本総合システムズ","バージョン":"2.1.0","ステータス":"検証中","技術スタック":"AWS、Kubernetes、Java Spring Boot、PostgreSQL、Apache Kafka、Docker","統合優先度":1,"実現可能性評価":"中","作成日時":"2024-04-15T09:30:00","更新日時":"2025-01-22T14:45:00","作成者ID":"rec-u001","更新者ID":"rec-u002"},{"システムID":"rec-001","システム名":"顧客サポート・請求連携システム","説明":"顧客サポートシステムで作成されたチケットを請求システムに自動連携し、請求関連の問い合わせ対応を効率化する統合ソリューション","ベンダー名":"日本テックソリューションズ株式会社","バージョン":"2.1.0","ステータス":"稼働中","技術スタック":"REST API、Apache Kafka、PostgreSQL、Java Spring Boot、Docker","統合優先度":2,"実現可能性評価":"高","作成日時":"2024-06-15T09:30:00+09:00","更新日時":"2025-01-20T14:45:00+09:00","作成者ID":"rec-u-0042","更新者ID":"rec-u-0087"},{"システムID":"rec-001","システム名":"製造実績自動収集プラットフォーム","説明":"生産ラインの複数システムから製造実績データを統一フォーマットで自動収集し、品質管理システムへリアルタイム反映するデータ連携基盤","ベンダー名":"日本システムインテグレーション株式会社","バージョン":"2.1.0","ステータス":"検証中","技術スタック":"Apache Kafka、PostgreSQL、REST API、Docker、Java Spring Boot","統合優先度":2,"実現可能性評価":"高","作成日時":"2024-08-15T09:30:00+09:00","更新日時":"2025-01-22T14:45:00+09:00","作成者ID":"rec-user-0042","更新者ID":"rec-user-0087"}],"API仕様書":[{"api_spec_id":"rec-001","system_id":"rec-sys-0042","api_name":"顧客マスタ取得・更新API","api_endpoint":"/api/v2/customers","http_method":"GET, POST, PUT","description":"基幹システムの顧客マスタ情報の取得・新規登録・更新を行うAPI。顧客ID、企業名、住所、連絡先などの情報を管理。","request_format":"JSON形式。顧客ID、企業名、郵便番号、住所、電話番号、メールアドレス、業種コード、担当者名を含む。","response_format":"JSON形式。ステータスコード、顧客マスタレコード、エラーメッセージを含む。","authentication_type":"OAuth 2.0","rate_limit":"1時間あたり10,000リクエスト","version":"2.1.0","status":"有効","created_at":"2024-04-15T09:30:00Z","created_by":"rec-user-0156","updated_at":"2025-01-22T14:15:00Z","updated_by":"rec-user-0289"},{"api_spec_id":"rec-001","system_id":"rec-sys-042","api_name":"受注同期API","api_endpoint":"https://api.ecommerce-sync.jp/v2/orders/sync","http_method":"POST","description":"受注データをリアルタイムで外部ECサイトに同期し、在庫状況と配送情報を更新するAPI","request_format":"Content-Type: application/json、受信側で受注ID、顧客情報、商品情報、金額、配送先を含むペイロード","response_format":"同期結果ステータス、処理ID、エラーメッセージ（該当時）をJSON形式で返却","authentication_type":"OAuth 2.0","rate_limit":"1時間あたり10,000リクエスト、1分あたり500リクエスト","version":"2.1.0","status":"有効","created_at":"2024-04-15T09:30:00Z","created_by":"rec-user-108","updated_at":"2025-01-22T14:45:00Z","updated_by":"rec-user-156"},{"api_spec_id":"rec-001","system_id":"rec-sys-042","api_name":"売上実績日次送信API","api_endpoint":"https://accounting.example.jp/api/v2/sales-daily","http_method":"POST","description":"営業システムから当日の売上実績データを経理システムへ日次バッチで送信するAPI","request_format":"JSON形式。売上日、売上金額、顧客ID、商品ID、部門コード、営業担当者IDを含む配列","response_format":"JSON形式。ステータス、処理件数、エラー件数、受付ID、タイムスタンプを返却","authentication_type":"OAuth2.0","rate_limit":"1時間あたり100リクエスト","version":"2.1","status":"有効","created_at":"2024-04-15T09:30:00+09:00","created_by":"rec-user-128","updated_at":"2025-01-20T14:45:00+09:00","updated_by":"rec-user-256"},{"api_spec_id":"rec-001","system_id":"rec-sys-042","api_name":"在庫状況配信API","api_endpoint":"https://api.inventory.example.com/v2/stock/distribute","http_method":"POST","description":"複数営業所への在庫状況リアルタイム配信。営業所単位での在庫数、入荷予定、欠品情報を一括配信する。","request_format":"JSON形式。営業所ID配列、配信対象商品コード、配信優先度を含む。最大500営業所まで対応。","response_format":"JSON形式。配信成功/失敗ステータス、配信先営業所ID、タイムスタンプ、エラーコードを含む。","authentication_type":"OAuth 2.0","rate_limit":"1時間あたり10000リクエスト、1分あたり500リクエスト","version":"2.1.0","status":"有効","created_at":"2024-04-15T09:30:00Z","created_by":"rec-user-078","updated_at":"2025-01-22T14:15:00Z","updated_by":"rec-user-091"},{"api_spec_id":"rec-001","system_id":"rec-sys-042","api_name":"顧客問い合わせ登録API","api_endpoint":"/api/v2/inquiries/create","http_method":"POST","description":"顧客からの問い合わせ内容をCRMシステムに新規登録し、自動的に担当者へ割り当てる","request_format":"JSON形式。customer_id、inquiry_type、subject、message、contact_method、priority（1-5）を必須項目として含む","response_format":"JSON形式。inquiry_id、status、assigned_to、created_at、next_action_dateを返却","authentication_type":"OAuth 2.0","rate_limit":"1時間あたり10,000リクエスト","version":"2.1","status":"有効","created_at":"2024-06-15T09:30:00Z","created_by":"rec-user-108","updated_at":"2025-01-20T14:22:00Z","updated_by":"rec-user-156"},{"api_spec_id":"rec-001","system_id":"rec-sys-0042","api_name":"従業員情報取得API","api_endpoint":"/api/v1/employees","http_method":"GET","description":"給与計算システムから従業員の基本情報・雇用形態・部門情報を取得するAPI","request_format":"クエリパラメータ: employee_id(必須)、include_salary(オプション)、date_from(オプション)","response_format":"JSON形式。employee_id、name、department、position、employment_type、hire_date、salary_grade等を含む","authentication_type":"OAuth 2.0","rate_limit":"1時間あたり10,000リクエスト","version":"1.2.0","status":"有効","created_at":"2024-04-15T09:30:00+09:00","created_by":"rec-user-0156","updated_at":"2025-01-20T14:22:00+09:00","updated_by":"rec-user-0089"},{"api_spec_id":"rec-001","system_id":"rec-sys-042","api_name":"税務申告データ取得API","api_endpoint":"https://api.tax-service.jp/v2/declaration/data","http_method":"POST","description":"請求書発行システムが月次の税務申告データを取得するためのAPI。売上・仕入・控除額等の集計データを返却。","request_format":"JSON形式。パラメータ: fiscal_year(年度)、fiscal_month(月)、company_id(企業ID)、data_type(データ種別:sales/purchase/deduction)","response_format":"JSON形式。レスポンス: declaration_id、total_sales、total_purchase、deduction_amount、tax_amount、status、generated_at","authentication_type":"OAuth 2.0","rate_limit":"1時間あたり1000リクエスト","version":"2.1.0","status":"有効","created_at":"2024-04-15T09:30:00Z","created_by":"rec-user-018","updated_at":"2025-01-20T14:15:00Z","updated_by":"rec-user-025"},{"api_spec_id":"rec-001","system_id":"rec-sys-042","api_name":"決済結果通知API","api_endpoint":"https://api.payment-gateway.jp/v2/settlement/notify","http_method":"POST","description":"外部決済サービスから決済完了・失敗結果をリアルタイムで受け取るWebhook型API","request_format":"JSON形式。transaction_id、amount、status、timestamp、merchant_idを必須項目として含む","response_format":"JSON形式。status、message、received_atを含む。成功時はHTTP 200","authentication_type":"HMAC-SHA256署名検証","rate_limit":"1時間あたり10,000リクエスト","version":"2.1","status":"有効","created_at":"2024-04-15T09:30:00+09:00","created_by":"rec-user-018","updated_at":"2025-01-22T14:15:00+09:00","updated_by":"rec-user-025"},{"api_spec_id":"rec-001","system_id":"rec-sys-0042","api_name":"生産計画データ同期API","api_endpoint":"/api/v2/production-plans/sync","http_method":"POST","description":"製造部門の生産計画データを基幹システムに日次で反映するAPI。計画数量、スケジュール、リソース配置情報を含む。","request_format":"JSON形式。plan_id、product_code、quantity、scheduled_date、line_id、resource_allocation を必須フィールドとする。","response_format":"JSON形式。sync_id、status、processed_records、error_details、timestamp を返却。成功時はHTTP 200、エラー時は400/500。","authentication_type":"OAuth 2.0","rate_limit":"1時間あたり1000リクエスト、1分あたり50リクエスト","version":"2.1.0","status":"有効","created_at":"2024-04-15 09:30:00","created_by":"rec-user-0156","updated_at":"2024-12-10 14:22:00","updated_by":"rec-user-0089"},{"api_spec_id":"rec-001","system_id":"rec-sys-042","api_name":"配送状況追跡API","api_endpoint":"https://api.logistics-partner.jp/v2/tracking","http_method":"GET","description":"配送業者の配送状況をリアルタイムで追跡し、荷物の現在位置と配達予定時刻を取得するAPI","request_format":"クエリパラメータ: tracking_number(必須)、carrier_code(必須)。レスポンスフォーマットはJSON形式で返却。","response_format":"tracking_id、status(配送中/配達完了/遅延等)、current_location、estimated_delivery、last_updated_at、delivery_notes","authentication_type":"OAuth 2.0","rate_limit":"1時間あたり10,000リクエスト","version":"2.1.0","status":"有効","created_at":"2024-06-15T09:30:00Z","created_by":"rec-user-156","updated_at":"2025-01-10T14:22:00Z","updated_by":"rec-user-189"}],"連携ガイドライン":[{"ガイドラインID":"rec-001","システムID":"rec-sys-042","API仕様書ID":"rec-api-015","ガイドライン名":"既存会計システム連携ガイドライン v2.1","説明":"月次請求データをREST APIで会計システムへ自動連携するための標準ガイドライン","連携方式":"REST","実装手順":"認証トークン取得 → 請求データCSV準備 → API呼び出し（バッチ処理） → 連携結果確認 → エラーログレビュー","注意事項":"月末締切は毎月25日。重複データ防止のため連携IDは必須。夜間バッチ実行推奨（21:00-06:00）","セキュリティ要件":"OAuth 2.0認証、TLS 1.2以上、リクエスト署名（HMAC-SHA256）、APIキーは環境変数管理","パフォーマンス要件":"レスポンスタイム3秒以内、スループット500件/分、同時接続数5以下","ステータス":"承認済み","バージョン":2,"作成日時":"2024-04-15T09:30:00Z","作成者ID":"rec-user-008","更新日時":"2025-01-20T14:45:00Z","更新者ID":"rec-user-012"},{"ガイドラインID":"rec-001","システムID":"rec-sys-0042","API仕様書ID":"rec-api-0156","ガイドライン名":"顧客マスタ同期ガイドライン v2.1","説明":"営業支援システムへの顧客マスタ情報の定期同期手順を定めたガイドライン","連携方式":"REST API","実装手順":"認証取得後、差分検出API呼び出し→バッチ処理で顧客データ抽出→REST POST送信→同期結果確認","注意事項":"同期実行は毎日午前2時に限定。同期中は顧客マスタ更新禁止。エラー時は自動リトライ3回まで","セキュリティ要件":"OAuth 2.0認証、TLS 1.2以上、ペイロード暗号化(AES-256)、API キー有効期限90日","パフォーマンス要件":"レスポンスタイム5秒以内、同期件数1000件/分、エラー率0.1%以下","ステータス":"承認済み","バージョン":2,"作成日時":"2024-04-15T09:30:00Z","作成者ID":"rec-user-0087","更新日時":"2025-01-22T14:45:00Z","更新者ID":"rec-user-0156"},{"ガイドラインID":"rec-001","システムID":"rec-sys-042","API仕様書ID":"rec-api-156","ガイドライン名":"在庫管理システムリアルタイム連携ガイド","説明":"販売システムと在庫管理システム間の在庫数量をリアルタイムで同期するための統合ガイドライン","連携方式":"REST API（Webhook併用）","実装手順":"認証トークン取得 → エンドポイント設定 → Webhook登録 → テスト実行 → 本番環境への切替え","注意事項":"在庫数がマイナスにならないよう事前チェック必須。ネットワーク遅延時の重複更新対策が必要。","セキュリティ要件":"OAuth 2.0認証、TLS 1.3以上、APIキーローテーション90日ごと、リクエスト署名によるなりすまし防止","パフォーマンス要件":"平均レスポンスタイム500ms以下、ピーク時スループット1000リクエスト/分、99.5%可用性","ステータス":"承認済み","バージョン":3,"作成日時":"2024-06-15T09:30:00+09:00","作成者ID":"rec-user-018","更新日時":"2025-01-22T14:45:00+09:00","更新者ID":"rec-user-025"},{"ガイドラインID":"rec-001","システムID":"rec-sys-hr","API仕様書ID":"rec-api-emp-001","ガイドライン名":"人事給与システム従業員情報連携ガイド","説明":"給与計算システムへの従業員基本情報、配置情報、給与情報の日次同期ガイドライン","連携方式":"REST API","実装手順":"認証トークン取得後、従業員マスタエンドポイントにPOSTで差分データを送信。応答ステータス確認後、ログを記録する。","注意事項":"深夜2時〜4時の連携ウィンドウで実行。既存従業員IDとの重複チェック必須。削除フラグ立案は人事部承認後のみ。","セキュリティ要件":"OAuth 2.0による認証、全通信HTTPS暗号化、個人情報はAES-256暗号化、IPホワイトリスト設定必須","パフォーマンス要件":"レスポンスタイム3秒以内、1回あたり最大5000件、月間データ転送量100GB以内","ステータス":"承認済み","バージョン":3,"作成日時":"2024-04-15T09:30:00","作成者ID":"rec-user-001","更新日時":"2025-01-22T14:15:00","更新者ID":"rec-user-003"},{"ガイドラインID":"rec-001","システムID":"rec-sys-042","API仕様書ID":"rec-api-018","ガイドライン名":"EDI受注自動処理ガイドライン v2.1","説明":"大口取引先からのEDI受注データを自動受信・処理し、受注システムへ連携するための標準ガイドライン","連携方式":"EDI/EDIFACT","実装手順":"EDIメッセージ受信→バリデーション→受注マスタ登録→在庫確認→納期算出→自動確認応答","注意事項":"重複受注の検出機能必須。受注番号の採番ルール統一。営業時間外受信の処理フロー確認","セキュリティ要件":"VPN接続必須。SFTP通信。送受信ファイルの電子署名。アクセスログ180日保持","パフォーマンス要件":"受注処理平均応答時間3秒以内。1時間あたり500件処理可能。同時接続数5セッション","ステータス":"承認済み","バージョン":2,"作成日時":"2024-03-15T09:30:00Z","作成者ID":"rec-usr-156","更新日時":"2024-11-20T14:45:00Z","更新者ID":"rec-usr-289"},{"ガイドラインID":"rec-001","システムID":"rec-sys-042","API仕様書ID":"rec-api-089","ガイドライン名":"監査ログ一括送信ガイドライン","説明":"業務システムから発生した監査ログをログシステムへ一括送信する際の標準的な連携手順と要件","連携方式":"REST","実装手順":"1.ログデータをJSON形式で整形 2.バッチ処理で1日1回夜間送信 3.送信結果をシステムログに記録","注意事項":"送信失敗時は翌日の送信時に再試行。ログサイズが100MBを超える場合は分割送信が必須","セキュリティ要件":"TLS 1.2以上での通信暗号化、OAuth 2.0による認証、送信ペイロードの電子署名付与","パフォーマンス要件":"レスポンスタイム3秒以内、スループット1000件/秒以上、バッチ処理完了時間30分以内","ステータス":"承認済み","バージョン":3,"作成日時":"2024-04-15T09:30:00Z","作成者ID":"rec-usr-156","更新日時":"2025-01-22T14:45:00Z","更新者ID":"rec-usr-203"},{"ガイドラインID":"rec-001","システムID":"rec-sys-042","API仕様書ID":"rec-api-018","ガイドライン名":"外部決済ゲートウェイ連携ガイド v2.1","説明":"Stripe決済ゲートウェイとの支払い処理連携における実装手順とセキュリティ要件をまとめたガイドライン","連携方式":"REST API","実装手順":"Stripe APIキー設定後、決済リクエスト→トークン生成→チャージ実行→レスポンス処理の流れで実装。Webhook設定により非同期イベント監視を行う。","注意事項":"PCI DSS準拠必須。本番環境切り替え前に複数回のテスト決済実施。決済失敗時のリトライロジック設定が重要。","セキュリティ要件":"API Key、Secret Keyは環境変数で管理。全通信HTTPS必須。トークン化により直接カード情報を保持しない。","パフォーマンス要件":"決済レスポンスタイム3秒以内。スループット最大500トランザクション/分。タイムアウト設定30秒。","ステータス":"承認済み","バージョン":2,"作成日時":"2024-03-15T09:30:00Z","作成者ID":"rec-user-156","更新日時":"2024-11-22T14:45:00Z","更新者ID":"rec-user-089"},{"ガイドラインID":"rec-001","システムID":"rec-sys-042","API仕様書ID":"rec-api-015","ガイドライン名":"メインフレーム売上データバッチ転送ガイド","説明":"レガシーメインフレームシステムから日次の売上データをCSV形式で転送する際の標準ガイドライン","連携方式":"ファイル転送","実装手順":"専用FTPサーバーへの接続認証後、毎日23:00にバッチジョブで売上ファイルを転送。受信側で検証後にDBへ取込む","注意事項":"ファイル転送失敗時は翌営業日の朝に手動確認必須。月末月初は処理遅延の可能性あり","セキュリティ要件":"SFTP接続、RSA 2048bit暗号化、転送ファイルはAES-256で暗号化。接続ユーザーはサービスアカウント専用","パフォーマンス要件":"ファイルサイズ最大500MB、転送時間30分以内、日次3000件以上の売上レコード処理に対応","ステータス":"承認済み","バージョン":3,"作成日時":"2024-06-15T09:30:00","作成者ID":"rec-user-087","更新日時":"2025-01-22T14:15:00","更新者ID":"rec-user-156"},{"ガイドラインID":"rec-001","システムID":"rec-sys-042","API仕様書ID":"rec-api-156","ガイドライン名":"Salesforce顧客データ双方向同期ガイドライン","説明":"社内CRMシステムとSalesforce間で顧客マスタデータをリアルタイム同期するための実装ガイド","連携方式":"REST API（Webhook併用）","実装手順":"認証設定→API接続テスト→データマッピング定義→同期スケジュール設定→本番運用開始","注意事項":"重複排除ロジック必須。同期タイミングの競合に注意。削除データの扱いは事前協議が必要。","セキュリティ要件":"OAuth 2.0認証、TLS 1.2以上、APIキーローテーション90日毎、監査ログ保持1年間","パフォーマンス要件":"API応答時間3秒以内、1日あたり10,000件同期対応、エラー時の自動リトライ3回","ステータス":"承認済み","バージョン":2,"作成日時":"2024-06-15T09:30:00Z","作成者ID":"rec-user-087","更新日時":"2025-01-22T14:45:00Z","更新者ID":"rec-user-092"},{"ガイドラインID":"rec-001","システムID":"rec-sys-042","API仕様書ID":"rec-api-015","ガイドライン名":"営業実績データBI送信ガイドライン","説明":"営業管理システムからBI/分析ツールへ日次で営業実績データを自動送信するための連携ガイドライン","連携方式":"REST API","実装手順":"認証トークン取得→差分抽出→JSON形式変換→バッチ送信→結果確認の5ステップで実装","注意事項":"毎日午前2時～4時の送信時間帯を厳守。送信失敗時は翌日に自動リトライ。データ重複排除処理が必須","セキュリティ要件":"OAuth 2.0による認証。送信データはTLS 1.2以上で暗号化。APIキーは環境変数で管理","パフォーマンス要件":"レスポンスタイム5秒以内。1回あたりの送信件数は最大10,000件。月間スループット200万件以上に対応","ステータス":"承認済み","バージョン":3,"作成日時":"2024-06-15T09:30:00","作成者ID":"rec-user-008","更新日時":"2025-01-22T14:45:00","更新者ID":"rec-user-012"}],"統合可能性検証結果":[{"検証結果ID":"rec-001","ユーザーID":"rec-u-0042","システムID":"rec-s-0015","API仕様書ID":"rec-api-0008","連携ガイドラインID":"rec-guide-0003","検証ステータス":"完了","技術的実現可能性":"条件付き可能","実現可能性スコア":72,"検証コメント":"既存会計システムのREST APIは売上データ連携に対応可能。ただし日次バッチ処理での対応が必要。","課題事項":"会計システム側の認証トークン有効期限が短く、大量データ送信時のタイムアウト対策が必要。","推奨事項":"API呼び出し時の再試行ロジック実装と、会計システム側のタイムアウト設定見直しを推奨。","検証日時":"2025-01-15T14:30:00+09:00","作成日時":"2025-01-15T14:35:22+09:00","更新日時":"2025-01-16T09:12:45+09:00","作成者":"rec-u-0028"},{"検証結果ID":"rec-001","ユーザーID":"rec-u-042","システムID":"rec-s-015","API仕様書ID":"rec-api-008","連携ガイドラインID":"rec-guide-003","検証ステータス":"完了","技術的実現可能性":"条件付き可能","実現可能性スコア":68,"検証コメント":"レガシーシステムのSOAP APIは基本的に統合可能だが、認証機構の刷新とデータマッピング調整が必須","課題事項":"既存システムのバッチ処理タイムアウト、文字コード変換時のデータ損失リスク、API応答時間が不安定","推奨事項":"段階的な移行計画の策定、中間変換レイヤーの実装、本番環境での負荷テスト実施","検証日時":"2024-11-15T14:30:00+09:00","作成日時":"2024-11-15T14:35:22+09:00","更新日時":"2024-11-20T09:12:45+09:00","作成者":"rec-u-018"},{"検証結果ID":"rec-001","ユーザーID":"rec-u-042","システムID":"rec-s-015","API仕様書ID":"rec-api-008","連携ガイドラインID":"rec-gl-003","検証ステータス":"完了","技術的実現可能性":"条件付き可能","実現可能性スコア":78,"検証コメント":"ERPシステムの在庫APIは標準的なREST仕様で、既存在庫管理システムとの連携は可能。ただし在庫単位の変換ロジックが必要。","課題事項":"現行システムではロット単位での在庫管理だが、ERP側はシリアル単位の要求があり、マッピング処理の複雑性が高い。","推奨事項":"中間変換レイヤーの実装とパイロット運用での検証を推奨。既存在庫データの事前クレンジングが必須。","検証日時":"2024-11-15 14:30:00","作成日時":"2024-11-15 14:35:00","更新日時":"2024-11-16 09:20:00","作成者":"rec-u-042"},{"検証結果ID":"rec-001","ユーザーID":"usr-0847","システムID":"sys-0312","API仕様書ID":"api-0056","連携ガイドラインID":"gld-0019","検証ステータス":"完了","技術的実現可能性":"条件付き可能","実現可能性スコア":78,"検証コメント":"決済ゲートウェイのAPI仕様は標準的だが、トランザクション管理の非同期処理対応が必要","課題事項":"決済完了通知の遅延リスク、通信障害時の再試行ロジック実装が複雑","推奨事項":"タイムアウト設定を30秒以上とし、キューイングシステムの導入を検討すること","検証日時":"2024-11-15T14:30:00+09:00","作成日時":"2024-11-15T14:35:22+09:00","更新日時":"2024-11-16T09:12:45+09:00","作成者":"usr-0521"},{"検証結果ID":"rec-001","ユーザーID":"usr-0847","システムID":"sys-0312","API仕様書ID":"api-0156","連携ガイドラインID":"guide-0089","検証ステータス":"完了","技術的実現可能性":"条件付き可能","実現可能性スコア":72,"検証コメント":"東京・大阪・名古屋営業所システムの顧客マスター統合は技術的には可能だが、データ形式の統一と同期頻度の調整が必要","課題事項":"営業所ごとの顧客ID体系が異なり、重複排除ロジックの実装が必須。リアルタイム同期時のネットワーク遅延対策も要検討","推奨事項":"統一顧客ID生成ルールの策定と段階的な移行計画の作成を推奨。初期段階は夜間バッチ同期から開始することを提案","検証日時":"2024-11-15 14:30:00","作成日時":"2024-11-15 14:35:22","更新日時":"2024-11-16 09:12:45","作成者":"usr-0521"},{"検証結果ID":"rec-001","ユーザーID":"user-0847","システムID":"sys-0312","API仕様書ID":"api-0156","連携ガイドラインID":"guide-0089","検証ステータス":"完了","技術的実現可能性":"条件付き可能","実現可能性スコア":72,"検証コメント":"既存EDIシステムのレガシー仕様への対応が必要だが、REST APIゲートウェイの導入により段階的な連携が可能","課題事項":"既存システムの文字コード変換処理と注文データの形式差異への対応が必要。初期段階での同期遅延リスク","推奨事項":"APIゲートウェイの構築とデータマッピング層の実装。3ヶ月の試行運用期間を設定","検証日時":"2025-01-15T14:30:00+09:00","作成日時":"2025-01-15T14:35:22+09:00","更新日時":"2025-01-16T09:12:45+09:00","作成者":"user-0521"},{"検証結果ID":"rec-001","ユーザーID":"rec-u-0847","システムID":"rec-s-0312","API仕様書ID":"rec-api-0156","連携ガイドラインID":"rec-guide-0089","検証ステータス":"完了","技術的実現可能性":"条件付き可能","実現可能性スコア":72,"検証コメント":"既存の人事給与システムとのAPI連携は基本的に可能だが、従業員コード体系の統一と認証方式の変更が必要。","課題事項":"レガシーシステムのAPI応答時間が遅く、大量データ同期時のタイムアウト対策が必須。マスタデータの定義相違も調整が必要。","推奨事項":"段階的な試験環境での検証を実施し、バッチ処理の分割実装を検討。既存システム側のAPI改善を並行実施することを推奨。","検証日時":"2024-11-15T14:30:00+09:00","作成日時":"2024-11-15T14:35:22+09:00","更新日時":"2024-11-15T16:20:15+09:00","作成者":"rec-u-0521"},{"検証結果ID":"rec-001","ユーザーID":"usr-0847","システムID":"sys-0512","API仕様書ID":"api-2024-0389","連携ガイドラインID":"guide-0156","検証ステータス":"完了","技術的実現可能性":"条件付き可能","実現可能性スコア":68,"検証コメント":"レガシーシステムの通信プロトコル変換により段階的統合は可能だが、バッチ処理の最適化が必要。","課題事項":"メインフレームの応答時間が長く、リアルタイム連携の実現には専用ゲートウェイの導入が必須。","推奨事項":"第1段階でバッチ連携を実装し、第2段階でAPI化による準リアルタイム化を検討すること。","検証日時":"2024-11-15 14:30:00","作成日時":"2024-11-15 14:35:22","更新日時":"2024-11-20 09:12:45","作成者":"usr-0847"},{"検証結果ID":"rec-001","ユーザーID":"usr-0847","システムID":"sys-0512","API仕様書ID":"api-2024-001","連携ガイドラインID":"guide-bi-001","検証ステータス":"完了","技術的実現可能性":"条件付き可能","実現可能性スコア":72,"検証コメント":"REST API経由でのデータ連携は可能だが、リアルタイム同期にはメッセージキューの導入が必要","課題事項":"大規模データセット(月間100GB以上)の転送時にAPI呼び出し制限に抵触する可能性あり","推奨事項":"バッチ処理とキャッシング機構の実装、API制限値の事前交渉を推奨","検証日時":"2024-11-15T14:30:00+09:00","作成日時":"2024-11-15T14:35:22+09:00","更新日時":"2024-11-16T09:12:45+09:00","作成者":"usr-0847"},{"検証結果ID":"rec-001","ユーザーID":"user-2024-0847","システムID":"sys-erp-001","API仕様書ID":"api-spec-2024-1205","連携ガイドラインID":"guide-integration-2024-q4","検証ステータス":"完了","技術的実現可能性":"条件付き可能","実現可能性スコア":72,"検証コメント":"東京・大阪・福岡の3拠点システムは基本的な統合は可能だが、ネットワーク遅延対策とデータ同期タイミングの調整が必要。","課題事項":"拠点間の通信遅延により決算処理時にデータ不整合が発生するリスク。既存システムのAPI応答時間が最大3秒。","推奨事項":"キャッシング機構の導入とバッチ処理の時間帯シフトにより対応可能。段階的な統合を推奨。","検証日時":"2024-12-15T14:30:00+09:00","作成日時":"2024-12-15T14:35:00+09:00","更新日時":"2024-12-15T16:45:00+09:00","作成者":"user-2024-0847"}],"連携テスト仕様":[{"連携テスト仕様ID":"rec-001","システムID":"rec-sys-045","API仕様書ID":"rec-api-078","連携ガイドラインID":"rec-guide-012","テスト仕様名":"会計システム請求データ連携テスト仕様","テスト仕様説明":"月次請求データの同期、金額計算の正確性、エラーハンドリング、データ形式の検証を対象とした統合テスト","テストケース数":24,"テスト対象範囲":"認証、データ連携、エラーハンドリング、データ形式検証","実行可能性検証済み":true,"検証ステータス":"検証完了","作成日時":"2024-10-15T09:30:00+09:00","作成者":"rec-user-156","更新日時":"2025-01-22T14:45:00+09:00","更新者":"rec-user-189"},{"連携テスト仕様ID":"rec-001","システムID":"rec-sys-0847","API仕様書ID":"rec-api-0523","連携ガイドラインID":"rec-guide-0156","テスト仕様名":"CRM顧客情報同期_認証・エラーハンドリング検証","テスト仕様説明":"OAuth2.0認証の成功・失敗ケースおよび通信エラー、タイムアウト、データ不正時の例外処理を検証","テストケース数":24,"テスト対象範囲":"認証、エラーハンドリング","実行可能性検証済み":true,"検証ステータス":"検証中","作成日時":"2024-11-15T09:30:00+09:00","作成者":"rec-user-0412","更新日時":"2025-01-08T14:22:00+09:00","更新者":"rec-user-0518"},{"連携テスト仕様ID":"rec-001","システムID":"rec-sys-0042","API仕様書ID":"rec-api-0156","連携ガイドラインID":"rec-guide-0089","テスト仕様名":"EDIシステム受発注データ交換連携テスト仕様","テスト仕様説明":"EDIシステムとの受発注データ交換における通信、データフォーマット、エラーハンドリングの実行可能性を確認するテスト仕様","テストケース数":47,"テスト対象範囲":"認証、データ連携、エラーハンドリング、パフォーマンス","実行可能性検証済み":true,"検証ステータス":"検証完了","作成日時":"2024-08-15T09:30:00Z","作成者":"rec-user-0234","更新日時":"2025-01-22T14:15:00Z","更新者":"rec-user-0567"},{"連携テスト仕様ID":"rec-001","システムID":"rec-sys-002","API仕様書ID":"rec-api-015","連携ガイドラインID":"rec-guide-008","テスト仕様名":"人事給与システム従業員マスタ連携テスト仕様","テスト仕様説明":"人事給与システムとの従業員マスタ情報の日次同期における認証、データ整合性、エラーハンドリングの包括的検証","テストケース数":42,"テスト対象範囲":"認証、データ連携、エラーハンドリング、整合性検証","実行可能性検証済み":true,"検証ステータス":"検証完了","作成日時":"2024-11-15T09:30:00+09:00","作成者":"rec-user-047","更新日時":"2025-01-22T14:45:00+09:00","更新者":"rec-user-052"},{"連携テスト仕様ID":"rec-001","システムID":"rec-sys-042","API仕様書ID":"rec-api-156","連携ガイドラインID":"rec-guide-008","テスト仕様名":"在庫管理システムリアルタイム更新API検証","テスト仕様説明":"商品の在庫数変動をリアルタイムで同期するAPI連携の正確性、応答速度、エラーハンドリングを検証","テストケース数":24,"テスト対象範囲":"認証、データ連携、エラーハンドリング、パフォーマンス","実行可能性検証済み":true,"検証ステータス":"検証中","作成日時":"2024-11-15T09:30:00Z","作成者":"rec-user-087","更新日時":"2025-01-22T14:15:00Z","更新者":"rec-user-092"},{"連携テスト仕様ID":"rec-001","システムID":"rec-sys-042","API仕様書ID":"rec-api-015","連携ガイドラインID":"rec-guide-008","テスト仕様名":"外部決済ゲートウェイ支払処理連携テスト仕様","テスト仕様説明":"Stripe決済APIとの支払処理連携について、決済申請から結果通知までの一連の流れを検証する。","テストケース数":24,"テスト対象範囲":"認証、支払処理、結果通知、エラーハンドリング","実行可能性検証済み":true,"検証ステータス":"検証完了","作成日時":"2024-11-15T09:30:00+09:00","作成者":"rec-user-103","更新日時":"2025-01-22T14:15:00+09:00","更新者":"rec-user-156"},{"連携テスト仕様ID":"rec-001","システムID":"rec-sys-042","API仕様書ID":"rec-api-087","連携ガイドラインID":"rec-guide-015","テスト仕様名":"監査ログ送信信頼性検証仕様","テスト仕様説明":"ログシステムへの監査ログ送信の完全性、順序性、タイムアウト処理を検証","テストケース数":24,"テスト対象範囲":"認証、データ連携、エラーハンドリング、タイムアウト","実行可能性検証済み":true,"検証ステータス":"検証完了","作成日時":"2024-08-15T09:30:00+09:00","作成者":"rec-user-156","更新日時":"2025-01-22T14:15:00+09:00","更新者":"rec-user-203"},{"連携テスト仕様ID":"rec-001","システムID":"rec-sys-042","API仕様書ID":"rec-api-156","連携ガイドラインID":"rec-guide-008","テスト仕様名":"既存DWH連携バッチ処理テスト仕様","テスト仕様説明":"営業システムから既存DWHへの日次バッチ連携処理の正常系・異常系テストを含む","テストケース数":24,"テスト対象範囲":"データ連携、エラーハンドリング、リトライ処理","実行可能性検証済み":true,"検証ステータス":"検証完了","作成日時":"2024-11-15T09:30:00+09:00","作成者":"rec-user-087","更新日時":"2025-01-22T14:45:00+09:00","更新者":"rec-user-092"},{"連携テスト仕様ID":"rec-001","システムID":"rec-sys-042","API仕様書ID":"rec-api-156","連携ガイドラインID":"rec-guide-008","テスト仕様名":"メール配信サービスAPI通知機能連携検証","テスト仕様説明":"顧客通知機能とメール配信サービスの連携において、認証、配信トリガー、エラーハンドリングの3領域を検証","テストケース数":24,"テスト対象範囲":"認証、データ連携、エラーハンドリング","実行可能性検証済み":true,"検証ステータス":"検証完了","作成日時":"2024-11-15T09:30:00+09:00","作成者":"rec-user-087","更新日時":"2025-01-22T14:45:00+09:00","更新者":"rec-user-092"},{"連携テスト仕様ID":"rec-001","システムID":"rec-sys-042","API仕様書ID":"rec-api-156","連携ガイドラインID":"rec-guide-018","テスト仕様名":"レガシーシステム間ファイル転送互換性テスト","テスト仕様説明":"CSV形式でのバッチファイル転送時の文字コード・改行コード・フィールド区切り文字の互換性を検証","テストケース数":47,"テスト対象範囲":"ファイル転送、データ形式変換、エラーハンドリング","実行可能性検証済み":true,"検証ステータス":"検証完了","作成日時":"2024-08-15T10:30:00+09:00","作成者":"rec-user-087","更新日時":"2025-01-22T14:15:00+09:00","更新者":"rec-user-091"}],"テスト実行履歴":[{"テスト実行履歴ID":"rec-001","連携テスト仕様ID":"rec-045","統合可能性検証結果ID":"rec-089","実行ステータス":"成功","実行開始日時":"2024-11-15T09:30:00+09:00","実行終了日時":"2024-11-15T09:47:23+09:00","実行結果":"仕訳データ1,250件の連携確認完了。ERP側の売上仕訳、経費仕訳、決算仕訳すべてがクラウド会計システムへ正常に同期され、勘定科目マッピングも適切に反映されました。","実行時間(ミリ秒)":1043000,"実行者ID":"rec-012","作成日時":"2024-11-15T09:47:45+09:00","更新日時":"2024-11-15T09:47:45+09:00"},{"テスト実行履歴ID":"rec-001","連携テスト仕様ID":"rec-002","統合可能性検証結果ID":"rec-003","実行ステータス":"実行中","実行開始日時":"2025-01-15T09:30:00+09:00","実行終了日時":null,"実行結果":"顧客マスタ同期処理がタイムアウト。レガシー基幹システムからの1000件以上の顧客データ取得時に60秒制限を超過。","実行時間(ミリ秒)":60000,"実行者ID":"rec-004","作成日時":"2025-01-15T09:30:00+09:00","更新日時":"2025-01-15T10:30:15+09:00"},{"テスト実行履歴ID":"rec-001","連携テスト仕様ID":"rec-042","統合可能性検証結果ID":"rec-089","実行ステータス":"スキップ","実行開始日時":null,"実行終了日時":null,"実行結果":"対象システム(売上管理システムA)が定期メンテナンス中のため、テスト実行を延期しました。再実行予定日は2025-02-15です。","実行時間(ミリ秒)":null,"実行者ID":"rec-156","作成日時":"2025-02-10 09:30:00","更新日時":"2025-02-10 09:30:00"},{"テスト実行履歴ID":"rec-20250214-001","連携テスト仕様ID":"rec-spec-0847","統合可能性検証結果ID":"rec-verify-2025-02","実行ステータス":"失敗","実行開始日時":"2025-02-14T09:30:00+09:00","実行終了日時":"2025-02-14T09:35:42+09:00","実行結果":"決済ゲートウェイからの入金データ形式がISO8601形式だが、会計システムが想定するYYYYMMDD形式との不一致により消込処理が失敗。金額フィールドの小数点桁数も異なる（決済側3桁、会計側2桁）。","実行時間(ミリ秒)":342,"実行者ID":"rec-user-0521","作成日時":"2025-02-14T09:36:15+09:00","更新日時":"2025-02-14T09:36:15+09:00"},{"テスト実行履歴ID":"rec-20250115-001","連携テスト仕様ID":"rec-spec-hr-attendance-001","統合可能性検証結果ID":"rec-validation-2025-01","実行ステータス":"成功","実行開始日時":"2025-01-15T09:30:00+09:00","実行終了日時":"2025-01-15T09:47:23+09:00","実行結果":"従業員情報同期は正常に完了。人事給与システムから勤怠管理システムへ892件のレコードを同期。警告：部門コード「営業推進室」の名称変更が検出されたため手動確認推奨。","実行時間(ミリ秒)":1043000,"実行者ID":"rec-user-yamada-001","作成日時":"2025-01-15T09:47:30+09:00","更新日時":"2025-01-15T09:47:30+09:00"},{"テスト実行履歴ID":"rec-20250115-001","連携テスト仕様ID":"rec-spec-0847","統合可能性検証結果ID":"rec-val-2501-042","実行ステータス":"失敗","実行開始日時":"2025-01-15T09:30:00+09:00","実行終了日時":"2025-01-15T09:31:15+09:00","実行結果":"API認証エラー: Authorization headerが無効。在庫管理システムのAPIキー有効期限切れ（2025-01-14 23:59:59で失効）","実行時間(ミリ秒)":75000,"実行者ID":"rec-user-1204","作成日時":"2025-01-15T09:31:20+09:00","更新日時":"2025-01-15T09:31:20+09:00"},{"テスト実行履歴ID":"rec-001","連携テスト仕様ID":"rec-002","統合可能性検証結果ID":"rec-003","実行ステータス":"成功","実行開始日時":"2024-11-15T09:30:00+09:00","実行終了日時":"2024-11-15T09:47:23+09:00","実行結果":"発注データ100件を正常に取込。データ形式検証、マッピング、在庫確認すべて完了。","実行時間(ミリ秒)":1043000,"実行者ID":"rec-004","作成日時":"2024-11-15T09:47:30+09:00","更新日時":"2024-11-15T09:47:30+09:00"},{"テスト実行履歴ID":"rec-001","連携テスト仕様ID":"rec-002","統合可能性検証結果ID":"rec-003","実行ステータス":"未実行","実行開始日時":null,"実行終了日時":null,"実行結果":"承認待ち中。セキュリティ部門の事前承認が必要です。","実行時間(ミリ秒)":null,"実行者ID":null,"作成日時":"2025-01-15T10:30:00+09:00","更新日時":"2025-01-15T10:30:00+09:00"},{"テスト実行履歴ID":"rec-001","連携テスト仕様ID":"rec-002","統合可能性検証結果ID":"rec-003","実行ステータス":"失敗","実行開始日時":"2024-11-15T09:30:00+09:00","実行終了日時":"2024-11-15T09:47:23+09:00","実行結果":"為替レート取得APIのレスポンスタイムアウト（60秒超過）。本社会計システムへのデータ連携が未完了。ネットワーク遅延により海外拠点との通信が断続的に失敗。","実行時間(ミリ秒)":1043000,"実行者ID":"rec-004","作成日時":"2024-11-15T09:47:30+09:00","更新日時":"2024-11-15T09:47:30+09:00"},{"テスト実行履歴ID":"rec-001","連携テスト仕様ID":"rec-042","統合可能性検証結果ID":"rec-157","実行ステータス":"成功","実行開始日時":"2025-01-15T09:30:00+09:00","実行終了日時":"2025-01-15T09:47:23+09:00","実行結果":"3データソース（営業DB、マーケティングDB、会計システム）からの定期抽出・統合完了。データ品質チェック合格、スキーマ検証OK。レポート出力形式（Excel/PDF）確認済み。","実行時間(ミリ秒)":1043000,"実行者ID":"rec-203","作成日時":"2025-01-15T09:47:30+09:00","更新日時":"2025-01-15T09:47:30+09:00"}],"進捗管理":[{"進捗管理ID":"rec-20250115-001","統合プロジェクトID":"proj-2024-erp-integration","タスク名":"会計システムへの売上データ自動連携機能の実装","ステータス":"進行中","完了度":65,"予定開始日":"2024-12-16T09:00:00+09:00","予定完了日":"2025-01-31T18:00:00+09:00","実績開始日":"2024-12-16T10:30:00+09:00","実績完了日":null,"担当者ID":"user-nakamura-hanako","備考":"APIスキーマの設計完了。データマッピング定義で会計部との調整が必要。","作成日時":"2024-12-10T14:20:00+09:00","更新日時":"2025-01-15T16:45:00+09:00","作成者ID":"user-suzuki-taro"},{"進捗管理ID":"rec-001","統合プロジェクトID":"proj-2024-crm-api","タスク名":"既存CRMシステムへのAPI統合仕様書の作成","ステータス":"進行中","完了度":65,"予定開始日":"2024-11-15T09:00:00","予定完了日":"2024-12-20T17:00:00","実績開始日":"2024-11-18T10:30:00","実績完了日":null,"担当者ID":"user-2024-yamada","備考":"顧客データ連携仕様は完了、決済連携部分の要件定義が進行中。営業部との調整会議は12月上旬予定。","作成日時":"2024-11-10T14:20:00","更新日時":"2024-12-05T16:45:00","作成者ID":"user-2024-suzuki"},{"進捗管理ID":"rec-001","統合プロジェクトID":"rec-proj-2024-legacy","タスク名":"顧客マスターデータ抽出・検証","ステータス":"進行中","完了度":65,"予定開始日":"2024-11-15T09:00:00","予定完了日":"2024-12-10T17:00:00","実績開始日":"2024-11-18T10:30:00","実績完了日":null,"担当者ID":"rec-user-0847","備考":"データ品質チェックで重複顧客レコード2,847件を検出。クレンジング作業は予定より3日遅延の見込み。","作成日時":"2024-11-10T14:20:00","更新日時":"2024-11-22T16:45:00","作成者ID":"rec-user-0521"},{"進捗管理ID":"rec-001","統合プロジェクトID":"proj-2024-001","タスク名":"統合後の動作検証テスト","ステータス":"進行中","完了度":65,"予定開始日":"2024-11-15T09:00:00","予定完了日":"2024-12-10T18:00:00","実績開始日":"2024-11-18T10:30:00","実績完了日":null,"担当者ID":"user-2024-087","備考":"基幹システムとの連携機能で予期しない遅延が発生。対応中のため完了予定日を3日延期予定。","作成日時":"2024-11-10T14:20:00","更新日時":"2024-12-02T16:45:00","作成者ID":"user-2024-045"},{"進捗管理ID":"rec-001","統合プロジェクトID":"proj-2024-auth","タスク名":"OAuth 2.0 認証フロー実装","ステータス":"進行中","完了度":65,"予定開始日":"2024-11-01T09:00:00","予定完了日":"2024-12-15T18:00:00","実績開始日":"2024-11-04T10:30:00","実績完了日":null,"担当者ID":"user-yamada","備考":"トークンリフレッシュ機能の実装が予定より2日遅延。セキュリティレビュー待ち。","作成日時":"2024-10-28T14:20:00","更新日時":"2024-12-03T16:45:00","作成者ID":"user-suzuki"},{"進捗管理ID":"rec-001","統合プロジェクトID":"rec-proj-042","タスク名":"既存データベーススキーマの整合性確認","ステータス":"進行中","完了度":65,"予定開始日":"2024-11-15T09:00:00","予定完了日":"2024-12-10T17:00:00","実績開始日":"2024-11-18T10:30:00","実績完了日":null,"担当者ID":"rec-user-156","備考":"本番環境との差分検出中。テーブル構造は確認完了、外部キー制約の不整合が3件発見された。","作成日時":"2024-11-14T14:20:00","更新日時":"2024-12-02T16:45:00","作成者ID":"rec-user-089"},{"進捗管理ID":"rec-001","統合プロジェクトID":"rec-proj-2024-001","タスク名":"統合プラットフォーム パフォーマンステスト","ステータス":"進行中","完了度":65,"予定開始日":"2024-11-15T09:00:00+09:00","予定完了日":"2024-12-20T17:00:00+09:00","実績開始日":"2024-11-15T10:30:00+09:00","実績完了日":null,"担当者ID":"rec-user-0847","備考":"負荷テスト環境でサーバー応答時間が予想値を超過。DB最適化を検討中。","作成日時":"2024-11-10T14:20:00+09:00","更新日時":"2024-12-05T16:45:00+09:00","作成者ID":"rec-user-0521"},{"進捗管理ID":"rec-001","統合プロジェクトID":"rec-proj-2024-001","タスク名":"本番環境への統合システムデプロイ準備","ステータス":"進行中","完了度":72,"予定開始日":"2024-12-16T09:00:00","予定完了日":"2025-01-20T18:00:00","実績開始日":"2024-12-16T10:30:00","実績完了日":null,"担当者ID":"rec-user-0847","備考":"本番環境インフラ構築完了。データ移行テスト実施中。セキュリティ監査は1月中旬予定。","作成日時":"2024-12-10T14:20:00","更新日時":"2025-01-08T16:45:00","作成者ID":"rec-user-0521"},{"進捗管理ID":"rec-001","統合プロジェクトID":"rec-proj-042","タスク名":"ユーザー受入テストと要件確認","ステータス":"進行中","完了度":65,"予定開始日":"2024-11-15T09:00:00","予定完了日":"2024-12-20T17:00:00","実績開始日":"2024-11-18T10:30:00","実績完了日":null,"担当者ID":"rec-user-087","備考":"営業部門との要件確認会議を12月上旬に予定。テストケース50件中32件完了。","作成日時":"2024-11-10T14:22:00","更新日時":"2024-12-05T16:45:00","作成者ID":"rec-user-015"},{"進捗管理ID":"rec-001","統合プロジェクトID":"prj-2024-001","タスク名":"統合システム運用マニュアル作成","ステータス":"進行中","完了度":65,"予定開始日":"2024-12-16T09:00:00","予定完了日":"2025-01-31T17:00:00","実績開始日":"2024-12-18T10:30:00","実績完了日":null,"担当者ID":"usr-0847","備考":"基本操作編は完了。トラブルシューティング章の作成中。レビュー日程調整待ち。","作成日時":"2024-12-16T08:15:00","更新日時":"2025-01-15T14:45:00","作成者ID":"usr-0521"}],"操作ログ":[{"操作ログID":"rec-001","ユーザーID":"rec-U001","操作種別":"作成","対象テーブル":"統合_顧客マスタ","対象ID":"rec-T001","操作内容":"既存システムの顧客情報テーブルを統合するための新規テーブル定義を作成","変更前値":null,"変更後値":"カラム構成: 顧客ID、顧客名、郵便番号、住所、電話番号、メールアドレス、契約日、解約日、ステータス、作成日時、更新日時","実行結果":"成功","エラーメッセージ":null,"IPアドレス":"192.168.1.105","セッションID":"sess-2024-12-15-a7b3c9e2","作成日時":"2024-12-15 14:32:47"},{"操作ログID":"rec-001","ユーザーID":"rec-u-042","操作種別":"検証実行","対象テーブル":"技術検証案件","対象ID":"rec-proj-0158","操作内容":"技術実現可能性検証を開始、スコープ確認、リソース割当完了","変更前値":"ステータス: 計画中","変更後値":"ステータス: 検証実行中、開始日時: 2024-12-15 09:30:00","実行結果":"成功","エラーメッセージ":null,"IPアドレス":"192.168.1.105","セッションID":"sess-2024-12-15-a7f3e9b2","作成日時":"2024-12-15T09:30:45+09:00"},{"操作ログID":"rec-001","ユーザーID":"rec-u-042","操作種別":"検証実行","対象テーブル":"検証設定","対象ID":"rec-v-0156","操作内容":"検証実行中にパラメータ設定値を更新。タイムアウト値とリトライ回数を変更","変更前値":"タイムアウト:30秒、リトライ回数:3回","変更後値":"タイムアウト:60秒、リトライ回数:5回","実行結果":"成功","エラーメッセージ":null,"IPアドレス":"192.168.10.45","セッションID":"sess-2024-11-28-0847-a3f9","作成日時":"2024-11-28T08:47:32+09:00"},{"操作ログID":"rec-001","ユーザーID":"rec-002","操作種別":"テスト実行","対象テーブル":"注文管理システム","対象ID":"rec-003","操作内容":"統合テスト実行：顧客マスタ同期機能の検証","変更前値":null,"変更後値":null,"実行結果":"失敗","エラーメッセージ":"タイムアウトエラー：外部API連携処理で60秒以内に応答なし","IPアドレス":"192.168.1.105","セッションID":"sess-20250115-7f8a2c","作成日時":"2025-01-15T14:32:18+09:00"},{"操作ログID":"rec-001","ユーザーID":"rec-u-042","操作種別":"削除","対象テーブル":"APIエンドポイント設定","対象ID":"rec-api-0156","操作内容":"本番環境の顧客管理API（v2.1）エンドポイント設定を削除。廃止予定のバージョンのため削除承認済み","変更前値":"エンドポイント: /api/v2.1/customers、メソッド: GET/POST/PUT、認証: OAuth2.0、レート制限: 1000req/h","変更後値":null,"実行結果":"成功","エラーメッセージ":null,"IPアドレス":"192.168.10.45","セッションID":"sess-20250115-7a8f3c","作成日時":"2025-01-15T14:32:18+09:00"},{"操作ログID":"rec-001","ユーザーID":"rec-002","操作種別":"ダウンロード","対象テーブル":"検証レポート","対象ID":"rec-003","操作内容":"2025年1月度の検証レポート(PDF形式)をダウンロード","変更前値":null,"変更後値":null,"実行結果":"成功","エラーメッセージ":null,"IPアドレス":"192.168.1.45","セッションID":"sess-20250115-7a3b2c1d","作成日時":"2025-01-15 14:32:18"},{"操作ログID":"rec-001","ユーザーID":"rec-002","操作種別":"アクセス試行","対象テーブル":"売上管理","対象ID":"rec-003","操作内容":"売上管理テーブルの詳細レポート表示を試行","変更前値":null,"変更後値":null,"実行結果":"失敗","エラーメッセージ":"権限不足: 本操作にはマネージャー以上の権限が必要です。現在の権限レベル: 一般ユーザー","IPアドレス":"192.168.1.105","セッションID":"sess-20250115-7a4f2b","作成日時":"2025-01-15T14:32:47+09:00"},{"操作ログID":"rec-001","ユーザーID":"rec-u-042","操作種別":"更新","対象テーブル":"統合仕様書","対象ID":"rec-spec-156","操作内容":"統合仕様書v2.3の要件定義セクションを修正","変更前値":"システム要件: メモリ4GB以上、処理時間目標5秒以内","変更後値":"システム要件: メモリ8GB以上、処理時間目標3秒以内、同時接続数500以上","実行結果":"成功","エラーメッセージ":null,"IPアドレス":"192.168.1.105","セッションID":"sess-20250214-78d4e2","作成日時":"2025-02-14T14:32:17+09:00"},{"操作ログID":"rec-001","ユーザーID":"rec-u-0042","操作種別":"更新","対象テーブル":"顧客マスタ","対象ID":"rec-c-0156","操作内容":"顧客情報の住所変更を試みたが、セッションタイムアウトによりエラー発生","変更前値":"東京都渋谷区道玄坂1-2-3","変更後値":"東京都渋谷区道玄坂1-2-4","実行結果":"失敗","エラーメッセージ":"セッションタイムアウト: ユーザーセッションが無効です。再度ログインしてください。","IPアドレス":"192.168.1.105","セッションID":"sess-2024-11-15-9a7f2c","作成日時":"2024-11-15 14:32:47"},{"操作ログID":"rec-001","ユーザーID":"rec-u-042","操作種別":"ダウンロード","対象テーブル":"操作ログ","対象ID":"rec-export-20250115","操作内容":"2025年1月1日～1月15日の操作ログ全件をCSV形式でエクスポート","変更前値":null,"変更後値":null,"実行結果":"成功","エラーメッセージ":null,"IPアドレス":"192.168.1.105","セッションID":"sess-8f7d2c9e1a4b","作成日時":"2025-01-15T14:32:18+09:00"}],"統合エラーログ":[{"エラーログID":"rec-001","統合可能性検証結果ID":"rec-002","テスト実行履歴ID":"rec-003","エラーコード":"AUTH_TOKEN_INVALID_001","エラーメッセージ":"レガシーシステムから返却されたAPIトークンが無効です。トークンの有効期限切れまたは取り消された可能性があります。","エラー種別":"認証エラー","発生箇所":"API連携モジュール/認証トークン検証処理","スタックトレース":"at com.integration.legacy.AuthTokenValidator.validate(AuthTokenValidator.java:87) at com.integration.legacy.LegacyAPIClient.executeRequest(LegacyAPIClient.java:156)","重要度":"高","ステータス":"対応中","対応内容":"レガシーシステム側のトークン有効期限設定を確認し、リフレッシュトークン機構の実装を進行中","発生日時":"2024-11-15 14:32:47","作成日時":"2024-11-15 14:35:22","更新日時":"2024-11-16 09:18:05","作成者":"rec-101","更新者":"rec-102"},{"エラーログID":"rec-001","統合可能性検証結果ID":"rec-042","テスト実行履歴ID":"rec-156","エラーコード":"DBT-0047","エラーメッセージ":"顧客マスタテーブルの金額カラムがVARCHARで取得されたため、SUM集計時に型変換エラーが発生しました。","エラー種別":"データ形式エラー","発生箇所":"統合データ変換モジュール","スタックトレース":"at DataTransformer.convertSchema (line 287) - Cannot convert VARCHAR to DECIMAL","重要度":"高","ステータス":"解決済み","対応内容":"ソース側スキーマ定義を修正し、金額カラムをDECIMAL(15,2)に変更。変換ロジックでCASTを追加実装。","発生日時":"2024-11-15T14:32:18+09:00","作成日時":"2024-11-15T14:35:42+09:00","更新日時":"2024-11-16T10:18:05+09:00","作成者":"rec-u-089","更新者":"rec-u-112"},{"エラーログID":"rec-001","統合可能性検証結果ID":"rec-0042","テスト実行履歴ID":"rec-0156","エラーコード":"CONN_TIMEOUT_001","エラーメッセージ":"既存システムA連携時に接続タイムアウトが発生しました。設定タイムアウト値30秒を超過し接続が切断されました。","エラー種別":"API接続エラー","発生箇所":"統合ゲートウェイ・レイヤー","スタックトレース":"java.net.SocketTimeoutException: Read timed out at java.net.SocketInputStream.socketRead0 (line 157)","重要度":"高","ステータス":"対応中","対応内容":"既存システムAのタイムアウト設定を30秒から60秒に延長予定。ネットワーク遅延調査も並行実施中。","発生日時":"2024-11-28T14:35:22+09:00","作成日時":"2024-11-28T14:36:15+09:00","更新日時":"2024-11-29T09:12:48+09:00","作成者":"rec-user-0087","更新者":"rec-user-0092"},{"エラーログID":"rec-001","統合可能性検証結果ID":"rec-002","テスト実行履歴ID":"rec-003","エラーコード":"NET_TIMEOUT_5001","エラーメッセージ":"顧客管理システムとの通信がタイムアウトしました。接続待機時間が30秒を超過しました。","エラー種別":"API接続エラー","発生箇所":"統合ゲートウェイモジュール","スタックトレース":"java.net.SocketTimeoutException: Read timed out at IntegrationGateway.callRemoteAPI(line 287)","重要度":"高","ステータス":"対応中","対応内容":"ネットワーク遅延対策としてタイムアウト値を30秒から60秒に拡張し、リトライロジックを実装。本番環境での検証予定。","発生日時":"2024-11-15 14:32:18","作成日時":"2024-11-15 14:35:42","更新日時":"2024-11-16 09:20:15","作成者":"rec-100","更新者":"rec-101"},{"エラーログID":"rec-001","統合可能性検証結果ID":"rec-042","テスト実行履歴ID":"rec-087","エラーコード":"ERR_DUPLICATE_KEY_CONSTRAINT","エラーメッセージ":"重複キー制約違反: テーブル顧客マスタのカラム顧客ID値(CUST_20240815_001)は既に存在します","エラー種別":"データベース制約エラー","発生箇所":"マイグレーション処理モジュール/データ挿入レイヤー","スタックトレース":"at InsertBatchProcessor.execute() line 245 caused by SQLException: Duplicate entry 'CUST_20240815_001' for key 'PRIMARY'","重要度":"高","ステータス":"解決済み","対応内容":"重複データの原因は旧システムの顧客IDが重複していたため。データクレンジング処理を追加して重複排除後に再実行","発生日時":"2024-09-15T14:32:18+09:00","作成日時":"2024-09-15T14:33:05+09:00","更新日時":"2024-09-16T10:21:42+09:00","作成者":"rec-201","更新者":"rec-203"},{"エラーログID":"rec-001","統合可能性検証結果ID":"rec-042","テスト実行履歴ID":"rec-089","エラーコード":"AUTH_SCOPE_INSUFFICIENT","エラーメッセージ":"既存システムの顧客マスタAPIへのアクセスが拒否されました。必要なスコープ: customer:read が付与されていません。","エラー種別":"認証エラー","発生箇所":"統合ゲートウェイ/認可検証モジュール","スタックトレース":"AuthorizationFilter.validateScope() at line 234 → ScopeValidator.check() at line 156 → AccessDeniedException thrown","重要度":"高","ステータス":"対応中","対応内容":"サービスアカウントに customer:read スコープを追加申請済み。承認待ち中。","発生日時":"2024-11-15T14:32:18+09:00","作成日時":"2024-11-15T14:33:45+09:00","更新日時":"2024-11-15T16:22:10+09:00","作成者":"rec-user-078","更新者":"rec-user-045"},{"エラーログID":"rec-001","統合可能性検証結果ID":"rec-002","テスト実行履歴ID":"rec-003","エラーコード":"ERR-ENCODING-0001","エラーメッセージ":"既存データファイルの文字コードがShift-JISのため、UTF-8での読み込みに失敗しました。バイト列の不正な変換が発生しています。","エラー種別":"データ形式エラー","発生箇所":"データインポートモジュール","スタックトレース":"com.example.importer.FileReader.readCSV() line 142 → java.nio.charset.MalformedInputException: Input length = 1","重要度":"高","ステータス":"対応中","対応内容":"ファイルのBOM確認後、Shift-JISからUTF-8への変換処理を追加実装予定。","発生日時":"2025-01-15T14:32:18+09:00","作成日時":"2025-01-15T14:35:42+09:00","更新日時":"2025-01-15T16:20:05+09:00","作成者":"rec-101","更新者":"rec-102"},{"エラーログID":"rec-001","統合可能性検証結果ID":"rec-102","テスト実行履歴ID":"rec-203","エラーコード":"HTTP_429","エラーメッセージ":"API呼び出し頻度が上限に達しました。リトライは60秒後にお試しください。","エラー種別":"API接続エラー","発生箇所":"統合APIクライアント_リクエストハンドラー","スタックトレース":"com.integration.api.client.HttpClientException: Rate limit exceeded at com.integration.api.handler.RequestHandler.execute(RequestHandler.java:145)","重要度":"中","ステータス":"解決済み","対応内容":"エクスポーネンシャルバックオフを実装し、リトライ間隔を60秒に設定した。次回リクエストは自動的に遅延実行される。","発生日時":"2024-11-15T14:32:47+09:00","作成日時":"2024-11-15T14:33:12+09:00","更新日時":"2024-11-15T15:18:05+09:00","作成者":"rec-u001","更新者":"rec-u002"},{"エラーログID":"rec-001","統合可能性検証結果ID":"rec-002","テスト実行履歴ID":"rec-003","エラーコード":"SESSION_COMPAT_001","エラーメッセージ":"既存システムのセッションタイムアウト設定（30分）が新統合モジュールで認識されず、予期しないセッション終了が発生","エラー種別":"互換性エラー","発生箇所":"セッション管理モジュール","スタックトレース":"com.system.session.SessionManager.validateTimeout() - line 247 で既存設定値の読み込み失敗","重要度":"高","ステータス":"対応中","対応内容":"セッション設定ファイルの形式を新モジュール対応版に変換するコンバーター開発中","発生日時":"2024-11-15T14:32:00+09:00","作成日時":"2024-11-15T14:35:00+09:00","更新日時":"2024-11-16T09:20:00+09:00","作成者":"rec-004","更新者":"rec-005"},{"エラーログID":"rec-001","統合可能性検証結果ID":"rec-0847","テスト実行履歴ID":"rec-2156","エラーコード":"ENV_DIFF_0042","エラーメッセージ":"本番環境のデータベース接続文字列がステージング環境と異なるため、マイグレーション処理が中断されました。","エラー種別":"環境設定エラー","発生箇所":"データベース接続モジュール","スタックトレース":"at DbConnectionPool.initialize() line 247 / at EnvironmentConfig.loadSettings() line 89 / at MigrationService.start() line 156","重要度":"高","ステータス":"対応中","対応内容":"本番環境の接続設定を確認し、ステージング環境との差分を修正予定。セキュリティチームに暗号化キーの検証を依頼中。","発生日時":"2025-01-15T14:32:18+09:00","作成日時":"2025-01-15T14:35:42+09:00","更新日時":"2025-01-15T16:20:05+09:00","作成者":"rec-0512","更新者":"rec-0513"}],"ドキュメント管理":[{"ドキュメントID":"rec-001","ドキュメント名":"既存ERPシステムとの API連携仕様書 v2.3","ドキュメント種別":"API仕様書","関連システムID":"rec-sys-042","ファイルパス":"https://docs.internal.company.jp/api/erp-integration-v2.3.pdf","バージョン":"2.3","説明":"ERPシステムとの受発注・請求データ連携に関するAPI仕様。エンドポイント、認証方式、リクエスト/レスポンス形式を定義。","公開状態":"限定公開","作成日時":"2024-03-15 09:30:00","更新日時":"2025-01-22 14:45:00","作成者ID":"rec-user-108","更新者ID":"rec-user-156"},{"ドキュメントID":"rec-001","ドキュメント名":"レガシー基幹システムデータ抽出ガイドライン v2.1","ドキュメント種別":"技術資料","関連システムID":"rec-sys-0847","ファイルパス":"https://docs.internal.company.jp/legacy-system/extraction-guide-v2.1.pdf","バージョン":"2.1","説明":"基幹システムから月次決算データを抽出する際の手順、注意事項、エラー対応方法をまとめたガイド。CSV形式での出力仕様も記載。","公開状態":"限定公開","作成日時":"2024-04-15T09:30:00","更新日時":"2025-01-22T14:45:00","作成者ID":"rec-user-0312","更新者ID":"rec-user-0156"},{"ドキュメントID":"rec-001","ドキュメント名":"クラウド会計システム連携設定マニュアル v2.1","ドキュメント種別":"連携ガイドライン","関連システムID":"rec-sys-045","ファイルパス":"/documents/accounting/cloud-integration-manual-v2.1.pdf","バージョン":"2.1","説明":"クラウド会計システムと基幹システム間のデータ連携設定手順、API認証方法、エラー対応を記載したマニュアル。","公開状態":"限定公開","作成日時":"2024-06-15 09:30:00","更新日時":"2025-01-20 14:15:00","作成者ID":"rec-user-127","更新者ID":"rec-user-089"},{"ドキュメントID":"rec-001","ドキュメント名":"旧営業管理システム データベーススキーマ仕様書 v2.3","ドキュメント種別":"技術資料","関連システムID":"rec-sys-0042","ファイルパス":"/documents/legacy-sales-system/db-schema-v2.3.pdf","バージョン":"2.3","説明":"営業管理システムの顧客・受注・売上テーブルのスキーマ定義およびER図。マイグレーション計画用の参考資料。","公開状態":"限定公開","作成日時":"2024-06-15 09:30:00","更新日時":"2025-01-22 14:45:00","作成者ID":"rec-user-0156","更新者ID":"rec-user-0289"},{"ドキュメントID":"rec-001","ドキュメント名":"CRM認証・セキュリティ実装ガイド v2.3","ドキュメント種別":"技術資料","関連システムID":"rec-sys-042","ファイルパス":"/documents/crm/security/auth-guide-v2.3.pdf","バージョン":"2.3","説明":"OAuth 2.0、MFA、API認証、暗号化通信の実装方法および運用上のセキュリティ要件をまとめた技術資料。","公開状態":"限定公開","作成日時":"2024-08-15T09:30:00","更新日時":"2025-01-22T14:45:00","作成者ID":"rec-user-156","更新者ID":"rec-user-289"},{"ドキュメントID":"rec-001","ドキュメント名":"オンプレミス在庫管理システム バッチ処理仕様書 v2.1","ドキュメント種別":"技術資料","関連システムID":"rec-sys-0047","ファイルパス":"/documents/inventory-system/batch-specification-v2.1.pdf","バージョン":"2.1","説明":"夜間バッチ処理における在庫数値の集計、仕入先への自動連携、月次棚卸し対応の実行フロー及びエラーハンドリング仕様","公開状態":"限定公開","作成日時":"2024-06-15T09:30:00","更新日時":"2025-01-22T14:45:00","作成者ID":"rec-user-0312","更新者ID":"rec-user-0508"},{"ドキュメントID":"rec-001","ドキュメント名":"基幹システムA廃止予定日および移行計画書","ドキュメント種別":"技術資料","関連システムID":"rec-sys-042","ファイルパス":"https://docs.company.jp/migration/legacy-system-a-2025.pdf","バージョン":"2.3","説明":"2025年9月30日の廃止に向けた移行スケジュール、データ移行手順、システム連携切断計画をまとめた資料","公開状態":"限定公開","作成日時":"2024-11-15 09:30:00","更新日時":"2025-01-22 14:45:00","作成者ID":"rec-user-108","更新者ID":"rec-user-203"},{"ドキュメントID":"rec-001","ドキュメント名":"既存システム間のマスタデータ同期ルール定義書","ドキュメント種別":"技術資料","関連システムID":"rec-sys-042","ファイルパス":"/documents/master-data-sync/rule-definition-v2.1.pdf","バージョン":"2.1","説明":"顧客マスタ、商品マスタ、部門マスタの同期タイミング、優先順位、エラーハンドリングを定義した運用ルール","公開状態":"限定公開","作成日時":"2024-04-15T09:30:00","更新日時":"2025-01-20T14:15:00","作成者ID":"rec-user-108","更新者ID":"rec-user-203"},{"ドキュメントID":"rec-0047","ドキュメント名":"レガシー決済システム API エンドポイント一覧 v2.3","ドキュメント種別":"API仕様書","関連システムID":"rec-sys-0012","ファイルパス":"https://internal-docs.company.jp/payment-legacy/api-endpoints-v2.3.pdf","バージョン":"2.3","説明":"旧決済システムの全APIエンドポイント、認証方式、リクエスト/レスポンス形式、エラーコード定義を記載した仕様書。移行対象システムの開発チーム向け。","公開状態":"限定公開","作成日時":"2024-06-15T09:30:00","更新日時":"2025-01-22T14:45:00","作成者ID":"rec-user-0089","更新者ID":"rec-user-0142"},{"ドキュメントID":"rec-001","ドキュメント名":"統合テスト実施時の既存システム動作確認チェックリスト","ドキュメント種別":"技術資料","関連システムID":"rec-sys-042","ファイルパス":"/documents/integration-test/checklist-v2.1.xlsx","バージョン":"2.1","説明":"本番環境への移行前に実施する統合テストにおいて、既存システムの機能・パフォーマンス・セキュリティ項目を網羅的に確認するためのチェックリスト。全47項目で構成。","公開状態":"限定公開","作成日時":"2024-08-15 10:30:00","更新日時":"2025-01-22 14:15:00","作成者ID":"rec-user-156","更新者ID":"rec-user-289"}],"バージョン管理":[{"バージョン管理ID":"rec-001","対象テーブル名":"API仕様書","対象レコードID":"rec-0042","バージョン番号":"1.1.0","変更内容":"ユーザー認証エンドポイント追加、レスポンスタイムアウト仕様変更","変更前データ":"バージョン1.0.5: エンドポイント数12個、認証方式OAuth2のみ、タイムアウト30秒","変更後データ":"バージョン1.1.0: エンドポイント数14個、認証方式OAuth2+SAML対応、タイムアウト60秒","リリース状態":"リリース済み","作成日時":"2024-11-15T09:30:00+09:00","作成者":"rec-u0156","更新日時":"2024-12-08T14:22:00+09:00","更新者":"rec-u0089","リリース日時":"2024-12-08T16:00:00+09:00"},{"バージョン管理ID":"rec-001","対象テーブル名":"連携ガイドライン","対象レコードID":"rec-042","バージョン番号":"2.1.1","変更内容":"TLS1.3への統一、API認証トークン有効期限を30分に短縮、リクエスト署名検証の必須化","変更前データ":"TLS1.2以上対応、トークン有効期限60分、署名検証は推奨","変更後データ":"TLS1.3必須、トークン有効期限30分、署名検証は必須","リリース状態":"リリース済み","作成日時":"2024-12-15T09:30:00+09:00","作成者":"rec-u-087","更新日時":"2024-12-18T14:15:00+09:00","更新者":"rec-u-042","リリース日時":"2024-12-18T16:00:00+09:00"},{"バージョン管理ID":"rec-001","対象テーブル名":"システム設定","対象レコードID":"rec-sys-0847","バージョン番号":"2.1.0","変更内容":"DB接続タイムアウト値を30秒から60秒に変更、接続プール最大数を20から50に拡張","変更前データ":"connection_timeout=30s, pool_max_size=20, ssl_enabled=false","変更後データ":"connection_timeout=60s, pool_max_size=50, ssl_enabled=true","リリース状態":"リリース済み","作成日時":"2024-11-15T09:30:00+09:00","作成者":"rec-user-0312","更新日時":"2024-11-22T14:45:00+09:00","更新者":"rec-user-0215","リリース日時":"2024-11-25T08:00:00+09:00"},{"バージョン管理ID":"rec-0847","対象テーブル名":"API仕様書","対象レコードID":"rec-2341","バージョン番号":"2.1.0","変更内容":"OAuth 2.0認証への移行に伴い、全5エンドポイントの認証ヘッダ仕様を更新","変更前データ":"Authorization: Bearer {api_key}、リクエストタイムアウト: 30秒","変更後データ":"Authorization: Bearer {access_token}、リフレッシュトークン対応、リクエストタイムアウト: 60秒","リリース状態":"リリース済み","作成日時":"2024-11-15T09:30:00+09:00","作成者":"rec-1203","更新日時":"2024-12-10T14:45:00+09:00","更新者":"rec-1205","リリース日時":"2024-12-20T00:00:00+09:00"},{"バージョン管理ID":"rec-001","対象テーブル名":"連携ガイドライン","対象レコードID":"rec-042","バージョン番号":"2.1.1","変更内容":"API呼び出しタイムアウト値の誤記修正（30秒→60秒）、決済連携の実装事例を追加","変更前データ":"タイムアウト設定値: 30秒、決済連携の実装例なし","変更後データ":"タイムアウト設定値: 60秒、決済連携の実装事例（楽天ペイ、PayPay）を追加","リリース状態":"リリース済み","作成日時":"2024-11-15T09:30:00+09:00","作成者":"rec-101","更新日時":"2024-11-22T14:15:00+09:00","更新者":"rec-102","リリース日時":"2024-11-22T16:45:00+09:00"},{"バージョン管理ID":"rec-0847","対象テーブル名":"API仕様書","対象レコードID":"rec-2156","バージョン番号":"2.1.0","変更内容":"新規統合先システム「販売管理クラウド」対応の認証エンドポイント、注文データ連携APIを追加","変更前データ":"v2.0.0時点：対応システムは既存3社のみ、認証方式OAuth2.0のみ、エンドポイント数18個","変更後データ":"v2.1.0：対応システム4社に拡大、SAML2.0認証対応追加、エンドポイント数22個、レスポンスタイムアウト設定値変更","リリース状態":"承認済み","作成日時":"2024-11-15T09:30:00+09:00","作成者":"rec-0512","更新日時":"2024-12-08T14:22:00+09:00","更新者":"rec-0518","リリース日時":"2025-01-10T00:00:00+09:00"},{"バージョン管理ID":"rec-001","対象テーブル名":"API仕様書","対象レコードID":"rec-042","バージョン番号":"2.1.0","変更内容":"ユーザー情報取得APIのレスポンス形式をJSON-LDからOpenAPI 3.0形式に統一","変更前データ":"{ \"@context\": \"https://schema.org\", \"@type\": \"Person\", \"name\": \"string\" }","変更後データ":"{ \"userId\": \"uuid\", \"userName\": \"string\", \"email\": \"string\", \"createdAt\": \"ISO8601\" }","リリース状態":"承認済み","作成日時":"2025-01-15T09:30:00+09:00","作成者":"rec-u-001","更新日時":"2025-01-22T14:45:00+09:00","更新者":"rec-u-002","リリース日時":"2025-02-01T00:00:00+09:00"},{"バージョン管理ID":"rec-001","対象テーブル名":"連携ガイドライン","対象レコードID":"rec-042","バージョン番号":"2.1.0","変更内容":"エラーハンドリング手順を5段階フローに再構成し、タイムアウト・リトライロジックの詳細化を実施","変更前データ":"エラー時の対応は基本的な例外処理のみ記載。リトライ回数や待機時間の明記なし。","変更後データ":"エラー分類(一時的・永続的・認証)ごとの処理フロー、リトライ間隔(初回3秒、指数バックオフ)、ログ出力仕様を追加。","リリース状態":"承認済み","作成日時":"2024-11-15T09:30:00+09:00","作成者":"rec-user-087","更新日時":"2024-12-08T14:45:00+09:00","更新者":"rec-user-052","リリース日時":"2024-12-20T00:00:00+09:00"},{"バージョン管理ID":"rec-001","対象テーブル名":"API仕様書","対象レコードID":"rec-api-spec-0042","バージョン番号":"2.1.0","変更内容":"レート制限を1時間あたり10,000リクエストから15,000リクエストに引き上げ、バースト上限を500から750に変更","変更前データ":"rate_limit_hourly: 10000, burst_limit: 500, window_size: 3600","変更後データ":"rate_limit_hourly: 15000, burst_limit: 750, window_size: 3600","リリース状態":"リリース済み","作成日時":"2024-11-15T09:30:00+09:00","作成者":"rec-user-0156","更新日時":"2024-12-02T14:15:00+09:00","更新者":"rec-user-0089","リリース日時":"2024-12-05T00:00:00+09:00"},{"バージョン管理ID":"rec-20250115-001","対象テーブル名":"連携ガイドライン","対象レコードID":"rec-guideline-2024-001","バージョン番号":"2.0.0","変更内容":"複数システム間統合フロー見直しに伴う全面改訂。API仕様、データマッピング、エラーハンドリング手順を刷新","変更前データ":"v1.5.2 旧フロー（販売管理→会計→在庫の順序処理、同期間隔60分）","変更後データ":"v2.0.0 新フロー（イベント駆動型リアルタイム連携、全システム並列処理対応）","リリース状態":"承認済み","作成日時":"2025-01-08T09:30:00+09:00","作成者":"rec-user-佐藤花子","更新日時":"2025-01-15T14:45:00+09:00","更新者":"rec-user-山田次郎","リリース日時":"2025-02-01T00:00:00+09:00"}]};
+window.AIVIC_PAGE_SCREEN_ID = "scr-1789462261118";
+window.AIVIC_PAGE_INIT_JS = "function(container, apiUrl, tables) {}";
+</script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<nav data-aivic-system-switcher style="position:sticky;top:0;z-index:2147483000;display:flex;align-items:center;overflow-x:auto;background:var(--top-bar-bg);color:var(--top-bar-text);border-bottom:1px solid var(--top-bar-border,var(--border));padding:0 12px;height:40px;flex-shrink:0;"><span data-aivic-app-name style="padding:6px 14px;font-size:13px;font-weight:700;letter-spacing:0.02em;color:var(--top-bar-text);white-space:nowrap;">作業管理システム</span><a href="./scr-1789461964046.html" data-aivic-nav-system="itg-2" style="padding:6px 14px;text-decoration:none;font-size:13px;white-space:nowrap;color:var(--top-bar-text);opacity:0.72;border-bottom:2px solid transparent;font-weight:400;">作業者生産性データ分析・配置最適化支援システム</a><a href="./scr-1789462261118.html" data-aivic-nav-system="itg-3" style="padding:6px 14px;text-decoration:none;font-size:13px;white-space:nowrap;color:var(--top-bar-text);opacity:1;border-bottom:2px solid currentColor;font-weight:600;">既存システム統合・技術実現可能性検証プラットフォーム</a><a href="./scr-1789462440034.html" data-aivic-nav-system="itg-4" style="padding:6px 14px;text-decoration:none;font-size:13px;white-space:nowrap;color:var(--top-bar-text);opacity:0.72;border-bottom:2px solid transparent;font-weight:400;">システム運用・スケーラビリティ管理ダッシュボード</a><a href="./scr-1789462725117.html" data-aivic-nav-system="itg-5" style="padding:6px 14px;text-decoration:none;font-size:13px;white-space:nowrap;color:var(--top-bar-text);opacity:0.72;border-bottom:2px solid transparent;font-weight:400;">ベンダー選定・契約リスク評価支援システム</a><a href="./scr-1789461783315.html" data-aivic-nav-system="itg-1" style="padding:6px 14px;text-decoration:none;font-size:13px;white-space:nowrap;color:var(--top-bar-text);opacity:0.72;border-bottom:2px solid transparent;font-weight:400;">作業進捗・人員配置最適化エンジン</a></nav>
+  <div data-aivic-shell-pattern="command_center" data-aivic-nav-position="top" data-aivic-density="balanced">
+    <header class="shell-header">
+      <div class="shell-header-left">
+        <div>
+          <div class="shell-logo">作業管理システム</div>
+          <div class="shell-logo-system">既存システム統合・技術実現可能性検証プラットフォーム</div>
+        </div>
+        <nav class="shell-nav-top">
+          <button class="shell-nav-item aivic-active" data-aivic-nav="scr-1789462261118" onclick="window.location.href='./scr-1789462261118.html'">API仕様書・連携ガイドライン管理</button>
+          <button class="shell-nav-item" data-aivic-nav="scr-1789462276246" onclick="window.location.href='./scr-1789462276246.html'">連携テスト・進捗管理</button>
+        </nav>
+      </div>
+      <div class="shell-header-right">
+        <div class="shell-user-area">
+          <div class="shell-user-avatar">U</div>
+          <div class="shell-user-name">ユーザー</div>
+          <a class="shell-user-logout" href="./login.html">ログアウト</a>
+        </div>
+      </div>
+    </header>
+    <div class="shell-body">
+      <main class="content-area">
+        <div data-aivic-panel="scr-1789462261118" style="display:block"><div style="display: flex; flex-direction: column; height: 100%; background: var(--bg-main); color: var(--text); font-family: var(--font-family);">
+  <!-- Breadcrumb / Sub-header -->
+  <div style="padding: 12px 16px; border-bottom: 1px solid var(--border); background: var(--bg-card); font-size: 12px; color: var(--text-muted);">
+    作業管理システム / 既存システム統合・技術実現可能性検証プラットフォーム / API仕様書・連携ガイドライン管理画面
+  </div>
+
+  <!-- Top Action Bar -->
+  <div style="padding: 12px 16px; border-bottom: 1px solid var(--border); background: var(--bg-card); display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+    <input 
+      type="text" 
+      placeholder="API名・ガイドライン名で検索..." 
+      data-testid="search-input"
+      style="flex: 1; min-width: 200px; padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg-main); color: var(--text); font-size: 13px;"
+    />
+    <select 
+      data-testid="system-filter"
+      style="padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg-main); color: var(--text); font-size: 13px; cursor: pointer;"
+    >
+      <option value="">全システム</option>
+      <option value="wms">WMS（倉庫管理）</option>
+      <option value="handy">ハンディターミナル</option>
+      <option value="erp">ERP統合</option>
+    </select>
+    <select 
+      data-testid="status-filter"
+      style="padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg-main); color: var(--text); font-size: 13px; cursor: pointer;"
+    >
+      <option value="">全ステータス</option>
+      <option value="active">有効</option>
+      <option value="draft">ドラフト</option>
+      <option value="deprecated">廃止予定</option>
+    </select>
+    <button 
+      data-testid="register-api-button"
+      style="padding: 8px 16px; background: var(--primary); color: #fff; border: none; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer; transition: background 200ms;"
+    >
+      + API仕様書登録
+    </button>
+    <button 
+      data-testid="register-guideline-button"
+      style="padding: 8px 16px; background: transparent; border: 1px solid var(--border); color: var(--text); border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 200ms;"
+    >
+      + ガイドライン登録
+    </button>
+  </div>
+
+  <!-- Main Content: 2-Column Layout -->
+  <div style="display: flex; flex: 1; overflow: hidden; gap: 0;">
+    <!-- Left Panel: API & Guideline List (30%) -->
+    <div style="width: 30%; border-right: 1px solid var(--border); display: flex; flex-direction: column; overflow: hidden; background: var(--bg-card);">
+      <!-- Tab Navigation -->
+      <div style="display: flex; border-bottom: 1px solid var(--border); background: var(--bg-main);">
+        <button 
+          data-testid="tab-api-specs"
+          class="tab-btn"
+          style="flex: 1; padding: 12px; border: none; background: transparent; color: var(--text); font-size: 13px; font-weight: 500; cursor: pointer; border-bottom: 2px solid var(--primary); transition: all 200ms;"
+        >
+          API仕様書
+        </button>
+        <button 
+          data-testid="tab-guidelines"
+          class="tab-btn"
+          style="flex: 1; padding: 12px; border: none; background: transparent; color: var(--text-muted); font-size: 13px; font-weight: 500; cursor: pointer; border-bottom: 2px solid transparent; transition: all 200ms;"
+        >
+          連携ガイドライン
+        </button>
+      </div>
+
+      <!-- API Specs List -->
+      <div 
+        id="api-specs-list"
+        style="flex: 1; overflow-y: auto; padding: 8px 0;"
+      >
+        <!-- Populated by initJs -->
+      </div>
+
+      <!-- Guidelines List (hidden initially) -->
+      <div 
+        id="guidelines-list"
+        style="flex: 1; overflow-y: auto; padding: 8px 0; display: none;"
+      >
+        <!-- Populated by initJs -->
+      </div>
+    </div>
+
+    <!-- Right Panel: Detail & Version History (70%) -->
+    <div style="flex: 1; display: flex; flex-direction: column; overflow: hidden; background: var(--bg-main);">
+      <!-- Detail Panel Header -->
+      <div style="padding: 16px; border-bottom: 1px solid var(--border); background: var(--bg-card);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <h2 id="detail-title" style="margin: 0; font-size: 16px; font-weight: 600; color: var(--text);">
+            詳細を選択してください
+          </h2>
+          <div style="display: flex; gap: 6px;">
+            <button 
+              id="edit-button"
+              data-testid="edit-button"
+              style="padding: 6px 12px; background: transparent; border: 1px solid var(--border); color: var(--text); border-radius: 6px; font-size: 12px; cursor: pointer; display: none; transition: all 200ms;"
+            >
+              編集
+            </button>
+            <button 
+              id="delete-button"
+              data-testid="delete-button"
+              style="padding: 6px 12px; background: transparent; border: 1px solid #dc2626; color: #dc2626; border-radius: 6px; font-size: 12px; cursor: pointer; display: none; transition: all 200ms;"
+            >
+              削除
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Detail Content -->
+      <div style="flex: 1; display: flex; flex-direction: column; overflow: hidden;">
+        <!-- API/Guideline Detail Panel -->
+        <div 
+          id="detail-panel"
+          style="flex: 1; padding: 16px; overflow-y: auto; display: none;"
+        >
+          <!-- Populated by initJs -->
+        </div>
+
+        <!-- Empty State -->
+        <div 
+          id="empty-state"
+          style="flex: 1; display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 14px;"
+        >
+          左側から項目を選択して詳細を表示
+        </div>
+
+        <!-- Version History Timeline (Bottom Section) -->
+        <div style="height: 220px; border-top: 1px solid var(--border); background: var(--bg-card); display: flex; flex-direction: column; overflow: hidden;">
+          <div style="padding: 12px 16px; border-bottom: 1px solid var(--border); background: var(--bg-main);">
+            <h3 style="margin: 0; font-size: 13px; font-weight: 600; color: var(--text);">バージョン履歴</h3>
+          </div>
+          <div 
+            id="version-timeline"
+            style="flex: 1; overflow-y: auto; padding: 12px 16px; font-size: 12px;"
+          >
+            <!-- Populated by initJs -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Register/Edit API Spec -->
+<div 
+  id="api-modal"
+  class="modal-overlay"
+  style="display: none; position: fixed; inset: 0; z-index: 1000; background: rgba(0, 0, 0, 0.55); display: flex; align-items: center; justify-content: center;"
+>
+  <div style="background: var(--bg-card); color: var(--text); padding: 24px; border-radius: 12px; max-width: 600px; width: 90%; max-height: 90vh; overflow-y: auto; box-shadow: 0 8px 32px rgba(0,0,0,0.4);">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+      <h2 id="api-modal-title" style="margin: 0; font-size: 18px; font-weight: 600;">API仕様書登録</h2>
+      <button 
+        id="api-modal-close"
+        style="background: none; border: none; font-size: 24px; cursor: pointer; color: var(--text-muted);"
+      >
+        ×
+      </button>
+    </div>
+
+    <form id="api-form" style="display: flex; flex-direction: column; gap: 16px;">
+      <div>
+        <label style="display: block; font-size: 12px; font-weight: 500; color: var(--text-muted); margin-bottom: 4px;">システム</label>
+        <select 
+          name="system_id"
+          data-testid="api-system-select"
+          required
+          style="width: 100%; padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg-main); color: var(--text); font-size: 13px; cursor: pointer;"
+        >
+          <option value="">選択してください</option>
+          <option value="wms">WMS（倉庫管理）</option>
+          <option value="handy">ハンディターミナル</option>
+          <option value="erp">ERP統合</option>
+        </select>
+      </div>
+
+      <div>
+        <label style="display: block; font-size: 12px; font-weight: 500; color: var(--text-muted); margin-bottom: 4px;">API名</label>
+        <input 
+          type="text"
+          name="api_name"
+          data-testid="api-name-input"
+          placeholder="例: 在庫照会API"
+          required
+          style="width: 100%; padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg-main); color: var(--text); font-size: 13px; box-sizing: border-box;"
+        />
+      </div>
+
+      <div>
+        <label style="display: block; font-size: 12px; font-weight: 500; color: var(--text-muted); margin-bottom: 4px;">エンドポイント</label>
+        <input 
+          type="text"
+          name="api_endpoint"
+          data-testid="api-endpoint-input"
+          placeholder="例: /api/v1/inventory"
+          required
+          style="width: 100%; padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg-main); color: var(--text); font-size: 13px; box-sizing: border-box; font-family: 'Courier New', monospace;"
+        />
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+        <div>
+          <label style="display: block; font-size: 12px; font-weight: 500; color: var(--text-muted); margin-bottom: 4px;">HTTPメソッド</label>
+          <select 
+            name="http_method"
+            data-testid="api-method-select"
+            required
+            style="width: 100%; padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg-main); color: var(--text); font-size: 13px; cursor: pointer;"
+          >
+            <option value="">選択</option>
+            <option value="GET">GET</option>
+            <option value="POST">POST</option>
+            <option value="PUT">PUT</option>
+            <option value="DELETE">DELETE</option>
+          </select>
+        </div>
+        <div>
+          <label style="display: block; font-size: 12px; font-weight: 500; color: var(--text-muted); margin-bottom: 4px;">認証方式</label>
+          <select 
+            name="authentication_type"
+            data-testid="api-auth-select"
+            style="width: 100%; padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg-main); color: var(--text); font-size: 13px; cursor: pointer;"
+          >
+            <option value="">選択</option>
+            <option value="OAuth">OAuth</option>
+            <option value="API Key">API Key</option>
+            <option value="Basic">Basic</option>
+            <option value="Bearer">Bearer Token</option>
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <label style="display: block; font-size: 12px; font-weight: 500; color: var(--text-muted); margin-bottom: 4px;">バージョン</label>
+        <input 
+          type="text"
+          name="version"
+          data-testid="api-version-input"
+          placeholder="例: 1.0.0"
+          style="width: 100%; padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg-main); color: var(--text); font-size: 13px; box-sizing: border-box;"
+        />
+      </div>
+
+      <div>
+        <label style="display: block; font-size: 12px; font-weight: 500; color: var(--text-muted); margin-bottom: 4px;">説明</label>
+        <textarea 
+          name="description"
+          data-testid="api-description-textarea"
+          placeholder="API仕様の詳細説明"
+          rows="3"
+          style="width: 100%; padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg-main); color: var(--text); font-size: 13px; box-sizing: border-box; font-family: var(--font-family); resize: vertical;"
+        ></textarea>
+      </div>
+
+      <div style="display: flex; gap: 8px; justify-content: flex-end; margin-top: 12px;">
+        <button 
+          type="button"
+          id="api-modal-cancel"
+          style="padding: 8px 16px; background: transparent; border: 1px solid var(--border); color: var(--text); border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 200ms;"
+        >
+          キャンセル
+        </button>
+        <button 
+          type="submit"
+          data-testid="api-save-button"
+          style="padding: 8px 16px; background: var(--primary); color: #fff; border: none; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer; transition: background 200ms;"
+        >
+          保存
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal: Register/Edit Guideline -->
+<div 
+  id="guideline-modal"
+  class="modal-overlay"
+  style="display: none; position: fixed; inset: 0; z-index: 1000; background: rgba(0, 0, 0, 0.55); display: flex; align-items: center; justify-content: center;"
+>
+  <div style="background: var(--bg-card); color: var(--text); padding: 24px; border-radius: 12px; max-width: 600px; width: 90%; max-height: 90vh; overflow-y: auto; box-shadow: 0 8px 32px rgba(0,0,0,0.4);">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+      <h2 id="guideline-modal-title" style="margin: 0; font-size: 18px; font-weight: 600;">連携ガイドライン登録</h2>
+      <button 
+        id="guideline-modal-close"
+        style="background: none; border: none; font-size: 24px; cursor: pointer; color: var(--text-muted);"
+      >
+        ×
+      </button>
+    </div>
+
+    <form id="guideline-form" style="display: flex; flex-direction: column; gap: 16px;">
+      <div>
+        <label style="display: block; font-size: 12px; font-weight: 500; color: var(--text-muted); margin-bottom: 4px;">システム</label>
+        <select 
+          name="system_id"
+          data-testid="guideline-system-select"
+          required
+          style="width: 100%; padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg-main); color: var(--text); font-size: 13px; cursor: pointer;"
+        >
+          <option value="">選択してください</option>
+          <option value="wms">WMS（倉庫管理）</option>
+          <option value="handy">ハンディターミナル</option>
+          <option value="erp">ERP統合</option>
+        </select>
+      </div>
+
+      <div>
+        <label style="display: block; font-size: 12px; font-weight: 500; color: var(--text-muted); margin-bottom: 4px;">ガイドライン名</label>
+        <input 
+          type="text"
+          name="guideline_name"
+          data-testid="guideline-name-input"
+          placeholder="例: WMS連携実装ガイド"
+          required
+          style="width: 100%; padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg-main); color: var(--text); font-size: 13px; box-sizing: border-box;"
+        />
+      </div>
+
+      <div>
+        <label style="display: block; font-size: 12px; font-weight: 500; color: var(--text-muted); margin-bottom: 4px;">連携方式</label>
+        <select 
+          name="integration_method"
+          data-testid="guideline-method-select"
+          required
+          style="width: 100%; padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg-main); color: var(--text); font-size: 13px; cursor: pointer;"
+        >
+          <option value="">選択してください</option>
+          <option value="REST">REST API</option>
+          <option value="SOAP">SOAP</option>
+          <option value="File">ファイル転送</option>
+          <option value="Message Queue">メッセージキュー</option>
+        </select>
+      </div>
+
+      <div>
+        <label style="display: block; font-size: 12px; font-weight: 500; color: var(--text-muted); margin-bottom: 4px;">実装手順</label>
+        <textarea 
+          name="implementation_steps"
+          data-testid="guideline-steps-textarea"
+          placeholder="実装時の具体的な手順やステップを記述"
+          rows="3"
+          style="width: 100%; padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg-main); color: var(--text); font-size: 13px; box-sizing: border-box; font-family: var(--font-family); resize: vertical;"
+        ></textarea>
+      </div>
+
+      <div>
+        <label style="display: block; font-size: 12px; font-weight: 500; color: var(--text-muted); margin-bottom: 4px;">セキュリティ要件</label>
+        <textarea 
+          name="security_requirements"
+          data-testid="guideline-security-textarea"
+          placeholder="認証、暗号化等のセキュリティ要件"
+          rows="2"
+          style="width: 100%; padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg-main); color: var(--text); font-size: 13px; box-sizing: border-box; font-family: var(--font-family); resize: vertical;"
+        ></textarea>
+      </div>
+
+      <div style="display: flex; gap: 8px; justify-content: flex-end; margin-top: 12px;">
+        <button 
+          type="button"
+          id="guideline-modal-cancel"
+          style="padding: 8px 16px; background: transparent; border: 1px solid var(--border); color: var(--text); border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 200ms;"
+        >
+          キャンセル
+        </button>
+        <button 
+          type="submit"
+          data-testid="guideline-save-button"
+          style="padding: 8px 16px; background: var(--primary); color: #fff; border: none; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer; transition: background 200ms;"
+        >
+          保存
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal: Delete Confirmation -->
+<div 
+  id="delete-confirm-modal"
+  class="modal-overlay"
+  style="display: none; position: fixed; inset: 0; z-index: 1000; background: rgba(0, 0, 0, 0.55); display: flex; align-items: center; justify-content: center;"
+>
+  <div style="background: var(--bg-card); color: var(--text); padding: 24px; border-radius: 12px; max-width: 400px; width: 90%; box-shadow: 0 8px 32px rgba(0,0,0,0.4);">
+    <h2 style="margin: 0 0 12px 0; font-size: 16px; font-weight: 600;">削除確認</h2>
+    <p id="delete-confirm-message" style="margin: 0 0 20px 0; font-size: 14px; color: var(--text-muted); line-height: 1.5;">
+      この項目を削除してもよろしいですか？この操作は取り消せません。
+    </p>
+    <div style="display: flex; gap: 8px; justify-content: flex-end;">
+      <button 
+        id="delete-confirm-cancel"
+        style="padding: 8px 16px; background: transparent; border: 1px solid var(--border); color: var(--text); border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 200ms;"
+      >
+        キャンセル
+      </button>
+      <button 
+        id="delete-confirm-ok"
+        data-testid="delete-confirm-button"
+        style="padding: 8px 16px; background: #dc2626; color: #fff; border: none; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer; transition: background 200ms;"
+      >
+        削除
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Version Comparison -->
+<div 
+  id="version-compare-modal"
+  class="modal-overlay"
+  style="display: none; position: fixed; inset: 0; z-index: 1000; background: rgba(0, 0, 0, 0.55); display: flex; align-items: center; justify-content: center;"
+>
+  <div style="background: var(--bg-card); color: var(--text); padding: 24px; border-radius: 12px; max-width: 800px; width: 95%; max-height: 85vh; overflow-y: auto; box-shadow: 0 8px 32px rgba(0,0,0,0.4);">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+      <h2 style="margin: 0; font-size: 18px; font-weight: 600;">バージョン比較</h2>
+      <button 
+        id="compare-modal-close"
+        style="background: none; border: none; font-size: 24px; cursor: pointer; color: var(--text-muted);"
+      >
+        ×
+      </button>
+    </div>
+    <div 
+      id="compare-content"
+      style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; font-size: 12px;"
+    >
+      <!-- Populated by initJs -->
+    </div>
+  </div>
+</div>
+
+<!-- Modal: API Compatibility Verification -->
+<div 
+  id="verify-modal"
+  class="modal-overlay"
+  style="display: none; position: fixed; inset: 0; z-index: 1000; background: rgba(0, 0, 0, 0.55); display: flex; align-items: center; justify-content: center;"
+>
+  <div style="background: var(--bg-card); color: var(--text); padding: 24px; border-radius: 12px; max-width: 500px; width: 90%; max-height: 90vh; overflow-y: auto; box-shadow: 0 8px 32px rgba(0,0,0,0.4);">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+      <h2 style="margin: 0; font-size: 18px; font-weight: 600;">API互換性検証</h2>
+      <button 
+        id="verify-modal-close"
+        style="background: none; border: none; font-size: 24px; cursor: pointer; color: var(--text-muted);"
+      >
+        ×
+      </button>
+    </div>
+
+    <form id="verify-form" style="display: flex; flex-direction: column; gap: 16px;">
+      <div>
+        <label style="display: block; font-size: 12px; font-weight: 500; color: var(--text-muted); margin-bottom: 4px;">検証対象API</label>
+        <select 
+          name="api_id"
+          data-testid="verify-api-select"
+          required
+          style="width: 100%; padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg-main); color: var(--text); font-size: 13px; cursor: pointer;"
+        >
+          <option value="">選択してください</option>
+        </select>
+      </div>
+
+      <div>
+        <label style="display: block; font-size: 12px; font-weight: 500; color: var(--text-muted); margin-bottom: 4px;">検証ルール</label>
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 13px;">
+            <input type="checkbox" name="verify_auth" value="true" style="accent-color: var(--primary);" />
+            認証方式の検証
+          </label>
+          <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 13px;">
+            <input type="checkbox" name="verify_format" value="true" style="accent-color: var(--primary);" />
+            リクエスト/レスポンス形式の検証
+          </label>
+          <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 13px;">
+            <input type="checkbox" name="verify_rate" value="true" style="accent-color: var(--primary);" />
+            レート制限の検証
+          </label>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 8px; justify-content: flex-end; margin-top: 12px;">
+        <button 
+          type="button"
+          id="verify-modal-cancel"
+          style="padding: 8px 16px; background: transparent; border: 1px solid var(--border); color: var(--text); border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 200ms;"
+        >
+          キャンセル
+        </button>
+        <button 
+          type="submit"
+          data-testid="verify-start-button"
+          style="padding: 8px 16px; background: var(--primary); color: #fff; border: none; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer; transition: background 200ms;"
+        >
+          検証開始
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Floating Action Button: API Compatibility Verification -->
+<button 
+  id="floating-verify-button"
+  data-testid="floating-verify-button"
+  style="position: fixed; bottom: 24px; right: 24px; width: 56px; height: 56px; border-radius: 50%; background: var(--primary); color: #fff; border: none; font-size: 24px; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.15); transition: all 200ms; z-index: 500;"
+  title="API互換性検証を実行"
+>
+  ✓
+</button></div>
+        <div data-aivic-panel="scr-1789462276246" style="display:none"></div>
+      </main>
+    </div>
+    <footer class="shell-footer">
+      © 2025 作業管理システム. All rights reserved.
+    </footer>
+  </div>
+  
+<script>
+(function() {
+  var TABLE_DEFS = window.AIVIC_TABLES || [];
+  var PRESET_SEED = window.AIVIC_PRESET_SEED || {};
+  var SYSTEM_NAME = window.AIVIC_SYSTEM_NAME || "";
+  var APP_ID = window.AIVIC_APP_ID || "";
+  var API_URL = (window.AIVIC_API_URL && window.AIVIC_API_URL !== "REPLACE_WITH_API_URL")
+    ? window.AIVIC_API_URL : window.location.origin;
+
+  // 通知 helper ( SPA 版と同じ )
+  window.aivicNotify = (function() {
+    function ensureContainer() {
+      var c = document.getElementById("aivic-toast-container");
+      if (c) return c;
+      c = document.createElement("div");
+      c.id = "aivic-toast-container";
+      c.style.cssText = "position:fixed;top:16px;right:16px;z-index:9999;display:flex;flex-direction:column;gap:8px;pointer-events:none;max-width:360px;";
+      document.body.appendChild(c);
+      return c;
+    }
+    function show(msg, type) {
+      var c = ensureContainer();
+      var el = document.createElement("div");
+      el.textContent = msg;
+      el.style.cssText = "padding:10px 16px;border-radius:8px;font-size:13px;line-height:1.4;pointer-events:auto;color:#fff;background:" + (type === "error" ? "#dc2626" : "#d97706");
+      c.appendChild(el);
+      setTimeout(function() {
+        el.style.transition = "opacity .3s";
+        el.style.opacity = "0";
+        setTimeout(function() { if (el.parentNode) el.parentNode.removeChild(el); }, 320);
+      }, type === "error" ? 6000 : 4500);
+    }
+    return {
+      error: function(msg) { show("❌ " + msg, "error"); },
+      warn:  function(msg) { show("⚠️ " + msg, "warn"); },
+    };
+  })();
+
+  // CRUD API ( SPA 版と同じ )
+  window.aivicApi = (function() {
+    function dbErr(op) { window.aivicNotify.error("データベースエラー ( " + op + " ): APIサーバーに接続できません。"); }
+    function newId() { return typeof crypto !== "undefined" && crypto.randomUUID ? crypto.randomUUID() : "id-" + Date.now() + "-" + Math.random().toString(36).slice(2); }
+    function q(i) {
+      var t = TABLE_DEFS[i];
+      var dbP = (window.AIVIC_DB_TYPE && window.AIVIC_DB_TYPE !== "dynamodb") ? "&db=" + encodeURIComponent(window.AIVIC_DB_TYPE) : "";
+      return "?app=" + encodeURIComponent(APP_ID) + "&system=" + encodeURIComponent(SYSTEM_NAME) + "&table=" + encodeURIComponent(t ? t.tableName : "table" + i) + dbP;
+    }
+    return {
+      list: async function(tableIndex) {
+        if (!API_URL) return [];
+        try { var r = await fetch(API_URL + "/api/" + tableIndex + q(tableIndex)); var d = await r.json(); return Array.isArray(d) ? d : (d.items || []); }
+        catch(e) { dbErr("データ取得"); return []; }
+      },
+      save: async function(tableIndex, item) {
+        if (!API_URL) { dbErr("保存"); return null; }
+        var now = new Date().toISOString();
+        var rec = Object.assign({}, item, { id: item.id || newId(), createdAt: item.createdAt || now, updatedAt: now });
+        try { var r = await fetch(API_URL + "/api/" + tableIndex + q(tableIndex), { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(rec) }); return await r.json(); }
+        catch(e) { dbErr("保存"); return null; }
+      },
+      update: async function(tableIndex, id, changes) {
+        if (!API_URL) { dbErr("更新"); return null; }
+        try { var r = await fetch(API_URL + "/api/" + tableIndex + "/" + id + q(tableIndex), { method:"PUT", headers:{"Content-Type":"application/json"}, body:JSON.stringify(Object.assign({}, changes, {updatedAt: new Date().toISOString()})) }); return await r.json(); }
+        catch(e) { dbErr("更新"); return null; }
+      },
+      delete: async function(tableIndex, id) {
+        if (!API_URL) { dbErr("削除"); return {deleted:false}; }
+        try { await fetch(API_URL + "/api/" + tableIndex + "/" + id + q(tableIndex), {method:"DELETE"}); return {deleted:true}; }
+        catch(e) { dbErr("削除"); return {deleted:false}; }
+      },
+    };
+  })();
+
+  // showScreen はマルチページ構成ではページ遷移として動く。
+  var _aivicNavLastTime = 0;
+  var _aivicNavLastTarget = "";
+  var _aivicReady = false;
+  window.showScreen = function(screenId) {
+    if (!screenId) return;
+    if (screenId === window.AIVIC_PAGE_SCREEN_ID) return;
+    var targetPath = './' + encodeURIComponent(screenId) + '.html';
+    var currentName = (window.location.pathname.split('/').pop() || '');
+    if (currentName === (encodeURIComponent(screenId) + '.html') ||
+        currentName === (screenId + '.html')) {
+      return;
+    }
+    var now = Date.now();
+    if (_aivicNavLastTarget === targetPath && (now - _aivicNavLastTime) < 100) {
+      console.warn('[aivic] showScreen 連続呼び出し検知。 無限ループ防止のため抑制:', screenId);
+      return;
+    }
+    if (!_aivicReady) {
+      console.warn('[aivic] DOMContentLoaded 前の showScreen 呼び出し。 抑制:', screenId);
+      return;
+    }
+    _aivicNavLastTime = now;
+    _aivicNavLastTarget = targetPath;
+    window.location.href = targetPath;
+  };
+
+  function seedAllIfEmpty() {
+    if (!API_URL) return Promise.resolve();
+    return Promise.all(TABLE_DEFS.map(function(t, i) {
+      var preset = PRESET_SEED[t.tableName];
+      if (!Array.isArray(preset) || preset.length === 0) return Promise.resolve();
+      return window.aivicApi.list(i).then(function(existing) {
+        if (existing && existing.length > 0) return;
+        return Promise.all(preset.map(function(row) { return window.aivicApi.save(i, row); }));
+      }).catch(function() {});
+    }));
+  }
+
+  // ── 初期表示: このページ専用の panel に initFn を実行 ──
+  document.addEventListener("DOMContentLoaded", function() {
+    setTimeout(function() { _aivicReady = true; }, 1500);
+    var pageScreenId = window.AIVIC_PAGE_SCREEN_ID;
+    if (!pageScreenId) return;
+
+    // AI シェルが SPA 用の初期表示処理を持っていても、マルチページでは
+    // このファイルに割り当てられた画面だけを表示する。
+    document.querySelectorAll('[data-aivic-panel]').forEach(function(panel) {
+      var isCurrent = panel.getAttribute('data-aivic-panel') === pageScreenId;
+      panel.style.display = isCurrent ? 'block' : 'none';
+    });
+
+    document.querySelectorAll('[data-aivic-nav]').forEach(function(btn) {
+      var isActive = btn.getAttribute("data-aivic-nav") === pageScreenId;
+      btn.classList.toggle("aivic-active", isActive);
+      btn.setAttribute("aria-current", isActive ? "page" : "false");
+    });
+
+    var container = document.querySelector('[data-aivic-panel="' + pageScreenId + '"]');
+    if (!container) return;
+
+    // content 要素の hidden 強制除去 ( 2026-05-24 Playwright 大量 fail 対応 )
+    var isModalLike = function(el) {
+      if (!el || !el.classList) return false;
+      var cn = String(el.className || "");
+      if (/\bmodal\b|\bdialog\b|\boverlay\b|\bpopup\b|\bdropdown\b|\btooltip\b/i.test(cn)) return true;
+      var role = el.getAttribute && el.getAttribute("role");
+      if (role === "dialog" || role === "alertdialog" || role === "tooltip" || role === "menu") return true;
+      if (el.hasAttribute && (el.hasAttribute("data-modal") || el.hasAttribute("data-dropdown") || el.hasAttribute("data-popup") || el.hasAttribute("data-aivic-overlay"))) return true;
+      // 【2026-06-25】 class/role が無くても inline で画面を覆う overlay ( position:fixed ) は modal 扱いにして、
+      //  content 強制可視化が誤ってダイアログをロード時に表示してしまわないようにする。
+      if (el.style && el.style.position === "fixed") return true;
+      return false;
+    };
+    var unhideContentElements = function(root) {
+      var all = root.querySelectorAll('.hidden, [hidden], [style*="display:none"], [style*="display: none"]');
+      for (var k = 0; k < all.length; k++) {
+        var el = all[k];
+        if (isModalLike(el)) continue;
+        var p = el.parentElement;
+        var insideModal = false;
+        while (p && p !== root) {
+          if (isModalLike(p)) { insideModal = true; break; }
+          p = p.parentElement;
+        }
+        if (insideModal) continue;
+        el.classList.remove('hidden');
+        el.removeAttribute('hidden');
+        if (el.style && el.style.display === 'none') el.style.display = '';
+      }
+    };
+    try { unhideContentElements(container); } catch (e) { console.warn('[aivic] unhideContent failed:', e); }
+
+    var initJsSource = window.AIVIC_PAGE_INIT_JS;
+    if (!initJsSource) {
+      seedAllIfEmpty();
+      return;
+    }
+    var initFn = null;
+    try {
+      initFn = (new Function("return (" + initJsSource + ")"))();
+    } catch (e) {
+      console.error("[aivic] initJs compile error:", pageScreenId, e);
+      return;
+    }
+    if (typeof initFn !== "function") return;
+
+    seedAllIfEmpty().then(function() {
+      return Promise.all(TABLE_DEFS.map(function(t, i) {
+        return window.aivicApi.list(i)
+          .then(function(records) { return Object.assign({}, t, { records: records }); })
+          .catch(function() { return Object.assign({}, t, { records: [] }); });
+      }));
+    }).then(function(tables) {
+      try { initFn(container, API_URL, tables); } catch (e) { console.error("[aivic] initFn error:", pageScreenId, e); }
+      _aivicReady = true;
+    });
+  });
+
+  // 【2026-06-27 強化・必ず閉じられる保証】 モーダル/ダイアログを確実に閉じる安全網。
+  //  旧版は Esc のみ + セレクタ .overlay が class="modal-overlay" にマッチせず ( クラストークンが別 )
+  //  閉じられなかった ( ユーザー報告 2026-06-27: ダイアログが閉じない ) 。 ① Esc ② オーバーレイ背景クリック
+  //  ③ 閉じる系ボタン の 3 経路で閉じる。 セレクタは複合クラスも拾うよう [class*="overlay"] を含む。
+  //  閉じ方は「開クラス ( active/open/show 等 ) があれば外す ( 再オープン可 ) 、 無ければ inline display:none」。
+  //  modal-header 等の sub-part を誤って隠さないため [class*="modal"] は使わない。
+  var AIVIC_OVERLAY_SELECTOR = '[class*="overlay"],[data-aivic-overlay],[data-modal],[role="dialog"],[role="alertdialog"]';
+  var aivicCloseOverlay = function(el) {
+    if (!el || !el.classList) return;
+    var openClasses = ["active", "open", "show", "visible", "is-open", "is-active", "show-modal"];
+    var removed = false;
+    for (var c = 0; c < openClasses.length; c++) {
+      if (el.classList.contains(openClasses[c])) { el.classList.remove(openClasses[c]); removed = true; }
+    }
+    if (!removed && el.style) el.style.display = "none";
+  };
+  document.addEventListener("keydown", function(e) {
+    if (e.key !== "Escape" && e.keyCode !== 27) return;
+    var ov = document.querySelectorAll(AIVIC_OVERLAY_SELECTOR);
+    for (var i = 0; i < ov.length; i++) aivicCloseOverlay(ov[i]);
+  });
+  document.addEventListener("click", function(e) {
+    var t = e.target;
+    if (!t) return;
+    if (t.closest) {
+      var closer = t.closest('.modal-close,[data-modal-close],[data-close],[data-dismiss]');
+      if (closer) {
+        var oc = closer.closest(AIVIC_OVERLAY_SELECTOR);
+        if (oc) { aivicCloseOverlay(oc); return; }
+      }
+    }
+    // 背景 ( オーバーレイ要素そのもの ) を直接クリックした時のみ閉じる ( モーダル本体クリックでは閉じない ) 。
+    if (t.matches && t.matches(AIVIC_OVERLAY_SELECTOR) && t === e.target) {
+      aivicCloseOverlay(t);
+    }
+  });
+  // 【2026-06-28 強化・ロード時に必ず閉じる】 生成 AI が overlay を初期 display:none にし忘れた場合でも、
+  //  ロード直後にダイアログが画面を覆って操作不能になる事故 ( ユーザー報告 2026-06-28: ダイアログが常に表示され
+  //  閉じられない ) を防ぐ。 認識可能な overlay/dialog セレクタに該当する要素はロード時に必ず閉じる
+  //  ( 開クラス除去 or display:none ) 。 真にロード時表示すべき業務コンテンツは overlay セレクタに該当しないため
+  //  影響しない ( パネルコンテナは data-aivic-panel で別管理 ) 。
+  var aivicHideOverlaysOnLoad = function() {
+    var ov = document.querySelectorAll(AIVIC_OVERLAY_SELECTOR);
+    for (var i = 0; i < ov.length; i++) aivicCloseOverlay(ov[i]);
+  };
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", aivicHideOverlaysOnLoad);
+  } else {
+    aivicHideOverlaysOnLoad();
+  }
+})();
+
+</script>
+</body>
+</html>

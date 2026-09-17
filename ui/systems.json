@@ -1,0 +1,5530 @@
+[
+  {
+    "systemId": "itg-2",
+    "systemName": "作業者生産性データ分析・配置最適化支援システム",
+    "screens": [
+      {
+        "id": "scr-1789461964046",
+        "name": "生産性ダッシュボード・分析画面",
+        "purpose": "作業者個人の生産性データを自動収集・分析し、初期割当結果と実績の追跡比較を行うことで、習熟度評価と品質ばらつきを可視化し、配置最適化の意思決定を支援する",
+        "items": [
+          "作業者別生産性サマリーカード",
+          "生産性データ時系列グラフ",
+          "習熟度レベル表示",
+          "初期割当計画表示パネル",
+          "実績記録表示パネル",
+          "割当結果と実績の比較テーブル",
+          "偏差分析チャート",
+          "品質ばらつき検知アラート",
+          "パターン認識結果表示",
+          "生産性データ蓄積状態インジケーター",
+          "データ収集期間フィルター",
+          "作業タイプ別フィルター"
+        ]
+      },
+      {
+        "id": "scr-1789461978707",
+        "name": "最適人員配置案提案・実行画面",
+        "purpose": "作業者の生産性データに基づいて自動生成された最適人員配置案を確認・承認・実行し、割当変更を記録・追跡するための統合管理画面",
+        "items": [
+          "配置案サマリーパネル",
+          "現在の配置状況表示",
+          "提案配置案一覧表",
+          "配置案詳細ビュー",
+          "作業者別割当内容表示",
+          "部門別割当内容表示",
+          "生産性向上予測値表示",
+          "配置案の確認ボタン",
+          "配置案の承認ボタン",
+          "配置案の却下ボタン",
+          "配置案の実行ボタン",
+          "割当変更内容確認ダイアログ"
+        ]
+      },
+      {
+        "id": "scr-1789461993203",
+        "name": "作業実績データ記録・入力画面",
+        "purpose": "作業者の実績データを収集・記録し、作業タイプ・部門別に入力・管理するとともに、データの自動保存と検証を行う",
+        "items": [
+          "作業者選択ドロップダウン",
+          "部門選択ドロップダウン",
+          "作業タイプ選択ドロップダウン",
+          "作業日付入力フィールド",
+          "作業開始時刻入力フィールド",
+          "作業終了時刻入力フィールド",
+          "実績数量入力フィールド",
+          "単位選択ドロップダウン",
+          "作業内容説明テキストエリア",
+          "品質評価選択ボタングループ",
+          "備考入力フィールド",
+          "実績データ保存ボタン"
+        ]
+      }
+    ],
+    "tableDefinitions": [
+      {
+        "tableName": "ユーザー",
+        "purpose": "システムユーザーの認証・認可・プロフィール管理を行い、作業者・管理者・システム管理者などの役割に基づいたアクセス制御を実現する",
+        "columns": [
+          {
+            "name": "ユーザーID",
+            "type": "uuid",
+            "required": true,
+            "description": "ユーザーの一意識別子"
+          },
+          {
+            "name": "ユーザー名",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "ログイン時に使用するユーザー名"
+          },
+          {
+            "name": "メールアドレス",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "ユーザーの連絡先メールアドレス"
+          },
+          {
+            "name": "パスワードハッシュ",
+            "type": "varchar(255)",
+            "required": true,
+            "description": "暗号化されたパスワード"
+          },
+          {
+            "name": "氏名",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "ユーザーの実名"
+          },
+          {
+            "name": "役割",
+            "type": "varchar(50)",
+            "required": true,
+            "description": "ユーザーの役割（作業者・チームリーダー・管理者・システム管理者など）"
+          },
+          {
+            "name": "拠点ID",
+            "type": "uuid",
+            "required": false,
+            "description": "ユーザーが属する拠点の識別子"
+          },
+          {
+            "name": "チームID",
+            "type": "uuid",
+            "required": false,
+            "description": "ユーザーが属するチームの識別子"
+          },
+          {
+            "name": "ステータス",
+            "type": "varchar(20)",
+            "required": true,
+            "description": "ユーザーのステータス（有効・無効・休止中など）"
+          },
+          {
+            "name": "最終ログイン日時",
+            "type": "timestamp",
+            "required": false,
+            "description": "ユーザーが最後にログインした日時"
+          },
+          {
+            "name": "作成日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "ユーザーレコードの作成日時"
+          },
+          {
+            "name": "更新日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "ユーザーレコードの最終更新日時"
+          },
+          {
+            "name": "作成者",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "ユーザーレコードを作成したユーザー"
+          },
+          {
+            "name": "更新者",
+            "type": "varchar(100)",
+            "required": false,
+            "description": "ユーザーレコードを最後に更新したユーザー"
+          }
+        ]
+      },
+      {
+        "tableName": "作業者",
+        "purpose": "作業進捗・人員配置最適化エンジンにおいて、作業者の基本情報、所属、スキル、稼働状況を管理するマスタテーブル",
+        "columns": [
+          {
+            "name": "作業者ID",
+            "type": "uuid",
+            "required": true,
+            "description": "作業者を一意に識別するプライマリキー"
+          },
+          {
+            "name": "作業者名",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "作業者の氏名"
+          },
+          {
+            "name": "拠点ID",
+            "type": "uuid",
+            "required": true,
+            "description": "所属拠点を示す外部キー"
+          },
+          {
+            "name": "チームID",
+            "type": "uuid",
+            "required": true,
+            "description": "所属チームを示す外部キー"
+          },
+          {
+            "name": "職種",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "作業者の職種分類"
+          },
+          {
+            "name": "稼働状況",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "稼働中/休止中/退職等の状態"
+          },
+          {
+            "name": "時給",
+            "type": "integer",
+            "required": false,
+            "description": "作業者の時給単価"
+          },
+          {
+            "name": "最大稼働時間",
+            "type": "integer",
+            "required": false,
+            "description": "1日あたりの最大稼働時間"
+          },
+          {
+            "name": "作成日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "レコード作成日時"
+          },
+          {
+            "name": "更新日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "レコード最終更新日時"
+          },
+          {
+            "name": "作成者",
+            "type": "varchar(100)",
+            "required": false,
+            "description": "レコード作成者"
+          }
+        ]
+      },
+      {
+        "tableName": "生産性データ",
+        "purpose": "作業者の生産性指標を記録・分析し、人員配置最適化の判断基準となるデータを管理するトランザクションテーブル",
+        "columns": [
+          {
+            "name": "生産性データID",
+            "type": "uuid",
+            "required": true,
+            "description": "生産性データの一意識別子"
+          },
+          {
+            "name": "作業実績ID",
+            "type": "uuid",
+            "required": true,
+            "description": "関連する作業実績への外部キー"
+          },
+          {
+            "name": "作業者ID",
+            "type": "uuid",
+            "required": true,
+            "description": "生産性を記録する作業者への外部キー"
+          },
+          {
+            "name": "拠点ID",
+            "type": "uuid",
+            "required": true,
+            "description": "作業が実施された拠点への外部キー"
+          },
+          {
+            "name": "チームID",
+            "type": "uuid",
+            "required": true,
+            "description": "作業者が属するチームへの外部キー"
+          },
+          {
+            "name": "作業日",
+            "type": "timestamp",
+            "required": true,
+            "description": "生産性データが記録された作業日"
+          },
+          {
+            "name": "計画作業時間",
+            "type": "integer",
+            "required": true,
+            "description": "計画された作業時間（分単位）"
+          },
+          {
+            "name": "実績作業時間",
+            "type": "integer",
+            "required": true,
+            "description": "実際の作業時間（分単位）"
+          },
+          {
+            "name": "完了件数",
+            "type": "integer",
+            "required": true,
+            "description": "当日に完了した作業件数"
+          },
+          {
+            "name": "生産性率",
+            "type": "integer",
+            "required": true,
+            "description": "生産性率（パーセンテージ、0-100）"
+          },
+          {
+            "name": "品質スコア",
+            "type": "integer",
+            "required": false,
+            "description": "品質評価スコア（0-100）"
+          },
+          {
+            "name": "エラー件数",
+            "type": "integer",
+            "required": false,
+            "description": "当日に発生したエラー・不良件数"
+          },
+          {
+            "name": "習熟度レベル",
+            "type": "varchar(100)",
+            "required": false,
+            "description": "当日時点での作業者の習熟度レベル"
+          },
+          {
+            "name": "備考",
+            "type": "text",
+            "required": false,
+            "description": "生産性に影響した特記事項や環境要因"
+          },
+          {
+            "name": "作成日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "生産性データの作成日時"
+          },
+          {
+            "name": "更新日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "生産性データの最終更新日時"
+          },
+          {
+            "name": "作成者",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "生産性データを作成したユーザー"
+          }
+        ]
+      },
+      {
+        "tableName": "配置計画",
+        "purpose": "作業者の配置計画を管理し、生産性データに基づいて最適な配置を記録・追跡するマスタテーブル",
+        "columns": [
+          {
+            "name": "配置計画ID",
+            "type": "uuid",
+            "required": true,
+            "description": "配置計画の一意識別子"
+          },
+          {
+            "name": "作業者ID",
+            "type": "uuid",
+            "required": true,
+            "description": "配置対象の作業者を特定するための外部キー"
+          },
+          {
+            "name": "配置部門",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "作業者を配置する部門またはチーム名"
+          },
+          {
+            "name": "配置職務",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "配置先での職務内容またはロール"
+          },
+          {
+            "name": "開始日",
+            "type": "timestamp",
+            "required": true,
+            "description": "配置計画の開始日時"
+          },
+          {
+            "name": "終了日",
+            "type": "timestamp",
+            "required": false,
+            "description": "配置計画の終了日時、未定の場合はNULL"
+          },
+          {
+            "name": "配置ステータス",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "配置計画のステータス（計画中、実行中、完了、中止等）"
+          },
+          {
+            "name": "期待生産性目標",
+            "type": "integer",
+            "required": false,
+            "description": "この配置での期待生産性目標値"
+          },
+          {
+            "name": "最適化根拠",
+            "type": "text",
+            "required": false,
+            "description": "この配置が最適と判断された理由や分析結果"
+          },
+          {
+            "name": "作成日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "配置計画レコードの作成日時"
+          },
+          {
+            "name": "更新日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "配置計画レコードの最終更新日時"
+          },
+          {
+            "name": "作成者ID",
+            "type": "uuid",
+            "required": true,
+            "description": "配置計画を作成したユーザーの外部キー"
+          }
+        ]
+      },
+      {
+        "tableName": "初期割当",
+        "purpose": "作業者の初期配置情報を管理し、生産性データとの紐付けや配置計画の基準となるマスタデータを保持する",
+        "columns": [
+          {
+            "name": "割当ID",
+            "type": "uuid",
+            "required": true,
+            "description": "初期割当の一意識別子"
+          },
+          {
+            "name": "作業者ID",
+            "type": "uuid",
+            "required": true,
+            "description": "作業者テーブルへの外部キー"
+          },
+          {
+            "name": "配置部門",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "作業者が初期配置される部門名"
+          },
+          {
+            "name": "配置工程",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "作業者が初期配置される工程名"
+          },
+          {
+            "name": "割当開始日",
+            "type": "timestamp",
+            "required": true,
+            "description": "初期割当の開始日時"
+          },
+          {
+            "name": "割当終了日",
+            "type": "timestamp",
+            "required": false,
+            "description": "初期割当の終了日時（未定の場合はNULL）"
+          },
+          {
+            "name": "割当ステータス",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "割当状態（有効/無効/一時停止等）"
+          },
+          {
+            "name": "備考",
+            "type": "text",
+            "required": false,
+            "description": "割当に関する補足情報"
+          },
+          {
+            "name": "作成日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "レコード作成日時"
+          },
+          {
+            "name": "更新日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "レコード最終更新日時"
+          },
+          {
+            "name": "作成者",
+            "type": "uuid",
+            "required": true,
+            "description": "ユーザーテーブルへの外部キー（作成ユーザー）"
+          }
+        ]
+      },
+      {
+        "tableName": "実績記録",
+        "purpose": "作業者の日々の作業実績を記録し、生産性分析と配置最適化の基礎データとなるトランザクションテーブル",
+        "columns": [
+          {
+            "name": "実績記録ID",
+            "type": "uuid",
+            "required": true,
+            "description": "実績記録の一意識別子"
+          },
+          {
+            "name": "作業者ID",
+            "type": "uuid",
+            "required": true,
+            "description": "作業者テーブルへの外部キー"
+          },
+          {
+            "name": "配置計画ID",
+            "type": "uuid",
+            "required": false,
+            "description": "配置計画テーブルへの外部キー、該当する配置がある場合"
+          },
+          {
+            "name": "作業日",
+            "type": "timestamp",
+            "required": true,
+            "description": "作業が実施された日付"
+          },
+          {
+            "name": "作業内容",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "実施した作業の種類または名称"
+          },
+          {
+            "name": "完了数量",
+            "type": "integer",
+            "required": true,
+            "description": "当該作業で完了した件数または数量"
+          },
+          {
+            "name": "所要時間分",
+            "type": "integer",
+            "required": true,
+            "description": "作業に要した時間（分単位）"
+          },
+          {
+            "name": "品質スコア",
+            "type": "integer",
+            "required": false,
+            "description": "作業品質の評価スコア（0-100など）"
+          },
+          {
+            "name": "備考",
+            "type": "text",
+            "required": false,
+            "description": "実績に関する補足情報"
+          },
+          {
+            "name": "作成日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "実績記録が作成された日時"
+          },
+          {
+            "name": "更新日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "実績記録が最後に更新された日時"
+          },
+          {
+            "name": "作成者",
+            "type": "uuid",
+            "required": true,
+            "description": "ユーザーテーブルへの外部キー、実績を記録したユーザー"
+          }
+        ]
+      },
+      {
+        "tableName": "作業タイプ",
+        "purpose": "作業の種類を定義し、生産性データや配置計画で参照される作業タイプのマスタテーブル",
+        "columns": [
+          {
+            "name": "作業タイプID",
+            "type": "uuid",
+            "required": true,
+            "description": "作業タイプの一意識別子"
+          },
+          {
+            "name": "作業タイプ名",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "作業タイプの名称（例：組立、検査、梱包）"
+          },
+          {
+            "name": "説明",
+            "type": "text",
+            "required": false,
+            "description": "作業タイプの詳細説明"
+          },
+          {
+            "name": "標準生産性",
+            "type": "integer",
+            "required": false,
+            "description": "この作業タイプの標準生産性値（単位：個/時間など）"
+          },
+          {
+            "name": "難易度レベル",
+            "type": "integer",
+            "required": false,
+            "description": "作業の難易度を示す数値（1-5など）"
+          },
+          {
+            "name": "有効フラグ",
+            "type": "boolean",
+            "required": true,
+            "description": "作業タイプが有効かどうか"
+          },
+          {
+            "name": "作成日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "レコード作成日時"
+          },
+          {
+            "name": "更新日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "レコード最終更新日時"
+          },
+          {
+            "name": "作成者",
+            "type": "uuid",
+            "required": false,
+            "description": "レコード作成者のユーザーID"
+          }
+        ]
+      },
+      {
+        "tableName": "部門",
+        "purpose": "組織の部門マスタ。作業者の所属管理、生産性データの部門別集計、配置計画の部門単位での管理に使用される。",
+        "columns": [
+          {
+            "name": "部門ID",
+            "type": "uuid",
+            "required": true,
+            "description": "部門の一意識別子。主キー。"
+          },
+          {
+            "name": "部門名",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "部門の名称。例：製造部、品質管理部。"
+          },
+          {
+            "name": "部門コード",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "部門の業務コード。一意。例：MFG001。"
+          },
+          {
+            "name": "説明",
+            "type": "text",
+            "required": false,
+            "description": "部門の説明や役割。"
+          },
+          {
+            "name": "親部門ID",
+            "type": "uuid",
+            "required": false,
+            "description": "上位部門のID。階層構造を表現する場合に使用。"
+          },
+          {
+            "name": "責任者ユーザーID",
+            "type": "uuid",
+            "required": false,
+            "description": "部門の責任者となるユーザーID。ユーザーテーブルへの外部キー。"
+          },
+          {
+            "name": "ステータス",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "部門のステータス。例：active、inactive。"
+          },
+          {
+            "name": "作成日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "部門レコードの作成日時。"
+          },
+          {
+            "name": "更新日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "部門レコードの最終更新日時。"
+          },
+          {
+            "name": "作成者",
+            "type": "uuid",
+            "required": false,
+            "description": "部門レコードを作成したユーザーID。"
+          }
+        ]
+      },
+      {
+        "tableName": "割当変更履歴",
+        "purpose": "作業者の配置変更の履歴を記録し、変更前後の状態、理由、実行者を追跡するための履歴管理テーブル",
+        "columns": [
+          {
+            "name": "割当変更履歴ID",
+            "type": "uuid",
+            "required": true,
+            "description": "割当変更履歴の一意識別子"
+          },
+          {
+            "name": "作業者ID",
+            "type": "uuid",
+            "required": true,
+            "description": "変更対象の作業者を識別するID、作業者テーブルへの外部キー"
+          },
+          {
+            "name": "変更前配置計画ID",
+            "type": "uuid",
+            "required": false,
+            "description": "変更前の配置計画ID、配置計画テーブルへの外部キー"
+          },
+          {
+            "name": "変更後配置計画ID",
+            "type": "uuid",
+            "required": true,
+            "description": "変更後の配置計画ID、配置計画テーブルへの外部キー"
+          },
+          {
+            "name": "変更前部門ID",
+            "type": "uuid",
+            "required": false,
+            "description": "変更前の配置部門ID"
+          },
+          {
+            "name": "変更後部門ID",
+            "type": "uuid",
+            "required": true,
+            "description": "変更後の配置部門ID、部門テーブルへの外部キー"
+          },
+          {
+            "name": "変更前作業タイプID",
+            "type": "uuid",
+            "required": false,
+            "description": "変更前の作業タイプID"
+          },
+          {
+            "name": "変更後作業タイプID",
+            "type": "uuid",
+            "required": true,
+            "description": "変更後の作業タイプID、作業タイプテーブルへの外部キー"
+          },
+          {
+            "name": "変更理由",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "配置変更の理由コード（生産性向上、スキル育成、負荷分散等）"
+          },
+          {
+            "name": "変更理由詳細",
+            "type": "text",
+            "required": false,
+            "description": "配置変更理由の詳細説明"
+          },
+          {
+            "name": "変更実行日",
+            "type": "timestamp",
+            "required": true,
+            "description": "配置変更が実際に実行された日時"
+          },
+          {
+            "name": "予定変更日",
+            "type": "timestamp",
+            "required": false,
+            "description": "配置変更の予定実行日時"
+          },
+          {
+            "name": "作成日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "変更履歴レコードが作成された日時"
+          },
+          {
+            "name": "作成者ID",
+            "type": "uuid",
+            "required": true,
+            "description": "変更を実行したユーザーID、ユーザーテーブルへの外部キー"
+          },
+          {
+            "name": "承認者ID",
+            "type": "uuid",
+            "required": false,
+            "description": "変更を承認したユーザーID、ユーザーテーブルへの外部キー"
+          },
+          {
+            "name": "承認日時",
+            "type": "timestamp",
+            "required": false,
+            "description": "変更が承認された日時"
+          },
+          {
+            "name": "ステータス",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "変更ステータス（計画中、実行済、キャンセル等）"
+          }
+        ]
+      },
+      {
+        "tableName": "比較分析結果",
+        "purpose": "作業者の生産性データを複数の時期・条件で比較分析し、配置最適化の判断材料となる分析結果を記録・管理するテーブル",
+        "columns": [
+          {
+            "name": "比較分析結果ID",
+            "type": "uuid",
+            "required": true,
+            "description": "比較分析結果の一意識別子"
+          },
+          {
+            "name": "分析名",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "比較分析の名称・タイトル"
+          },
+          {
+            "name": "分析タイプ",
+            "type": "varchar(50)",
+            "required": true,
+            "description": "分析の種類(時系列比較/部門間比較/作業タイプ別比較/配置前後比較等)"
+          },
+          {
+            "name": "対象期間開始日",
+            "type": "timestamp",
+            "required": true,
+            "description": "比較分析の対象期間開始日時"
+          },
+          {
+            "name": "対象期間終了日",
+            "type": "timestamp",
+            "required": true,
+            "description": "比較分析の対象期間終了日時"
+          },
+          {
+            "name": "比較対象1",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "比較対象の第1グループ(作業者ID/部門ID/配置計画ID等)"
+          },
+          {
+            "name": "比較対象2",
+            "type": "varchar(100)",
+            "required": false,
+            "description": "比較対象の第2グループ(作業者ID/部門ID/配置計画ID等)"
+          },
+          {
+            "name": "平均生産性1",
+            "type": "integer",
+            "required": true,
+            "description": "比較対象1の平均生産性(単位:件数/時間等)"
+          },
+          {
+            "name": "平均生産性2",
+            "type": "integer",
+            "required": false,
+            "description": "比較対象2の平均生産性(単位:件数/時間等)"
+          },
+          {
+            "name": "生産性改善率",
+            "type": "integer",
+            "required": false,
+            "description": "生産性の改善率(パーセンテージ)"
+          },
+          {
+            "name": "平均品質スコア1",
+            "type": "integer",
+            "required": false,
+            "description": "比較対象1の平均品質スコア"
+          },
+          {
+            "name": "平均品質スコア2",
+            "type": "integer",
+            "required": false,
+            "description": "比較対象2の平均品質スコア"
+          },
+          {
+            "name": "分析結果サマリー",
+            "type": "text",
+            "required": false,
+            "description": "比較分析の結果要約・主要な発見事項"
+          },
+          {
+            "name": "推奨アクション",
+            "type": "text",
+            "required": false,
+            "description": "分析結果に基づく推奨される配置変更・改善施策"
+          },
+          {
+            "name": "統計的有意性",
+            "type": "boolean",
+            "required": false,
+            "description": "分析結果が統計的に有意であるかどうか"
+          },
+          {
+            "name": "作成日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "比較分析結果の作成日時"
+          },
+          {
+            "name": "更新日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "比較分析結果の最終更新日時"
+          },
+          {
+            "name": "作成者",
+            "type": "uuid",
+            "required": true,
+            "description": "比較分析結果を作成したユーザーID"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "systemId": "itg-3",
+    "systemName": "既存システム統合・技術実現可能性検証プラットフォーム",
+    "screens": [
+      {
+        "id": "scr-1789462261118",
+        "name": "API仕様書・連携ガイドライン管理画面",
+        "purpose": "API仕様書と連携ガイドラインの一元管理、バージョン管理、API互換性検証、統合可能性検証結果の表示を行い、システム間の統合実現可能性を検証するための中核管理画面",
+        "items": [
+          "API仕様書一覧表示",
+          "API仕様書登録ボタン",
+          "API仕様書編集ボタン",
+          "API仕様書削除ボタン",
+          "連携ガイドライン一覧表示",
+          "連携ガイドライン登録ボタン",
+          "連携ガイドライン編集ボタン",
+          "連携ガイドライン削除ボタン",
+          "ドキュメントバージョン履歴表示",
+          "バージョン比較機能",
+          "バージョン復元ボタン",
+          "API互換性検証実行ボタン"
+        ]
+      },
+      {
+        "id": "scr-1789462276246",
+        "name": "連携テスト・進捗管理ダッシュボード",
+        "purpose": "既存システムとの連携テスト仕様の作成・管理、テスト実行履歴の記録・表示、進捗状況のリアルタイム監視、テスト結果の分析、統合エラーの確認、技術実現可能性検証ステータスの表示、および作業実績データの自動取得・統合を一元管理するダッシュボード",
+        "items": [
+          "進捗状況サマリーパネル",
+          "連携テスト仕様一覧",
+          "テスト仕様新規作成ボタン",
+          "テスト仕様編集フォーム",
+          "テスト実行履歴タイムライン",
+          "テスト実行ボタン",
+          "テスト結果記録フォーム",
+          "テスト結果分析グラフ",
+          "統合エラーログビューア",
+          "エラー詳細表示パネル",
+          "技術実現可能性検証ステータス表示",
+          "検証ステータス更新ボタン"
+        ]
+      }
+    ],
+    "tableDefinitions": [
+      {
+        "tableName": "ユーザー",
+        "purpose": "システムユーザーの認証・認可・プロフィール管理を行い、作業者・管理者・システム管理者などの役割に基づいたアクセス制御を実現する",
+        "columns": [
+          {
+            "name": "ユーザーID",
+            "type": "uuid",
+            "required": true,
+            "description": "ユーザーの一意識別子"
+          },
+          {
+            "name": "ユーザー名",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "ログイン時に使用するユーザー名"
+          },
+          {
+            "name": "メールアドレス",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "ユーザーの連絡先メールアドレス"
+          },
+          {
+            "name": "パスワードハッシュ",
+            "type": "varchar(255)",
+            "required": true,
+            "description": "暗号化されたパスワード"
+          },
+          {
+            "name": "氏名",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "ユーザーの実名"
+          },
+          {
+            "name": "役割",
+            "type": "varchar(50)",
+            "required": true,
+            "description": "ユーザーの役割（作業者・チームリーダー・管理者・システム管理者など）"
+          },
+          {
+            "name": "拠点ID",
+            "type": "uuid",
+            "required": false,
+            "description": "ユーザーが属する拠点の識別子"
+          },
+          {
+            "name": "チームID",
+            "type": "uuid",
+            "required": false,
+            "description": "ユーザーが属するチームの識別子"
+          },
+          {
+            "name": "ステータス",
+            "type": "varchar(20)",
+            "required": true,
+            "description": "ユーザーのステータス（有効・無効・休止中など）"
+          },
+          {
+            "name": "最終ログイン日時",
+            "type": "timestamp",
+            "required": false,
+            "description": "ユーザーが最後にログインした日時"
+          },
+          {
+            "name": "作成日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "ユーザーレコードの作成日時"
+          },
+          {
+            "name": "更新日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "ユーザーレコードの最終更新日時"
+          },
+          {
+            "name": "作成者",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "ユーザーレコードを作成したユーザー"
+          },
+          {
+            "name": "更新者",
+            "type": "varchar(100)",
+            "required": false,
+            "description": "ユーザーレコードを最後に更新したユーザー"
+          }
+        ]
+      },
+      {
+        "tableName": "ユーザー権限",
+        "purpose": "ユーザーが各機能・データへのアクセス権限を管理し、作業進捗・人員配置システムにおける操作可能な範囲を制御する",
+        "columns": [
+          {
+            "name": "ユーザー権限ID",
+            "type": "uuid",
+            "required": true,
+            "description": "ユーザー権限レコードの一意識別子"
+          },
+          {
+            "name": "ユーザーID",
+            "type": "uuid",
+            "required": true,
+            "description": "権限が付与されるユーザーの外部キー参照"
+          },
+          {
+            "name": "拠点ID",
+            "type": "uuid",
+            "required": false,
+            "description": "権限が適用される拠点の外部キー参照、NULLの場合は全拠点対象"
+          },
+          {
+            "name": "チームID",
+            "type": "uuid",
+            "required": false,
+            "description": "権限が適用されるチームの外部キー参照、NULLの場合は全チーム対象"
+          },
+          {
+            "name": "権限種別",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "付与される権限の種類（例：作業指示作成、進捗確認、人員配置編集、レポート閲覧等）"
+          },
+          {
+            "name": "操作可能",
+            "type": "boolean",
+            "required": true,
+            "description": "権限が有効か無効かを示すフラグ"
+          },
+          {
+            "name": "有効開始日時",
+            "type": "timestamp",
+            "required": false,
+            "description": "権限の有効期間開始日時"
+          },
+          {
+            "name": "有効終了日時",
+            "type": "timestamp",
+            "required": false,
+            "description": "権限の有効期間終了日時"
+          },
+          {
+            "name": "作成日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "権限レコードの作成日時"
+          },
+          {
+            "name": "更新日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "権限レコードの最終更新日時"
+          },
+          {
+            "name": "作成者",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "権限レコードを作成したユーザーの識別子"
+          },
+          {
+            "name": "更新者",
+            "type": "varchar(100)",
+            "required": false,
+            "description": "権限レコードを最後に更新したユーザーの識別子"
+          }
+        ]
+      },
+      {
+        "tableName": "システム",
+        "purpose": "既存システムの統合対象となるシステム情報を管理し、技術実現可能性検証の対象システムを一元管理するマスタテーブル",
+        "columns": [
+          {
+            "name": "システムID",
+            "type": "uuid",
+            "required": true,
+            "description": "システムを一意に識別するプライマリキー"
+          },
+          {
+            "name": "システム名",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "システムの名称"
+          },
+          {
+            "name": "説明",
+            "type": "text",
+            "required": false,
+            "description": "システムの詳細説明や概要"
+          },
+          {
+            "name": "ベンダー名",
+            "type": "varchar(100)",
+            "required": false,
+            "description": "システムの提供ベンダー名"
+          },
+          {
+            "name": "バージョン",
+            "type": "varchar(100)",
+            "required": false,
+            "description": "システムのバージョン情報"
+          },
+          {
+            "name": "ステータス",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "システムの状態(稼働中/廃止予定/検証中等)"
+          },
+          {
+            "name": "技術スタック",
+            "type": "text",
+            "required": false,
+            "description": "使用されている技術やプラットフォーム情報"
+          },
+          {
+            "name": "統合優先度",
+            "type": "integer",
+            "required": false,
+            "description": "統合の優先度レベル(数値が小さいほど優先度が高い)"
+          },
+          {
+            "name": "実現可能性評価",
+            "type": "varchar(100)",
+            "required": false,
+            "description": "技術実現可能性の評価結果(高/中/低等)"
+          },
+          {
+            "name": "作成日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "レコード作成日時"
+          },
+          {
+            "name": "更新日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "レコード最終更新日時"
+          },
+          {
+            "name": "作成者ID",
+            "type": "uuid",
+            "required": true,
+            "description": "レコード作成者のユーザーID"
+          },
+          {
+            "name": "更新者ID",
+            "type": "uuid",
+            "required": true,
+            "description": "レコード最終更新者のユーザーID"
+          }
+        ]
+      },
+      {
+        "tableName": "API仕様書",
+        "purpose": "既存システムのAPI仕様情報を管理し、技術実現可能性検証時に参照・比較するためのマスタテーブル",
+        "columns": [
+          {
+            "name": "api_spec_id",
+            "type": "uuid",
+            "required": true,
+            "description": "API仕様書の一意識別子"
+          },
+          {
+            "name": "system_id",
+            "type": "uuid",
+            "required": true,
+            "description": "関連するシステムの識別子（システムテーブルへの外部キー）"
+          },
+          {
+            "name": "api_name",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "API名称"
+          },
+          {
+            "name": "api_endpoint",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "APIエンドポイントURL"
+          },
+          {
+            "name": "http_method",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "HTTPメソッド（GET、POST、PUT、DELETE等）"
+          },
+          {
+            "name": "description",
+            "type": "text",
+            "required": false,
+            "description": "API仕様の詳細説明"
+          },
+          {
+            "name": "request_format",
+            "type": "text",
+            "required": false,
+            "description": "リクエストフォーマット仕様"
+          },
+          {
+            "name": "response_format",
+            "type": "text",
+            "required": false,
+            "description": "レスポンスフォーマット仕様"
+          },
+          {
+            "name": "authentication_type",
+            "type": "varchar(100)",
+            "required": false,
+            "description": "認証方式（OAuth、API Key、Basic等）"
+          },
+          {
+            "name": "rate_limit",
+            "type": "varchar(100)",
+            "required": false,
+            "description": "レート制限情報"
+          },
+          {
+            "name": "version",
+            "type": "varchar(100)",
+            "required": false,
+            "description": "APIバージョン"
+          },
+          {
+            "name": "status",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "API仕様の状態（有効、廃止予定、廃止等）"
+          },
+          {
+            "name": "created_at",
+            "type": "timestamp",
+            "required": true,
+            "description": "作成日時"
+          },
+          {
+            "name": "created_by",
+            "type": "uuid",
+            "required": true,
+            "description": "作成者ユーザーID"
+          },
+          {
+            "name": "updated_at",
+            "type": "timestamp",
+            "required": true,
+            "description": "更新日時"
+          },
+          {
+            "name": "updated_by",
+            "type": "uuid",
+            "required": true,
+            "description": "更新者ユーザーID"
+          }
+        ]
+      },
+      {
+        "tableName": "連携ガイドライン",
+        "purpose": "既存システムとの連携方法、技術仕様、実装手順、注意事項を一元管理し、統合プロジェクトの実装ガイドとして機能するマスタテーブル",
+        "columns": [
+          {
+            "name": "ガイドラインID",
+            "type": "uuid",
+            "required": true,
+            "description": "連携ガイドラインの一意識別子"
+          },
+          {
+            "name": "システムID",
+            "type": "uuid",
+            "required": true,
+            "description": "連携対象システムへの外部キー参照"
+          },
+          {
+            "name": "API仕様書ID",
+            "type": "uuid",
+            "required": false,
+            "description": "関連するAPI仕様書への外部キー参照"
+          },
+          {
+            "name": "ガイドライン名",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "連携ガイドラインの名称"
+          },
+          {
+            "name": "説明",
+            "type": "text",
+            "required": false,
+            "description": "連携ガイドラインの詳細説明"
+          },
+          {
+            "name": "連携方式",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "連携方式の種類（REST、SOAP、ファイル転送等）"
+          },
+          {
+            "name": "実装手順",
+            "type": "text",
+            "required": false,
+            "description": "実装時の具体的な手順やステップ"
+          },
+          {
+            "name": "注意事項",
+            "type": "text",
+            "required": false,
+            "description": "実装時の注意点や制限事項"
+          },
+          {
+            "name": "セキュリティ要件",
+            "type": "text",
+            "required": false,
+            "description": "認証、暗号化等のセキュリティ要件"
+          },
+          {
+            "name": "パフォーマンス要件",
+            "type": "text",
+            "required": false,
+            "description": "レスポンスタイム、スループット等の要件"
+          },
+          {
+            "name": "ステータス",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "ガイドラインのステータス（ドラフト、承認済み、廃止等）"
+          },
+          {
+            "name": "バージョン",
+            "type": "integer",
+            "required": true,
+            "description": "ガイドラインのバージョン番号"
+          },
+          {
+            "name": "作成日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "ガイドラインの作成日時"
+          },
+          {
+            "name": "作成者ID",
+            "type": "uuid",
+            "required": true,
+            "description": "ガイドラインを作成したユーザーへの外部キー参照"
+          },
+          {
+            "name": "更新日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "ガイドラインの最終更新日時"
+          },
+          {
+            "name": "更新者ID",
+            "type": "uuid",
+            "required": true,
+            "description": "ガイドラインを最後に更新したユーザーへの外部キー参照"
+          }
+        ]
+      },
+      {
+        "tableName": "統合可能性検証結果",
+        "purpose": "既存システムとの統合可能性を検証し、技術的実現可能性の評価結果を記録・管理するテーブル",
+        "columns": [
+          {
+            "name": "検証結果ID",
+            "type": "uuid",
+            "required": true,
+            "description": "統合可能性検証結果の一意識別子"
+          },
+          {
+            "name": "ユーザーID",
+            "type": "uuid",
+            "required": true,
+            "description": "検証を実施したユーザーの識別子"
+          },
+          {
+            "name": "システムID",
+            "type": "uuid",
+            "required": true,
+            "description": "検証対象となる既存システムの識別子"
+          },
+          {
+            "name": "API仕様書ID",
+            "type": "uuid",
+            "required": true,
+            "description": "検証に使用したAPI仕様書の識別子"
+          },
+          {
+            "name": "連携ガイドラインID",
+            "type": "uuid",
+            "required": false,
+            "description": "参照した連携ガイドラインの識別子"
+          },
+          {
+            "name": "検証ステータス",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "検証状態を示す値(未実施/実施中/完了/却下)"
+          },
+          {
+            "name": "技術的実現可能性",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "技術的実現可能性の評価結果(可能/条件付き可能/不可能)"
+          },
+          {
+            "name": "実現可能性スコア",
+            "type": "integer",
+            "required": false,
+            "description": "技術的実現可能性を数値化したスコア(0-100)"
+          },
+          {
+            "name": "検証コメント",
+            "type": "text",
+            "required": false,
+            "description": "検証結果に関する詳細なコメントや所見"
+          },
+          {
+            "name": "課題事項",
+            "type": "text",
+            "required": false,
+            "description": "統合時に想定される課題や制限事項"
+          },
+          {
+            "name": "推奨事項",
+            "type": "text",
+            "required": false,
+            "description": "統合実現に向けた推奨事項や改善提案"
+          },
+          {
+            "name": "検証日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "検証を実施した日時"
+          },
+          {
+            "name": "作成日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "検証結果レコードが作成された日時"
+          },
+          {
+            "name": "更新日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "検証結果レコードが最後に更新された日時"
+          },
+          {
+            "name": "作成者",
+            "type": "uuid",
+            "required": true,
+            "description": "検証結果レコードを作成したユーザーの識別子"
+          }
+        ]
+      },
+      {
+        "tableName": "連携テスト仕様",
+        "purpose": "既存システムとの連携テストの仕様を定義・管理し、API仕様書と連携ガイドラインに基づいたテストケースの実行可能性を検証するためのマスタテーブル",
+        "columns": [
+          {
+            "name": "連携テスト仕様ID",
+            "type": "uuid",
+            "required": true,
+            "description": "連携テスト仕様の一意識別子"
+          },
+          {
+            "name": "システムID",
+            "type": "uuid",
+            "required": true,
+            "description": "連携対象システムへの外部キー参照"
+          },
+          {
+            "name": "API仕様書ID",
+            "type": "uuid",
+            "required": true,
+            "description": "テスト対象のAPI仕様書への外部キー参照"
+          },
+          {
+            "name": "連携ガイドラインID",
+            "type": "uuid",
+            "required": false,
+            "description": "適用される連携ガイドラインへの外部キー参照"
+          },
+          {
+            "name": "テスト仕様名",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "テスト仕様の名称"
+          },
+          {
+            "name": "テスト仕様説明",
+            "type": "text",
+            "required": false,
+            "description": "テスト仕様の詳細説明"
+          },
+          {
+            "name": "テストケース数",
+            "type": "integer",
+            "required": true,
+            "description": "この仕様に含まれるテストケースの総数"
+          },
+          {
+            "name": "テスト対象範囲",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "テスト対象の範囲（例：認証、データ連携、エラーハンドリング）"
+          },
+          {
+            "name": "実行可能性検証済み",
+            "type": "boolean",
+            "required": true,
+            "description": "技術実現可能性検証が完了したかどうか"
+          },
+          {
+            "name": "検証ステータス",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "検証状態（未検証、検証中、検証完了、検証失敗）"
+          },
+          {
+            "name": "作成日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "テスト仕様の作成日時"
+          },
+          {
+            "name": "作成者",
+            "type": "uuid",
+            "required": true,
+            "description": "テスト仕様を作成したユーザーへの外部キー参照"
+          },
+          {
+            "name": "更新日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "テスト仕様の最終更新日時"
+          },
+          {
+            "name": "更新者",
+            "type": "uuid",
+            "required": false,
+            "description": "テスト仕様を最後に更新したユーザーへの外部キー参照"
+          }
+        ]
+      },
+      {
+        "tableName": "テスト実行履歴",
+        "purpose": "連携テスト仕様に基づいて実行されたテストの実行結果、ステータス、詳細情報を記録し、統合可能性検証の進捗管理と履歴追跡を実現する",
+        "columns": [
+          {
+            "name": "テスト実行履歴ID",
+            "type": "uuid",
+            "required": true,
+            "description": "テスト実行履歴の一意識別子"
+          },
+          {
+            "name": "連携テスト仕様ID",
+            "type": "uuid",
+            "required": true,
+            "description": "実行対象の連携テスト仕様への外部キー参照"
+          },
+          {
+            "name": "統合可能性検証結果ID",
+            "type": "uuid",
+            "required": true,
+            "description": "親となる統合可能性検証結果への外部キー参照"
+          },
+          {
+            "name": "実行ステータス",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "テスト実行状態(未実行/実行中/成功/失敗/スキップ等)"
+          },
+          {
+            "name": "実行開始日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "テスト実行の開始日時"
+          },
+          {
+            "name": "実行終了日時",
+            "type": "timestamp",
+            "required": false,
+            "description": "テスト実行の終了日時"
+          },
+          {
+            "name": "実行結果",
+            "type": "text",
+            "required": false,
+            "description": "テスト実行の詳細結果、エラーメッセージ、ログ情報"
+          },
+          {
+            "name": "実行時間(ミリ秒)",
+            "type": "integer",
+            "required": false,
+            "description": "テスト実行にかかった時間(ミリ秒単位)"
+          },
+          {
+            "name": "実行者ID",
+            "type": "uuid",
+            "required": true,
+            "description": "テストを実行したユーザーへの外部キー参照"
+          },
+          {
+            "name": "作成日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "テスト実行履歴レコードの作成日時"
+          },
+          {
+            "name": "更新日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "テスト実行履歴レコードの最終更新日時"
+          }
+        ]
+      },
+      {
+        "tableName": "進捗管理",
+        "purpose": "既存システム統合プロジェクトの進捗状況を追跡・管理し、各統合タスクの実行状況、完了度、ステータス変更を記録するテーブル",
+        "columns": [
+          {
+            "name": "進捗管理ID",
+            "type": "uuid",
+            "required": true,
+            "description": "進捗管理レコードの一意識別子"
+          },
+          {
+            "name": "統合プロジェクトID",
+            "type": "uuid",
+            "required": true,
+            "description": "関連する統合プロジェクトの識別子、複数の統合タスクをグループ化"
+          },
+          {
+            "name": "タスク名",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "進捗管理対象のタスク名称"
+          },
+          {
+            "name": "ステータス",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "タスクの現在のステータス（未開始、進行中、完了、保留、失敗等）"
+          },
+          {
+            "name": "完了度",
+            "type": "integer",
+            "required": true,
+            "description": "タスクの完了度をパーセンテージで表示（0-100）"
+          },
+          {
+            "name": "予定開始日",
+            "type": "timestamp",
+            "required": false,
+            "description": "タスク実行予定の開始日時"
+          },
+          {
+            "name": "予定完了日",
+            "type": "timestamp",
+            "required": false,
+            "description": "タスク実行予定の完了日時"
+          },
+          {
+            "name": "実績開始日",
+            "type": "timestamp",
+            "required": false,
+            "description": "タスク実行の実際の開始日時"
+          },
+          {
+            "name": "実績完了日",
+            "type": "timestamp",
+            "required": false,
+            "description": "タスク実行の実際の完了日時"
+          },
+          {
+            "name": "担当者ID",
+            "type": "uuid",
+            "required": false,
+            "description": "タスク担当者のユーザーID"
+          },
+          {
+            "name": "備考",
+            "type": "text",
+            "required": false,
+            "description": "進捗状況に関する補足情報や課題の記述"
+          },
+          {
+            "name": "作成日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "進捗管理レコード作成日時"
+          },
+          {
+            "name": "更新日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "進捗管理レコード最終更新日時"
+          },
+          {
+            "name": "作成者ID",
+            "type": "uuid",
+            "required": true,
+            "description": "進捗管理レコード作成者のユーザーID"
+          }
+        ]
+      },
+      {
+        "tableName": "操作ログ",
+        "purpose": "ユーザーがシステム内で実行した操作を記録し、監査証跡、トラブルシューティング、セキュリティ監視に利用するトランザクションテーブル",
+        "columns": [
+          {
+            "name": "操作ログID",
+            "type": "uuid",
+            "required": true,
+            "description": "操作ログの一意識別子"
+          },
+          {
+            "name": "ユーザーID",
+            "type": "uuid",
+            "required": true,
+            "description": "操作を実行したユーザーの識別子、ユーザーテーブルへの外部キー"
+          },
+          {
+            "name": "操作種別",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "実行された操作の種類(作成、更新、削除、検証実行、テスト実行、ダウンロード等)"
+          },
+          {
+            "name": "対象テーブル",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "操作の対象となったテーブル名またはエンティティ名"
+          },
+          {
+            "name": "対象ID",
+            "type": "uuid",
+            "required": false,
+            "description": "操作の対象となったレコードの識別子"
+          },
+          {
+            "name": "操作内容",
+            "type": "text",
+            "required": false,
+            "description": "操作の詳細説明、変更内容、パラメータ等"
+          },
+          {
+            "name": "変更前値",
+            "type": "text",
+            "required": false,
+            "description": "更新操作の場合の変更前の値"
+          },
+          {
+            "name": "変更後値",
+            "type": "text",
+            "required": false,
+            "description": "更新操作の場合の変更後の値"
+          },
+          {
+            "name": "実行結果",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "操作の実行結果(成功、失敗、エラー等)"
+          },
+          {
+            "name": "エラーメッセージ",
+            "type": "text",
+            "required": false,
+            "description": "操作が失敗した場合のエラーメッセージ"
+          },
+          {
+            "name": "IPアドレス",
+            "type": "varchar(100)",
+            "required": false,
+            "description": "操作を実行したクライアントのIPアドレス"
+          },
+          {
+            "name": "セッションID",
+            "type": "varchar(100)",
+            "required": false,
+            "description": "操作が実行されたセッションの識別子"
+          },
+          {
+            "name": "作成日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "操作ログが記録された日時"
+          }
+        ]
+      },
+      {
+        "tableName": "統合エラーログ",
+        "purpose": "既存システム統合時に発生したエラーを記録・追跡し、統合の問題診断と改善に活用するための履歴管理テーブル",
+        "columns": [
+          {
+            "name": "エラーログID",
+            "type": "uuid",
+            "required": true,
+            "description": "エラーログの一意識別子"
+          },
+          {
+            "name": "統合可能性検証結果ID",
+            "type": "uuid",
+            "required": true,
+            "description": "関連する統合可能性検証結果への外部キー"
+          },
+          {
+            "name": "テスト実行履歴ID",
+            "type": "uuid",
+            "required": false,
+            "description": "関連するテスト実行履歴への外部キー"
+          },
+          {
+            "name": "エラーコード",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "エラーを識別するコード"
+          },
+          {
+            "name": "エラーメッセージ",
+            "type": "text",
+            "required": true,
+            "description": "エラーの詳細メッセージ"
+          },
+          {
+            "name": "エラー種別",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "エラーの分類（API接続エラー、データ形式エラー、認証エラー等）"
+          },
+          {
+            "name": "発生箇所",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "エラーが発生したシステム・モジュール名"
+          },
+          {
+            "name": "スタックトレース",
+            "type": "text",
+            "required": false,
+            "description": "エラーのスタックトレース情報"
+          },
+          {
+            "name": "重要度",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "エラーの重要度レベル（致命的、高、中、低）"
+          },
+          {
+            "name": "ステータス",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "エラーの対応状況（未対応、対応中、解決済み）"
+          },
+          {
+            "name": "対応内容",
+            "type": "text",
+            "required": false,
+            "description": "エラーに対する対応内容・解決方法"
+          },
+          {
+            "name": "発生日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "エラーが発生した日時"
+          },
+          {
+            "name": "作成日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "エラーログレコードが作成された日時"
+          },
+          {
+            "name": "更新日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "エラーログレコードが最後に更新された日時"
+          },
+          {
+            "name": "作成者",
+            "type": "uuid",
+            "required": true,
+            "description": "エラーログを作成したユーザーID"
+          },
+          {
+            "name": "更新者",
+            "type": "uuid",
+            "required": false,
+            "description": "エラーログを最後に更新したユーザーID"
+          }
+        ]
+      },
+      {
+        "tableName": "ドキュメント管理",
+        "purpose": "既存システムの統合に必要なドキュメント（API仕様書、連携ガイドライン、技術資料等）を一元管理し、バージョン管理と検索性を提供するマスタテーブル",
+        "columns": [
+          {
+            "name": "ドキュメントID",
+            "type": "uuid",
+            "required": true,
+            "description": "ドキュメントの一意識別子"
+          },
+          {
+            "name": "ドキュメント名",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "ドキュメントの名称"
+          },
+          {
+            "name": "ドキュメント種別",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "API仕様書、連携ガイドライン、技術資料等の分類"
+          },
+          {
+            "name": "関連システムID",
+            "type": "uuid",
+            "required": true,
+            "description": "このドキュメントが関連するシステムのID"
+          },
+          {
+            "name": "ファイルパス",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "ドキュメントの保存先パスまたはURL"
+          },
+          {
+            "name": "バージョン",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "ドキュメントのバージョン番号"
+          },
+          {
+            "name": "説明",
+            "type": "text",
+            "required": false,
+            "description": "ドキュメントの内容説明"
+          },
+          {
+            "name": "公開状態",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "公開、非公開、限定公開等のステータス"
+          },
+          {
+            "name": "作成日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "ドキュメント作成日時"
+          },
+          {
+            "name": "更新日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "ドキュメント最終更新日時"
+          },
+          {
+            "name": "作成者ID",
+            "type": "uuid",
+            "required": true,
+            "description": "ドキュメント作成者のユーザーID"
+          },
+          {
+            "name": "更新者ID",
+            "type": "uuid",
+            "required": true,
+            "description": "ドキュメント最終更新者のユーザーID"
+          }
+        ]
+      },
+      {
+        "tableName": "バージョン管理",
+        "purpose": "システムやAPI仕様書、連携ガイドラインなどの各種ドキュメント・設定のバージョン履歴を管理し、変更追跡と世代管理を実現するテーブル",
+        "columns": [
+          {
+            "name": "バージョン管理ID",
+            "type": "uuid",
+            "required": true,
+            "description": "バージョン管理レコードの一意識別子"
+          },
+          {
+            "name": "対象テーブル名",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "バージョン管理対象のテーブル名(システム、API仕様書、連携ガイドライン等)"
+          },
+          {
+            "name": "対象レコードID",
+            "type": "uuid",
+            "required": true,
+            "description": "対象テーブル内のレコードID"
+          },
+          {
+            "name": "バージョン番号",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "バージョン番号(例:1.0.0、1.0.1等)"
+          },
+          {
+            "name": "変更内容",
+            "type": "text",
+            "required": true,
+            "description": "このバージョンでの変更内容の説明"
+          },
+          {
+            "name": "変更前データ",
+            "type": "text",
+            "required": false,
+            "description": "変更前のデータ内容(差分追跡用)"
+          },
+          {
+            "name": "変更後データ",
+            "type": "text",
+            "required": false,
+            "description": "変更後のデータ内容(差分追跡用)"
+          },
+          {
+            "name": "リリース状態",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "バージョンの状態(草案、レビュー中、承認済み、リリース済み等)"
+          },
+          {
+            "name": "作成日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "バージョンレコード作成日時"
+          },
+          {
+            "name": "作成者",
+            "type": "uuid",
+            "required": true,
+            "description": "バージョン作成者のユーザーID"
+          },
+          {
+            "name": "更新日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "バージョンレコード最終更新日時"
+          },
+          {
+            "name": "更新者",
+            "type": "uuid",
+            "required": false,
+            "description": "バージョンレコード最終更新者のユーザーID"
+          },
+          {
+            "name": "リリース日時",
+            "type": "timestamp",
+            "required": false,
+            "description": "バージョンがリリースされた日時"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "systemId": "itg-4",
+    "systemName": "システム運用・スケーラビリティ管理ダッシュボード",
+    "screens": [
+      {
+        "id": "scr-1789462440034",
+        "name": "システム運用ダッシュボード",
+        "purpose": "拠点別のシステム負荷・データ量・ユーザー数の月次トレンドを自動集計し、スケーラビリティ分析と負荷管理を一元的に可視化・監視するダッシュボード",
+        "items": [
+          "拠点選択フィルター",
+          "月次トレンドグラフ（システム負荷）",
+          "月次トレンドグラフ（データ量）",
+          "月次トレンドグラフ（ユーザー数）",
+          "月次集計結果サマリーパネル",
+          "スケーラビリティ分析結果表示",
+          "負荷分析ダッシュボード",
+          "データ収集カバー率インジケーター",
+          "統一ダッシュボード更新ステータス",
+          "月次集計自動更新設定",
+          "トレンドデータエクスポートボタン",
+          "拠点別詳細ドリルダウンリンク"
+        ]
+      }
+    ],
+    "tableDefinitions": [
+      {
+        "tableName": "ユーザー",
+        "purpose": "システムユーザーの認証・認可・プロフィール管理を行い、作業者・管理者・システム管理者などの役割に基づいたアクセス制御を実現する",
+        "columns": [
+          {
+            "name": "ユーザーID",
+            "type": "uuid",
+            "required": true,
+            "description": "ユーザーの一意識別子"
+          },
+          {
+            "name": "ユーザー名",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "ログイン時に使用するユーザー名"
+          },
+          {
+            "name": "メールアドレス",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "ユーザーの連絡先メールアドレス"
+          },
+          {
+            "name": "パスワードハッシュ",
+            "type": "varchar(255)",
+            "required": true,
+            "description": "暗号化されたパスワード"
+          },
+          {
+            "name": "氏名",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "ユーザーの実名"
+          },
+          {
+            "name": "役割",
+            "type": "varchar(50)",
+            "required": true,
+            "description": "ユーザーの役割（作業者・チームリーダー・管理者・システム管理者など）"
+          },
+          {
+            "name": "拠点ID",
+            "type": "uuid",
+            "required": false,
+            "description": "ユーザーが属する拠点の識別子"
+          },
+          {
+            "name": "チームID",
+            "type": "uuid",
+            "required": false,
+            "description": "ユーザーが属するチームの識別子"
+          },
+          {
+            "name": "ステータス",
+            "type": "varchar(20)",
+            "required": true,
+            "description": "ユーザーのステータス（有効・無効・休止中など）"
+          },
+          {
+            "name": "最終ログイン日時",
+            "type": "timestamp",
+            "required": false,
+            "description": "ユーザーが最後にログインした日時"
+          },
+          {
+            "name": "作成日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "ユーザーレコードの作成日時"
+          },
+          {
+            "name": "更新日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "ユーザーレコードの最終更新日時"
+          },
+          {
+            "name": "作成者",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "ユーザーレコードを作成したユーザー"
+          },
+          {
+            "name": "更新者",
+            "type": "varchar(100)",
+            "required": false,
+            "description": "ユーザーレコードを最後に更新したユーザー"
+          }
+        ]
+      },
+      {
+        "tableName": "操作ログ",
+        "purpose": "ユーザーがシステム内で実行した操作を記録し、監査証跡、トラブルシューティング、セキュリティ監視に利用するトランザクションテーブル",
+        "columns": [
+          {
+            "name": "操作ログID",
+            "type": "uuid",
+            "required": true,
+            "description": "操作ログの一意識別子"
+          },
+          {
+            "name": "ユーザーID",
+            "type": "uuid",
+            "required": true,
+            "description": "操作を実行したユーザーの識別子、ユーザーテーブルへの外部キー"
+          },
+          {
+            "name": "操作種別",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "実行された操作の種類(作成、更新、削除、検証実行、テスト実行、ダウンロード等)"
+          },
+          {
+            "name": "対象テーブル",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "操作の対象となったテーブル名またはエンティティ名"
+          },
+          {
+            "name": "対象ID",
+            "type": "uuid",
+            "required": false,
+            "description": "操作の対象となったレコードの識別子"
+          },
+          {
+            "name": "操作内容",
+            "type": "text",
+            "required": false,
+            "description": "操作の詳細説明、変更内容、パラメータ等"
+          },
+          {
+            "name": "変更前値",
+            "type": "text",
+            "required": false,
+            "description": "更新操作の場合の変更前の値"
+          },
+          {
+            "name": "変更後値",
+            "type": "text",
+            "required": false,
+            "description": "更新操作の場合の変更後の値"
+          },
+          {
+            "name": "実行結果",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "操作の実行結果(成功、失敗、エラー等)"
+          },
+          {
+            "name": "エラーメッセージ",
+            "type": "text",
+            "required": false,
+            "description": "操作が失敗した場合のエラーメッセージ"
+          },
+          {
+            "name": "IPアドレス",
+            "type": "varchar(100)",
+            "required": false,
+            "description": "操作を実行したクライアントのIPアドレス"
+          },
+          {
+            "name": "セッションID",
+            "type": "varchar(100)",
+            "required": false,
+            "description": "操作が実行されたセッションの識別子"
+          },
+          {
+            "name": "作成日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "操作ログが記録された日時"
+          }
+        ]
+      },
+      {
+        "tableName": "拠点マスタ",
+        "purpose": "システム運用における複数拠点の基本情報を一元管理し、ユーザーの拠点割当やシステムリソースの拠点別配置を支援するマスタテーブル",
+        "columns": [
+          {
+            "name": "拠点ID",
+            "type": "uuid",
+            "required": true,
+            "description": "拠点を一意に識別するプライマリキー"
+          },
+          {
+            "name": "拠点名",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "拠点の表示名称（例：東京本社、大阪支社）"
+          },
+          {
+            "name": "拠点コード",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "拠点を識別するユニークなコード（例：TK001、OS002）"
+          },
+          {
+            "name": "都道府県",
+            "type": "varchar(100)",
+            "required": false,
+            "description": "拠点が所在する都道府県"
+          },
+          {
+            "name": "住所",
+            "type": "text",
+            "required": false,
+            "description": "拠点の詳細住所"
+          },
+          {
+            "name": "電話番号",
+            "type": "varchar(100)",
+            "required": false,
+            "description": "拠点の連絡先電話番号"
+          },
+          {
+            "name": "ステータス",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "拠点の運用状態（稼働中、休止中、廃止等）"
+          },
+          {
+            "name": "容量区分",
+            "type": "varchar(100)",
+            "required": false,
+            "description": "拠点のスケーラビリティ区分（小規模、中規模、大規模等）"
+          },
+          {
+            "name": "最大ユーザー数",
+            "type": "integer",
+            "required": false,
+            "description": "拠点で管理可能な最大ユーザー数"
+          },
+          {
+            "name": "備考",
+            "type": "text",
+            "required": false,
+            "description": "拠点に関する追加情報や特記事項"
+          },
+          {
+            "name": "作成日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "レコード作成日時"
+          },
+          {
+            "name": "更新日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "レコード最終更新日時"
+          },
+          {
+            "name": "作成者",
+            "type": "uuid",
+            "required": true,
+            "description": "レコード作成者のユーザーID（ユーザーテーブルへの外部キー）"
+          },
+          {
+            "name": "更新者",
+            "type": "uuid",
+            "required": true,
+            "description": "レコード最終更新者のユーザーID（ユーザーテーブルへの外部キー）"
+          }
+        ]
+      },
+      {
+        "tableName": "システム負荷データ",
+        "purpose": "システムの運用状況をリアルタイムで監視し、スケーラビリティ管理のための負荷情報を記録・分析するテーブル",
+        "columns": [
+          {
+            "name": "負荷データID",
+            "type": "uuid",
+            "required": true,
+            "description": "システム負荷データの一意識別子"
+          },
+          {
+            "name": "拠点ID",
+            "type": "uuid",
+            "required": true,
+            "description": "拠点マスタへの外部キー参照"
+          },
+          {
+            "name": "測定日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "負荷データを測定した日時"
+          },
+          {
+            "name": "CPU使用率",
+            "type": "integer",
+            "required": true,
+            "description": "CPU使用率のパーセンテージ値(0-100)"
+          },
+          {
+            "name": "メモリ使用率",
+            "type": "integer",
+            "required": true,
+            "description": "メモリ使用率のパーセンテージ値(0-100)"
+          },
+          {
+            "name": "ディスク使用率",
+            "type": "integer",
+            "required": true,
+            "description": "ディスク使用率のパーセンテージ値(0-100)"
+          },
+          {
+            "name": "アクティブユーザー数",
+            "type": "integer",
+            "required": true,
+            "description": "測定時点でのアクティブユーザー数"
+          },
+          {
+            "name": "平均応答時間",
+            "type": "integer",
+            "required": true,
+            "description": "システムの平均応答時間(ミリ秒)"
+          },
+          {
+            "name": "エラー発生件数",
+            "type": "integer",
+            "required": false,
+            "description": "測定期間中に発生したエラー件数"
+          },
+          {
+            "name": "ネットワーク帯域幅使用率",
+            "type": "integer",
+            "required": false,
+            "description": "ネットワーク帯域幅の使用率パーセンテージ値(0-100)"
+          },
+          {
+            "name": "警告フラグ",
+            "type": "boolean",
+            "required": true,
+            "description": "負荷が閾値を超えているかを示すフラグ"
+          },
+          {
+            "name": "作成日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "レコード作成日時"
+          },
+          {
+            "name": "作成者",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "レコード作成者のユーザーID"
+          }
+        ]
+      },
+      {
+        "tableName": "データ量トレンド",
+        "purpose": "システム運用におけるデータ量の時系列変化を記録・監視し、スケーラビリティ管理のための容量計画と性能分析を支援する",
+        "columns": [
+          {
+            "name": "トレンドID",
+            "type": "uuid",
+            "required": true,
+            "description": "データ量トレンドレコードの一意識別子"
+          },
+          {
+            "name": "測定日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "データ量を測定した日時"
+          },
+          {
+            "name": "拠点ID",
+            "type": "uuid",
+            "required": true,
+            "description": "拠点マスタへの外部キー参照"
+          },
+          {
+            "name": "テーブル名",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "測定対象のテーブル名"
+          },
+          {
+            "name": "レコード数",
+            "type": "integer",
+            "required": true,
+            "description": "該当テーブルのレコード総数"
+          },
+          {
+            "name": "データサイズMB",
+            "type": "integer",
+            "required": true,
+            "description": "テーブルの物理的なデータサイズ(MB単位)"
+          },
+          {
+            "name": "増加率パーセント",
+            "type": "integer",
+            "required": false,
+            "description": "前回測定時点からの増加率(%)"
+          },
+          {
+            "name": "作成日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "レコード作成日時"
+          },
+          {
+            "name": "更新日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "レコード最終更新日時"
+          },
+          {
+            "name": "作成者",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "レコード作成者のユーザーID"
+          }
+        ]
+      },
+      {
+        "tableName": "ユーザー数トレンド",
+        "purpose": "システム運用スケーラビリティ管理のためにユーザー数の時系列変化を記録・分析し、容量計画とパフォーマンス予測を支援するトレンドデータテーブル",
+        "columns": [
+          {
+            "name": "トレンドID",
+            "type": "uuid",
+            "required": true,
+            "description": "ユーザー数トレンドレコードの一意識別子"
+          },
+          {
+            "name": "集計日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "ユーザー数を集計した日時"
+          },
+          {
+            "name": "アクティブユーザー数",
+            "type": "integer",
+            "required": true,
+            "description": "集計日時時点でのアクティブユーザーの総数"
+          },
+          {
+            "name": "新規ユーザー数",
+            "type": "integer",
+            "required": false,
+            "description": "集計期間中に新規登録されたユーザー数"
+          },
+          {
+            "name": "離脱ユーザー数",
+            "type": "integer",
+            "required": false,
+            "description": "集計期間中に退会・非アクティブ化したユーザー数"
+          },
+          {
+            "name": "拠点ID",
+            "type": "uuid",
+            "required": false,
+            "description": "拠点マスタへの外部キー、拠点別集計の場合に使用"
+          },
+          {
+            "name": "集計粒度",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "集計の時間単位(日次/週次/月次等)"
+          },
+          {
+            "name": "作成日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "トレンドレコードが作成された日時"
+          },
+          {
+            "name": "更新日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "トレンドレコードが最後に更新された日時"
+          },
+          {
+            "name": "作成者",
+            "type": "varchar(100)",
+            "required": false,
+            "description": "トレンドレコードを作成したシステムまたはユーザー"
+          }
+        ]
+      },
+      {
+        "tableName": "月次集計結果",
+        "purpose": "システム運用・スケーラビリティ管理のための月次単位の集計データを管理し、ユーザー数、システム負荷、データ量などの主要指標を記録・分析する",
+        "columns": [
+          {
+            "name": "集計結果ID",
+            "type": "uuid",
+            "required": true,
+            "description": "月次集計結果の一意識別子"
+          },
+          {
+            "name": "集計年月",
+            "type": "varchar(7)",
+            "required": true,
+            "description": "集計対象の年月（YYYY-MM形式）"
+          },
+          {
+            "name": "拠点ID",
+            "type": "uuid",
+            "required": true,
+            "description": "拠点マスタへの外部キー、集計対象の拠点"
+          },
+          {
+            "name": "月次ユーザー数",
+            "type": "integer",
+            "required": true,
+            "description": "当月のアクティブユーザー数"
+          },
+          {
+            "name": "月次操作件数",
+            "type": "integer",
+            "required": true,
+            "description": "当月の総操作ログ件数"
+          },
+          {
+            "name": "平均システム負荷率",
+            "type": "integer",
+            "required": true,
+            "description": "当月のシステム負荷率の平均値（パーセンテージ）"
+          },
+          {
+            "name": "ピークシステム負荷率",
+            "type": "integer",
+            "required": true,
+            "description": "当月のシステム負荷率の最大値（パーセンテージ）"
+          },
+          {
+            "name": "月次データ量GB",
+            "type": "integer",
+            "required": true,
+            "description": "当月のデータ量合計（GB単位）"
+          },
+          {
+            "name": "前月比ユーザー数増減率",
+            "type": "integer",
+            "required": false,
+            "description": "前月比のユーザー数増減率（パーセンテージ）"
+          },
+          {
+            "name": "前月比データ量増減率",
+            "type": "integer",
+            "required": false,
+            "description": "前月比のデータ量増減率（パーセンテージ）"
+          },
+          {
+            "name": "作成日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "集計結果の作成日時"
+          },
+          {
+            "name": "更新日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "集計結果の最終更新日時"
+          },
+          {
+            "name": "作成者",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "集計結果を作成したユーザーまたはシステム"
+          }
+        ]
+      },
+      {
+        "tableName": "ダッシュボード設定",
+        "purpose": "システム運用・スケーラビリティ管理ダッシュボードの表示設定、ウィジェット配置、フィルタ条件、更新頻度などを管理するマスタテーブル",
+        "columns": [
+          {
+            "name": "ダッシュボード設定ID",
+            "type": "uuid",
+            "required": true,
+            "description": "ダッシュボード設定の一意識別子"
+          },
+          {
+            "name": "ユーザーID",
+            "type": "uuid",
+            "required": true,
+            "description": "設定を所有するユーザーの外部キー参照"
+          },
+          {
+            "name": "拠点ID",
+            "type": "uuid",
+            "required": false,
+            "description": "拠点マスタへの外部キー参照、拠点別ダッシュボード設定の場合に使用"
+          },
+          {
+            "name": "ダッシュボード名",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "ダッシュボードの表示名"
+          },
+          {
+            "name": "説明",
+            "type": "text",
+            "required": false,
+            "description": "ダッシュボードの説明"
+          },
+          {
+            "name": "デフォルトフラグ",
+            "type": "boolean",
+            "required": true,
+            "description": "ユーザーのデフォルトダッシュボードとして使用するかどうか"
+          },
+          {
+            "name": "自動更新間隔秒",
+            "type": "integer",
+            "required": true,
+            "description": "ダッシュボードの自動更新間隔（秒単位、0は自動更新なし）"
+          },
+          {
+            "name": "表示対象メトリクス",
+            "type": "text",
+            "required": false,
+            "description": "表示するメトリクスの種別（システム負荷、データ量トレンド、ユーザー数トレンド等）をカンマ区切りで指定"
+          },
+          {
+            "name": "フィルタ条件",
+            "type": "text",
+            "required": false,
+            "description": "ダッシュボードに適用するフィルタ条件（期間、拠点、ステータス等）"
+          },
+          {
+            "name": "レイアウトタイプ",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "ダッシュボードのレイアウト種別（標準、コンパクト、カスタム等）"
+          },
+          {
+            "name": "作成日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "ダッシュボード設定の作成日時"
+          },
+          {
+            "name": "更新日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "ダッシュボード設定の最終更新日時"
+          },
+          {
+            "name": "作成者",
+            "type": "uuid",
+            "required": true,
+            "description": "ダッシュボード設定を作成したユーザーID"
+          },
+          {
+            "name": "更新者",
+            "type": "uuid",
+            "required": true,
+            "description": "ダッシュボード設定を最後に更新したユーザーID"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "systemId": "itg-5",
+    "systemName": "ベンダー選定・契約リスク評価支援システム",
+    "screens": [
+      {
+        "id": "scr-1789462725117",
+        "name": "ベンダー評価ワークスペース",
+        "purpose": "ベンダー候補企業の総合評価を行うワークスペース。帝国データバンク情報の自動照会、導入実績・参照顧客・業界別適用事例の一元管理、契約書・API仕様・法務対応実績の統合管理、知的財産権・セキュリティリスク項目の業界標準パターン対比分析、リスク評価スコア算出、契約リスク評価・コンプライアンス検証、評価レポート生成を実現する",
+        "items": [
+          "ベンダー候補企業検索・選択パネル",
+          "帝国データバンク登録企業情報表示エリア",
+          "企業基本情報サマリー",
+          "導入実績一覧表示",
+          "参照顧客一覧表示",
+          "業界別適用事例一覧表示",
+          "契約書管理タブ",
+          "API仕様書管理タブ",
+          "法務対応実績管理タブ",
+          "知的財産権リスク項目リスト",
+          "セキュリティリスク項目リスト",
+          "業界標準パターン対比分析ビュー"
+        ]
+      }
+    ],
+    "tableDefinitions": [
+      {
+        "tableName": "ユーザー権限",
+        "purpose": "ユーザーが各機能・データへのアクセス権限を管理し、作業進捗・人員配置システムにおける操作可能な範囲を制御する",
+        "columns": [
+          {
+            "name": "ユーザー権限ID",
+            "type": "uuid",
+            "required": true,
+            "description": "ユーザー権限レコードの一意識別子"
+          },
+          {
+            "name": "ユーザーID",
+            "type": "uuid",
+            "required": true,
+            "description": "権限が付与されるユーザーの外部キー参照"
+          },
+          {
+            "name": "拠点ID",
+            "type": "uuid",
+            "required": false,
+            "description": "権限が適用される拠点の外部キー参照、NULLの場合は全拠点対象"
+          },
+          {
+            "name": "チームID",
+            "type": "uuid",
+            "required": false,
+            "description": "権限が適用されるチームの外部キー参照、NULLの場合は全チーム対象"
+          },
+          {
+            "name": "権限種別",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "付与される権限の種類（例：作業指示作成、進捗確認、人員配置編集、レポート閲覧等）"
+          },
+          {
+            "name": "操作可能",
+            "type": "boolean",
+            "required": true,
+            "description": "権限が有効か無効かを示すフラグ"
+          },
+          {
+            "name": "有効開始日時",
+            "type": "timestamp",
+            "required": false,
+            "description": "権限の有効期間開始日時"
+          },
+          {
+            "name": "有効終了日時",
+            "type": "timestamp",
+            "required": false,
+            "description": "権限の有効期間終了日時"
+          },
+          {
+            "name": "作成日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "権限レコードの作成日時"
+          },
+          {
+            "name": "更新日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "権限レコードの最終更新日時"
+          },
+          {
+            "name": "作成者",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "権限レコードを作成したユーザーの識別子"
+          },
+          {
+            "name": "更新者",
+            "type": "varchar(100)",
+            "required": false,
+            "description": "権限レコードを最後に更新したユーザーの識別子"
+          }
+        ]
+      },
+      {
+        "tableName": "API仕様書",
+        "purpose": "既存システムのAPI仕様情報を管理し、技術実現可能性検証時に参照・比較するためのマスタテーブル",
+        "columns": [
+          {
+            "name": "api_spec_id",
+            "type": "uuid",
+            "required": true,
+            "description": "API仕様書の一意識別子"
+          },
+          {
+            "name": "system_id",
+            "type": "uuid",
+            "required": true,
+            "description": "関連するシステムの識別子（システムテーブルへの外部キー）"
+          },
+          {
+            "name": "api_name",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "API名称"
+          },
+          {
+            "name": "api_endpoint",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "APIエンドポイントURL"
+          },
+          {
+            "name": "http_method",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "HTTPメソッド（GET、POST、PUT、DELETE等）"
+          },
+          {
+            "name": "description",
+            "type": "text",
+            "required": false,
+            "description": "API仕様の詳細説明"
+          },
+          {
+            "name": "request_format",
+            "type": "text",
+            "required": false,
+            "description": "リクエストフォーマット仕様"
+          },
+          {
+            "name": "response_format",
+            "type": "text",
+            "required": false,
+            "description": "レスポンスフォーマット仕様"
+          },
+          {
+            "name": "authentication_type",
+            "type": "varchar(100)",
+            "required": false,
+            "description": "認証方式（OAuth、API Key、Basic等）"
+          },
+          {
+            "name": "rate_limit",
+            "type": "varchar(100)",
+            "required": false,
+            "description": "レート制限情報"
+          },
+          {
+            "name": "version",
+            "type": "varchar(100)",
+            "required": false,
+            "description": "APIバージョン"
+          },
+          {
+            "name": "status",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "API仕様の状態（有効、廃止予定、廃止等）"
+          },
+          {
+            "name": "created_at",
+            "type": "timestamp",
+            "required": true,
+            "description": "作成日時"
+          },
+          {
+            "name": "created_by",
+            "type": "uuid",
+            "required": true,
+            "description": "作成者ユーザーID"
+          },
+          {
+            "name": "updated_at",
+            "type": "timestamp",
+            "required": true,
+            "description": "更新日時"
+          },
+          {
+            "name": "updated_by",
+            "type": "uuid",
+            "required": true,
+            "description": "更新者ユーザーID"
+          }
+        ]
+      },
+      {
+        "tableName": "操作履歴",
+        "purpose": "ユーザーによるシステム操作の全履歴を記録し、監査証跡・操作追跡・システム利用分析に活用する",
+        "columns": [
+          {
+            "name": "操作履歴ID",
+            "type": "uuid",
+            "required": true,
+            "description": "操作履歴の一意識別子"
+          },
+          {
+            "name": "ユーザーID",
+            "type": "uuid",
+            "required": true,
+            "description": "操作を実行したユーザーの識別子"
+          },
+          {
+            "name": "操作種別",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "実行された操作の種類(作業指示作成、人員配置実行、進捗更新等)"
+          },
+          {
+            "name": "操作対象テーブル",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "操作の対象となったテーブル名"
+          },
+          {
+            "name": "操作対象ID",
+            "type": "uuid",
+            "required": false,
+            "description": "操作の対象となったレコードの識別子"
+          },
+          {
+            "name": "操作内容",
+            "type": "text",
+            "required": false,
+            "description": "操作の詳細内容や変更内容"
+          },
+          {
+            "name": "変更前値",
+            "type": "text",
+            "required": false,
+            "description": "更新操作の場合の変更前の値"
+          },
+          {
+            "name": "変更後値",
+            "type": "text",
+            "required": false,
+            "description": "更新操作の場合の変更後の値"
+          },
+          {
+            "name": "操作ステータス",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "操作の実行結果(成功、失敗、部分成功等)"
+          },
+          {
+            "name": "エラーメッセージ",
+            "type": "text",
+            "required": false,
+            "description": "操作失敗時のエラーメッセージ"
+          },
+          {
+            "name": "IPアドレス",
+            "type": "varchar(100)",
+            "required": false,
+            "description": "操作を実行したクライアントのIPアドレス"
+          },
+          {
+            "name": "セッションID",
+            "type": "varchar(100)",
+            "required": false,
+            "description": "操作時のセッション識別子"
+          },
+          {
+            "name": "操作日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "操作が実行された日時"
+          },
+          {
+            "name": "作成日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "操作履歴レコードが作成された日時"
+          }
+        ]
+      },
+      {
+        "tableName": "ログインユーザー",
+        "purpose": "ベンダー選定・契約リスク評価支援システムのユーザー認証・管理を行い、ログイン情報と基本属性を保持する",
+        "columns": [
+          {
+            "name": "ユーザーID",
+            "type": "uuid",
+            "required": true,
+            "description": "ユーザーの一意識別子"
+          },
+          {
+            "name": "ログインID",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "ログイン時に使用するユーザー識別名、システム内で一意"
+          },
+          {
+            "name": "メールアドレス",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "ユーザーのメールアドレス、パスワードリセット等の通知に使用"
+          },
+          {
+            "name": "パスワードハッシュ",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "ハッシュ化されたパスワード"
+          },
+          {
+            "name": "ユーザー名",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "ユーザーの表示名"
+          },
+          {
+            "name": "部門",
+            "type": "varchar(100)",
+            "required": false,
+            "description": "ユーザーが属する部門"
+          },
+          {
+            "name": "ステータス",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "ユーザーのステータス（有効/無効/休止等）"
+          },
+          {
+            "name": "最終ログイン日時",
+            "type": "timestamp",
+            "required": false,
+            "description": "ユーザーが最後にログインした日時"
+          },
+          {
+            "name": "作成日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "ユーザーレコード作成日時"
+          },
+          {
+            "name": "更新日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "ユーザーレコード最終更新日時"
+          },
+          {
+            "name": "作成者",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "ユーザーレコードを作成したユーザーID"
+          }
+        ]
+      },
+      {
+        "tableName": "ベンダー候補企業",
+        "purpose": "ベンダー選定・契約リスク評価支援システムにおいて、評価対象となるベンダー候補企業の基本情報、評価スコア、契約リスク情報を一元管理するマスタテーブル",
+        "columns": [
+          {
+            "name": "ベンダーID",
+            "type": "uuid",
+            "required": true,
+            "description": "ベンダー候補企業を一意に識別するプライマリキー"
+          },
+          {
+            "name": "企業名",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "ベンダー候補企業の正式な企業名"
+          },
+          {
+            "name": "企業名カナ",
+            "type": "varchar(100)",
+            "required": false,
+            "description": "ベンダー候補企業名のカナ表記、検索用"
+          },
+          {
+            "name": "業種",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "ベンダーの業種分類"
+          },
+          {
+            "name": "所在地",
+            "type": "varchar(100)",
+            "required": false,
+            "description": "ベンダー候補企業の本社所在地"
+          },
+          {
+            "name": "代表者名",
+            "type": "varchar(100)",
+            "required": false,
+            "description": "ベンダー候補企業の代表者名"
+          },
+          {
+            "name": "資本金",
+            "type": "varchar(100)",
+            "required": false,
+            "description": "ベンダー候補企業の資本金"
+          },
+          {
+            "name": "従業員数",
+            "type": "integer",
+            "required": false,
+            "description": "ベンダー候補企業の従業員数"
+          },
+          {
+            "name": "設立年",
+            "type": "integer",
+            "required": false,
+            "description": "ベンダー候補企業の設立年"
+          },
+          {
+            "name": "連絡先電話番号",
+            "type": "varchar(100)",
+            "required": false,
+            "description": "ベンダー候補企業の代表電話番号"
+          },
+          {
+            "name": "連絡先メールアドレス",
+            "type": "varchar(100)",
+            "required": false,
+            "description": "ベンダー候補企業の代表メールアドレス"
+          },
+          {
+            "name": "評価ステータス",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "評価状況を示すステータス（未評価、評価中、評価完了、却下等）"
+          },
+          {
+            "name": "総合評価スコア",
+            "type": "integer",
+            "required": false,
+            "description": "ベンダー候補企業の総合評価スコア（0-100）"
+          },
+          {
+            "name": "契約リスク評価",
+            "type": "varchar(100)",
+            "required": false,
+            "description": "契約リスク評価レベル（低、中、高等）"
+          },
+          {
+            "name": "推奨度",
+            "type": "varchar(100)",
+            "required": false,
+            "description": "ベンダー選定における推奨度（推奨、条件付き推奨、非推奨等）"
+          },
+          {
+            "name": "備考",
+            "type": "text",
+            "required": false,
+            "description": "ベンダー候補企業に関する特記事項や評価コメント"
+          },
+          {
+            "name": "作成日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "ベンダー候補企業レコードの作成日時"
+          },
+          {
+            "name": "作成者",
+            "type": "uuid",
+            "required": true,
+            "description": "ベンダー候補企業レコードを作成したユーザーID"
+          },
+          {
+            "name": "更新日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "ベンダー候補企業レコードの最終更新日時"
+          },
+          {
+            "name": "更新者",
+            "type": "uuid",
+            "required": true,
+            "description": "ベンダー候補企業レコードを最後に更新したユーザーID"
+          }
+        ]
+      },
+      {
+        "tableName": "企業基本情報",
+        "purpose": "ベンダー選定・契約リスク評価支援システムにおいて、ベンダー候補企業の基本情報を一元管理し、リスク評価や契約判断の基礎データとなる企業マスタテーブル",
+        "columns": [
+          {
+            "name": "企業ID",
+            "type": "uuid",
+            "required": true,
+            "description": "企業を一意に識別するプライマリキー"
+          },
+          {
+            "name": "企業名",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "ベンダー企業の正式名称"
+          },
+          {
+            "name": "企業名カナ",
+            "type": "varchar(100)",
+            "required": false,
+            "description": "企業名のカナ表記、検索用"
+          },
+          {
+            "name": "業種",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "企業の主要業種分類"
+          },
+          {
+            "name": "所在地",
+            "type": "text",
+            "required": true,
+            "description": "企業の本社所在地住所"
+          },
+          {
+            "name": "代表者名",
+            "type": "varchar(100)",
+            "required": false,
+            "description": "企業の代表取締役等の名前"
+          },
+          {
+            "name": "設立年月日",
+            "type": "timestamp",
+            "required": false,
+            "description": "企業の設立日"
+          },
+          {
+            "name": "資本金",
+            "type": "integer",
+            "required": false,
+            "description": "企業の資本金額（万円単位）"
+          },
+          {
+            "name": "従業員数",
+            "type": "integer",
+            "required": false,
+            "description": "企業の従業員数"
+          },
+          {
+            "name": "売上高",
+            "type": "integer",
+            "required": false,
+            "description": "企業の直近年度売上高（万円単位）"
+          },
+          {
+            "name": "電話番号",
+            "type": "varchar(100)",
+            "required": false,
+            "description": "企業の代表電話番号"
+          },
+          {
+            "name": "メールアドレス",
+            "type": "varchar(100)",
+            "required": false,
+            "description": "企業の代表メールアドレス"
+          },
+          {
+            "name": "ウェブサイトURL",
+            "type": "varchar(100)",
+            "required": false,
+            "description": "企業の公式ウェブサイトURL"
+          },
+          {
+            "name": "評価ステータス",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "ベンダー評価の進捗状態（未評価、評価中、評価完了等）"
+          },
+          {
+            "name": "契約状態",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "ベンダーとの契約状態（候補、交渉中、契約済、終了等）"
+          },
+          {
+            "name": "備考",
+            "type": "text",
+            "required": false,
+            "description": "企業に関する追加情報や特記事項"
+          },
+          {
+            "name": "作成日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "レコード作成日時"
+          },
+          {
+            "name": "更新日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "レコード最終更新日時"
+          },
+          {
+            "name": "作成者",
+            "type": "uuid",
+            "required": true,
+            "description": "レコード作成者のユーザーID"
+          },
+          {
+            "name": "更新者",
+            "type": "uuid",
+            "required": true,
+            "description": "レコード最終更新者のユーザーID"
+          }
+        ]
+      },
+      {
+        "tableName": "導入実績",
+        "purpose": "ベンダー選定・契約後の導入プロジェクト実績を記録し、ベンダーの実行能力・品質・納期遵守状況を評価するための履歴管理テーブル",
+        "columns": [
+          {
+            "name": "導入実績ID",
+            "type": "uuid",
+            "required": true,
+            "description": "導入実績の一意識別子"
+          },
+          {
+            "name": "ベンダーID",
+            "type": "uuid",
+            "required": true,
+            "description": "ベンダー候補企業テーブルへの外部キー"
+          },
+          {
+            "name": "プロジェクト名",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "導入プロジェクトの名称"
+          },
+          {
+            "name": "プロジェクト説明",
+            "type": "text",
+            "required": false,
+            "description": "プロジェクトの詳細説明"
+          },
+          {
+            "name": "契約金額",
+            "type": "integer",
+            "required": true,
+            "description": "プロジェクト契約金額（円）"
+          },
+          {
+            "name": "契約開始日",
+            "type": "timestamp",
+            "required": true,
+            "description": "契約開始日時"
+          },
+          {
+            "name": "契約終了日",
+            "type": "timestamp",
+            "required": true,
+            "description": "契約終了予定日時"
+          },
+          {
+            "name": "実績完了日",
+            "type": "timestamp",
+            "required": false,
+            "description": "実際のプロジェクト完了日時"
+          },
+          {
+            "name": "納期遵守状況",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "納期遵守状況（予定通り/遅延/早期完了）"
+          },
+          {
+            "name": "品質評価",
+            "type": "integer",
+            "required": true,
+            "description": "品質評価スコア（1-5段階）"
+          },
+          {
+            "name": "顧客満足度",
+            "type": "integer",
+            "required": true,
+            "description": "顧客満足度スコア（1-5段階）"
+          },
+          {
+            "name": "実績評価コメント",
+            "type": "text",
+            "required": false,
+            "description": "導入実績に関する評価・コメント"
+          },
+          {
+            "name": "作成日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "レコード作成日時"
+          },
+          {
+            "name": "更新日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "レコード最終更新日時"
+          },
+          {
+            "name": "作成者",
+            "type": "uuid",
+            "required": true,
+            "description": "ログインユーザーテーブルへの外部キー"
+          }
+        ]
+      },
+      {
+        "tableName": "参照顧客",
+        "purpose": "ベンダー選定・契約リスク評価プロセスにおいて、評価対象となる顧客企業の基本情報と参照履歴を管理し、ベンダー候補企業との関連性や導入実績との紐付けを支援するマスタテーブル",
+        "columns": [
+          {
+            "name": "顧客ID",
+            "type": "uuid",
+            "required": true,
+            "description": "参照顧客を一意に識別するプライマリキー"
+          },
+          {
+            "name": "顧客名",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "顧客企業の正式名称"
+          },
+          {
+            "name": "業種",
+            "type": "varchar(100)",
+            "required": false,
+            "description": "顧客企業の業種分類"
+          },
+          {
+            "name": "企業規模",
+            "type": "varchar(100)",
+            "required": false,
+            "description": "顧客企業の規模区分（大企業/中堅企業/中小企業等）"
+          },
+          {
+            "name": "所在地",
+            "type": "varchar(100)",
+            "required": false,
+            "description": "顧客企業の本社所在地"
+          },
+          {
+            "name": "代表者名",
+            "type": "varchar(100)",
+            "required": false,
+            "description": "顧客企業の代表者名"
+          },
+          {
+            "name": "連絡先電話番号",
+            "type": "varchar(100)",
+            "required": false,
+            "description": "顧客企業の代表電話番号"
+          },
+          {
+            "name": "連絡先メールアドレス",
+            "type": "varchar(100)",
+            "required": false,
+            "description": "顧客企業の代表メールアドレス"
+          },
+          {
+            "name": "参照用途",
+            "type": "text",
+            "required": false,
+            "description": "ベンダー評価における参照理由や用途の説明"
+          },
+          {
+            "name": "参照ステータス",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "参照顧客の状態（アクティブ/非アクティブ/検証中等）"
+          },
+          {
+            "name": "作成日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "参照顧客レコードの作成日時"
+          },
+          {
+            "name": "更新日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "参照顧客レコードの最終更新日時"
+          },
+          {
+            "name": "作成者",
+            "type": "uuid",
+            "required": true,
+            "description": "参照顧客レコードを作成したユーザーID"
+          },
+          {
+            "name": "更新者",
+            "type": "uuid",
+            "required": false,
+            "description": "参照顧客レコードを最後に更新したユーザーID"
+          }
+        ]
+      },
+      {
+        "tableName": "業界別適用事例",
+        "purpose": "ベンダー選定時に業界別の導入実績・成功事例を参照し、業界特性に応じた適切なベンダー評価を支援するマスタテーブル",
+        "columns": [
+          {
+            "name": "事例ID",
+            "type": "uuid",
+            "required": true,
+            "description": "業界別適用事例の一意識別子"
+          },
+          {
+            "name": "業界分類",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "適用対象の業界名（製造業、金融、小売等）"
+          },
+          {
+            "name": "事例名",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "適用事例の名称"
+          },
+          {
+            "name": "事例説明",
+            "type": "text",
+            "required": true,
+            "description": "業界別適用事例の詳細説明"
+          },
+          {
+            "name": "ベンダー候補企業ID",
+            "type": "uuid",
+            "required": true,
+            "description": "この事例に関連するベンダー候補企業への外部キー"
+          },
+          {
+            "name": "導入実績ID",
+            "type": "uuid",
+            "required": false,
+            "description": "参照する導入実績への外部キー"
+          },
+          {
+            "name": "参照顧客ID",
+            "type": "uuid",
+            "required": false,
+            "description": "参照顧客への外部キー"
+          },
+          {
+            "name": "適用効果",
+            "type": "text",
+            "required": false,
+            "description": "業界別適用による期待効果・実績効果"
+          },
+          {
+            "name": "導入期間月数",
+            "type": "integer",
+            "required": false,
+            "description": "導入に要した期間（月単位）"
+          },
+          {
+            "name": "ROI達成度",
+            "type": "varchar(100)",
+            "required": false,
+            "description": "ROI達成度の評価"
+          },
+          {
+            "name": "推奨度",
+            "type": "integer",
+            "required": false,
+            "description": "業界別推奨度スコア（1-5）"
+          },
+          {
+            "name": "作成日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "事例レコード作成日時"
+          },
+          {
+            "name": "更新日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "事例レコード最終更新日時"
+          },
+          {
+            "name": "作成者",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "事例レコード作成者"
+          }
+        ]
+      },
+      {
+        "tableName": "契約書",
+        "purpose": "ベンダーとの契約内容、条件、ステータス、リスク評価情報を一元管理し、契約ライフサイクル全体を追跡・評価するためのマスタテーブル",
+        "columns": [
+          {
+            "name": "契約書ID",
+            "type": "uuid",
+            "required": true,
+            "description": "契約書の一意識別子"
+          },
+          {
+            "name": "ベンダーID",
+            "type": "uuid",
+            "required": true,
+            "description": "ベンダー候補企業テーブルへの外部キー"
+          },
+          {
+            "name": "契約名",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "契約の名称・タイトル"
+          },
+          {
+            "name": "契約内容",
+            "type": "text",
+            "required": false,
+            "description": "契約の詳細内容・概要"
+          },
+          {
+            "name": "契約開始日",
+            "type": "timestamp",
+            "required": true,
+            "description": "契約の開始日"
+          },
+          {
+            "name": "契約終了日",
+            "type": "timestamp",
+            "required": true,
+            "description": "契約の終了日"
+          },
+          {
+            "name": "契約金額",
+            "type": "integer",
+            "required": false,
+            "description": "契約金額（円）"
+          },
+          {
+            "name": "契約ステータス",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "契約状態（草案、承認待ち、有効、終了、更新予定等）"
+          },
+          {
+            "name": "リスク評価レベル",
+            "type": "varchar(100)",
+            "required": false,
+            "description": "契約に関連するリスク評価（高、中、低）"
+          },
+          {
+            "name": "リスク評価詳細",
+            "type": "text",
+            "required": false,
+            "description": "リスク評価の詳細内容・根拠"
+          },
+          {
+            "name": "支払条件",
+            "type": "text",
+            "required": false,
+            "description": "支払い方法・期日等の条件"
+          },
+          {
+            "name": "納期条件",
+            "type": "text",
+            "required": false,
+            "description": "納期・デリバリー条件"
+          },
+          {
+            "name": "SLA条項",
+            "type": "text",
+            "required": false,
+            "description": "サービスレベルアグリーメント条項"
+          },
+          {
+            "name": "ペナルティ条項",
+            "type": "text",
+            "required": false,
+            "description": "違約金・ペナルティに関する条項"
+          },
+          {
+            "name": "秘密保持条項",
+            "type": "boolean",
+            "required": false,
+            "description": "秘密保持条項の有無"
+          },
+          {
+            "name": "知的財産権条項",
+            "type": "boolean",
+            "required": false,
+            "description": "知的財産権に関する条項の有無"
+          },
+          {
+            "name": "解除条件",
+            "type": "text",
+            "required": false,
+            "description": "契約解除の条件・手続き"
+          },
+          {
+            "name": "更新予定日",
+            "type": "timestamp",
+            "required": false,
+            "description": "契約更新予定日"
+          },
+          {
+            "name": "担当者ID",
+            "type": "uuid",
+            "required": false,
+            "description": "ログインユーザーテーブルへの外部キー（契約担当者）"
+          },
+          {
+            "name": "承認者ID",
+            "type": "uuid",
+            "required": false,
+            "description": "ログインユーザーテーブルへの外部キー（承認者）"
+          },
+          {
+            "name": "作成日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "契約書レコード作成日時"
+          },
+          {
+            "name": "作成者ID",
+            "type": "uuid",
+            "required": true,
+            "description": "ログインユーザーテーブルへの外部キー（作成者）"
+          },
+          {
+            "name": "更新日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "契約書レコード最終更新日時"
+          },
+          {
+            "name": "更新者ID",
+            "type": "uuid",
+            "required": true,
+            "description": "ログインユーザーテーブルへの外部キー（更新者）"
+          }
+        ]
+      },
+      {
+        "tableName": "法務対応実績",
+        "purpose": "ベンダー選定・契約リスク評価支援システムにおいて、法務部門が対応した契約審査、リスク評価、交渉結果などの実績を記録・管理し、過去の対応事例を参照して将来のベンダー評価に活用するための履歴テーブル",
+        "columns": [
+          {
+            "name": "法務対応実績ID",
+            "type": "uuid",
+            "required": true,
+            "description": "法務対応実績を一意に識別するプライマリキー"
+          },
+          {
+            "name": "ベンダー候補企業ID",
+            "type": "uuid",
+            "required": true,
+            "description": "対応対象のベンダー候補企業を特定するための外部キー"
+          },
+          {
+            "name": "契約書ID",
+            "type": "uuid",
+            "required": false,
+            "description": "関連する契約書を参照するための外部キー"
+          },
+          {
+            "name": "対応種別",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "法務対応の種類（契約審査、リスク評価、交渉対応、紛争対応など）"
+          },
+          {
+            "name": "対応内容",
+            "type": "text",
+            "required": true,
+            "description": "実施した法務対応の詳細内容"
+          },
+          {
+            "name": "指摘事項",
+            "type": "text",
+            "required": false,
+            "description": "契約審査やリスク評価で発見された問題点や懸念事項"
+          },
+          {
+            "name": "リスクレベル",
+            "type": "varchar(100)",
+            "required": false,
+            "description": "評価されたリスクの程度（高/中/低など）"
+          },
+          {
+            "name": "対応結果",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "対応の結果（承認、条件付き承認、却下、保留など）"
+          },
+          {
+            "name": "対応担当者",
+            "type": "uuid",
+            "required": true,
+            "description": "対応を実施した法務担当者のユーザーID"
+          },
+          {
+            "name": "対応日",
+            "type": "timestamp",
+            "required": true,
+            "description": "法務対応を実施した日時"
+          },
+          {
+            "name": "作成日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "レコードが作成された日時"
+          },
+          {
+            "name": "更新日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "レコードが最後に更新された日時"
+          },
+          {
+            "name": "作成者",
+            "type": "uuid",
+            "required": true,
+            "description": "レコードを作成したユーザーのID"
+          }
+        ]
+      },
+      {
+        "tableName": "知的財産権リスク項目",
+        "purpose": "ベンダー選定時の知的財産権関連リスクを評価・管理するためのマスタテーブル。リスク項目の定義、評価基準、重要度を一元管理し、ベンダー評価時の参照データとして機能する。",
+        "columns": [
+          {
+            "name": "ip_risk_item_id",
+            "type": "uuid",
+            "required": true,
+            "description": "知的財産権リスク項目の一意識別子"
+          },
+          {
+            "name": "risk_category",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "リスク項目のカテゴリ（例：特許侵害、著作権侵害、営業秘密漏洩、ライセンス違反）"
+          },
+          {
+            "name": "risk_item_name",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "リスク項目の名称"
+          },
+          {
+            "name": "risk_description",
+            "type": "text",
+            "required": true,
+            "description": "リスク項目の詳細説明"
+          },
+          {
+            "name": "severity_level",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "リスク重要度レベル（例：高、中、低）"
+          },
+          {
+            "name": "evaluation_criteria",
+            "type": "text",
+            "required": true,
+            "description": "評価基準の詳細説明"
+          },
+          {
+            "name": "mitigation_measures",
+            "type": "text",
+            "required": false,
+            "description": "リスク軽減策の推奨事項"
+          },
+          {
+            "name": "applicable_industries",
+            "type": "varchar(100)",
+            "required": false,
+            "description": "適用対象業界"
+          },
+          {
+            "name": "is_active",
+            "type": "boolean",
+            "required": true,
+            "description": "リスク項目の有効/無効フラグ"
+          },
+          {
+            "name": "created_at",
+            "type": "timestamp",
+            "required": true,
+            "description": "レコード作成日時"
+          },
+          {
+            "name": "updated_at",
+            "type": "timestamp",
+            "required": true,
+            "description": "レコード更新日時"
+          },
+          {
+            "name": "created_by",
+            "type": "uuid",
+            "required": true,
+            "description": "レコード作成者のユーザーID"
+          }
+        ]
+      },
+      {
+        "tableName": "セキュリティリスク項目",
+        "purpose": "ベンダー選定時のセキュリティリスク評価項目を管理し、リスク項目の定義、評価基準、重要度を一元管理するマスタテーブル",
+        "columns": [
+          {
+            "name": "セキュリティリスク項目ID",
+            "type": "uuid",
+            "required": true,
+            "description": "セキュリティリスク項目の一意識別子"
+          },
+          {
+            "name": "リスク項目名",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "セキュリティリスク項目の名称"
+          },
+          {
+            "name": "リスク項目説明",
+            "type": "text",
+            "required": true,
+            "description": "セキュリティリスク項目の詳細説明と評価対象範囲"
+          },
+          {
+            "name": "リスクカテゴリ",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "リスク項目の分類（例：データ保護、アクセス制御、インシデント対応等）"
+          },
+          {
+            "name": "重要度レベル",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "リスク項目の重要度（例：高、中、低）"
+          },
+          {
+            "name": "評価基準",
+            "type": "text",
+            "required": true,
+            "description": "リスク項目の評価方法と判定基準"
+          },
+          {
+            "name": "評価スケール",
+            "type": "varchar(100)",
+            "required": false,
+            "description": "評価の段階（例：1-5、合格/不合格）"
+          },
+          {
+            "name": "参照標準",
+            "type": "varchar(100)",
+            "required": false,
+            "description": "参照する規格やガイドライン（例：ISO27001、NIST等）"
+          },
+          {
+            "name": "是正期限日数",
+            "type": "integer",
+            "required": false,
+            "description": "リスク検出時の是正対応期限（日数）"
+          },
+          {
+            "name": "有効フラグ",
+            "type": "boolean",
+            "required": true,
+            "description": "評価項目が現在有効かどうか"
+          },
+          {
+            "name": "作成日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "レコード作成日時"
+          },
+          {
+            "name": "更新日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "レコード最終更新日時"
+          },
+          {
+            "name": "作成者",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "レコード作成者のユーザーID"
+          },
+          {
+            "name": "更新者",
+            "type": "varchar(100)",
+            "required": false,
+            "description": "レコード最終更新者のユーザーID"
+          }
+        ]
+      },
+      {
+        "tableName": "業界標準パターン",
+        "purpose": "業界別のベンダー選定・契約リスク評価における標準的なパターン、チェックリスト、リスク項目、契約条件テンプレートを管理し、評価プロセスの効率化と標準化を実現する",
+        "columns": [
+          {
+            "name": "業界標準パターンID",
+            "type": "uuid",
+            "required": true,
+            "description": "業界標準パターンの一意識別子"
+          },
+          {
+            "name": "業界区分",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "適用対象の業界区分コード（製造業、金融、医療、小売等）"
+          },
+          {
+            "name": "パターン名",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "業界標準パターンの名称"
+          },
+          {
+            "name": "パターン説明",
+            "type": "text",
+            "required": false,
+            "description": "パターンの詳細説明と適用シーン"
+          },
+          {
+            "name": "推奨評価項目数",
+            "type": "integer",
+            "required": false,
+            "description": "このパターンで推奨される評価項目の数"
+          },
+          {
+            "name": "リスク重要度レベル",
+            "type": "varchar(100)",
+            "required": false,
+            "description": "パターンに関連するリスクの重要度レベル（高/中/低）"
+          },
+          {
+            "name": "契約条件テンプレートID",
+            "type": "uuid",
+            "required": false,
+            "description": "このパターンに紐付く契約条件テンプレートの参照ID"
+          },
+          {
+            "name": "チェックリスト項目数",
+            "type": "integer",
+            "required": false,
+            "description": "このパターンに含まれるチェックリスト項目の総数"
+          },
+          {
+            "name": "適用開始日",
+            "type": "timestamp",
+            "required": false,
+            "description": "パターンの適用開始日時"
+          },
+          {
+            "name": "適用終了日",
+            "type": "timestamp",
+            "required": false,
+            "description": "パターンの適用終了日時（廃止予定の場合）"
+          },
+          {
+            "name": "ステータス",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "パターンの状態（有効/無効/検討中）"
+          },
+          {
+            "name": "作成日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "レコード作成日時"
+          },
+          {
+            "name": "更新日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "レコード最終更新日時"
+          },
+          {
+            "name": "作成者",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "レコード作成者のユーザーID"
+          },
+          {
+            "name": "更新者",
+            "type": "varchar(100)",
+            "required": false,
+            "description": "レコード最終更新者のユーザーID"
+          }
+        ]
+      },
+      {
+        "tableName": "リスク対比分析結果",
+        "purpose": "複数ベンダー候補企業のリスク評価を対比分析し、契約判断の根拠となるリスク評価結果を記録・管理するテーブル",
+        "columns": [
+          {
+            "name": "分析結果ID",
+            "type": "uuid",
+            "required": true,
+            "description": "リスク対比分析結果を一意に識別するID"
+          },
+          {
+            "name": "分析セッションID",
+            "type": "uuid",
+            "required": true,
+            "description": "同一の選定プロセス内で複数ベンダーを対比分析するセッションを識別するID"
+          },
+          {
+            "name": "ベンダー候補企業ID",
+            "type": "uuid",
+            "required": true,
+            "description": "ベンダー候補企業テーブルへの外部キー"
+          },
+          {
+            "name": "セキュリティリスク総合スコア",
+            "type": "integer",
+            "required": true,
+            "description": "セキュリティリスク項目の総合評価スコア(0-100)"
+          },
+          {
+            "name": "知的財産権リスク総合スコア",
+            "type": "integer",
+            "required": true,
+            "description": "知的財産権リスク項目の総合評価スコア(0-100)"
+          },
+          {
+            "name": "法務リスク総合スコア",
+            "type": "integer",
+            "required": true,
+            "description": "契約書・法務対応実績に基づく法務リスク総合スコア(0-100)"
+          },
+          {
+            "name": "業界適合性スコア",
+            "type": "integer",
+            "required": true,
+            "description": "業界別適用事例・導入実績に基づく業界適合性スコア(0-100)"
+          },
+          {
+            "name": "総合リスクスコア",
+            "type": "integer",
+            "required": true,
+            "description": "全リスク項目を加重平均した総合リスクスコア(0-100、低いほど低リスク)"
+          },
+          {
+            "name": "推奨判定",
+            "type": "varchar(20)",
+            "required": true,
+            "description": "契約判断の推奨結果(推奨/条件付き推奨/非推奨)"
+          },
+          {
+            "name": "主要リスク摘要",
+            "type": "text",
+            "required": false,
+            "description": "特に注視すべき主要リスク項目の摘要"
+          },
+          {
+            "name": "対比分析コメント",
+            "type": "text",
+            "required": false,
+            "description": "他のベンダー候補との対比における相対的な評価コメント"
+          },
+          {
+            "name": "分析実施者ID",
+            "type": "uuid",
+            "required": true,
+            "description": "ログインユーザーテーブルへの外部キー、分析を実施したユーザーID"
+          },
+          {
+            "name": "作成日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "リスク対比分析結果が作成された日時"
+          },
+          {
+            "name": "更新日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "リスク対比分析結果が最後に更新された日時"
+          }
+        ]
+      },
+      {
+        "tableName": "ベンダー評価スコア",
+        "purpose": "ベンダー候補企業に対する多角的な評価スコアを管理し、選定プロセスにおける定量的な比較基準を提供するテーブル",
+        "columns": [
+          {
+            "name": "評価スコアID",
+            "type": "uuid",
+            "required": true,
+            "description": "評価スコアレコードの一意識別子"
+          },
+          {
+            "name": "ベンダー候補企業ID",
+            "type": "uuid",
+            "required": true,
+            "description": "ベンダー候補企業テーブルへの外部キー参照"
+          },
+          {
+            "name": "評価実施日",
+            "type": "timestamp",
+            "required": true,
+            "description": "評価が実施された日時"
+          },
+          {
+            "name": "総合スコア",
+            "type": "integer",
+            "required": true,
+            "description": "全評価項目を統合した総合スコア（0-100）"
+          },
+          {
+            "name": "財務健全性スコア",
+            "type": "integer",
+            "required": true,
+            "description": "企業の財務状況に基づくスコア（0-100）"
+          },
+          {
+            "name": "技術力スコア",
+            "type": "integer",
+            "required": true,
+            "description": "技術的能力と実装経験に基づくスコア（0-100）"
+          },
+          {
+            "name": "セキュリティスコア",
+            "type": "integer",
+            "required": true,
+            "description": "セキュリティ対応能力とリスク評価に基づくスコア（0-100）"
+          },
+          {
+            "name": "法務コンプライアンススコア",
+            "type": "integer",
+            "required": true,
+            "description": "法務対応実績と知的財産権対応に基づくスコア（0-100）"
+          },
+          {
+            "name": "導入実績スコア",
+            "type": "integer",
+            "required": true,
+            "description": "過去の導入実績と参照顧客評価に基づくスコア（0-100）"
+          },
+          {
+            "name": "業界適合性スコア",
+            "type": "integer",
+            "required": true,
+            "description": "業界別適用事例と業界標準パターンへの適合度に基づくスコア（0-100）"
+          },
+          {
+            "name": "リスク評価スコア",
+            "type": "integer",
+            "required": true,
+            "description": "リスク対比分析結果に基づくリスク度合いスコア（0-100、低いほど良好）"
+          },
+          {
+            "name": "評価者ID",
+            "type": "uuid",
+            "required": true,
+            "description": "評価を実施したユーザーの識別子"
+          },
+          {
+            "name": "評価コメント",
+            "type": "text",
+            "required": false,
+            "description": "評価に関する補足説明やコメント"
+          },
+          {
+            "name": "推奨判定",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "選定推奨度の判定結果（推奨/条件付き推奨/非推奨）"
+          },
+          {
+            "name": "作成日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "レコード作成日時"
+          },
+          {
+            "name": "更新日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "レコード最終更新日時"
+          },
+          {
+            "name": "作成者ID",
+            "type": "uuid",
+            "required": true,
+            "description": "レコード作成者のユーザーID"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "systemId": "itg-1",
+    "systemName": "作業進捗・人員配置最適化エンジン",
+    "screens": [
+      {
+        "id": "scr-1789461783315",
+        "name": "進捗・人員配置ダッシュボード",
+        "purpose": "拠点・チーム別の作業進捗状況をリアルタイム監視し、進捗ばらつき要因を自動分析。進捗遅延リスクを数値化して対応が必要な拠点と調整内容を自動提示し、人員配置案の実行状況を可視化する統合ダッシュボード",
+        "items": [
+          "拠点別進捗ばらつき分析表",
+          "チーム別進捗ばらつき分析表",
+          "ハンディターミナル連携ログ表示",
+          "作業実績データ自動取得状況",
+          "進捗遅延リスク判定結果一覧",
+          "納期遅延可能性スコア表示",
+          "対応が必要な拠点リスト",
+          "推奨調整内容表示（人員追加・優先順位変更等）",
+          "人員配置案実行状況リアルタイム表示",
+          "人員配置案進捗トレンドグラフ",
+          "改善指示配信履歴",
+          "改善指示配信状況確認"
+        ]
+      },
+      {
+        "id": "scr-1789461798629",
+        "name": "人員配置最適化提案・実行画面",
+        "purpose": "現在の作業進捗と個人生産性データを照合し、作業者習熟度に基づいた最適な人員配置案を自動生成・提案し、配置案と作業指示を一括配信・実行管理するための統合画面",
+        "items": [
+          "進捗・生産性データ照合パネル",
+          "作業進捗率表示",
+          "個人生産性データ表示",
+          "進捗遅延リスク表示",
+          "最適割当提案パネル",
+          "提案理由・根拠表示",
+          "作業者習熟度段階別難度調整ロジック適用状況表示",
+          "人員配置案自動生成ボタン",
+          "人員配置案一覧表",
+          "配置案詳細表示",
+          "配置案承認・却下ボタン",
+          "人員配置案と作業指示一括配信ボタン"
+        ]
+      },
+      {
+        "id": "scr-1789461813941",
+        "name": "作業指示・実績管理画面",
+        "purpose": "作業指示の受領・実行状況をリアルタイムで記録・管理し、ハンディターミナルおよびWMS連携ログを一元表示することで、作業進捗の可視化と実績データの正確な収集を実現する",
+        "items": [
+          "作業指示一覧表示",
+          "作業指示受領確認ボタン",
+          "受領確認日時記録",
+          "作業実績入力フォーム",
+          "実績数量入力欄",
+          "実績完了日時入力欄",
+          "実績更新ボタン",
+          "ハンディターミナル連携ログ表示パネル",
+          "WMS連携ログ表示パネル",
+          "作業指示受領履歴タブ",
+          "受領履歴検索フィルター",
+          "作業者別実績サマリー"
+        ]
+      }
+    ],
+    "tableDefinitions": [
+      {
+        "tableName": "拠点",
+        "purpose": "作業進捗・人員配置最適化エンジンにおける拠点マスタ。各拠点の基本情報、収容可能人員、稼働状況を管理し、人員配置と作業進捗の最適化の基盤となる。",
+        "columns": [
+          {
+            "name": "拠点ID",
+            "type": "uuid",
+            "required": true,
+            "description": "拠点を一意に識別するプライマリキー"
+          },
+          {
+            "name": "拠点名",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "拠点の名称"
+          },
+          {
+            "name": "拠点コード",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "拠点を識別するコード、ユニーク制約あり"
+          },
+          {
+            "name": "住所",
+            "type": "text",
+            "required": false,
+            "description": "拠点の住所"
+          },
+          {
+            "name": "最大収容人員数",
+            "type": "integer",
+            "required": true,
+            "description": "拠点が収容可能な最大人員数"
+          },
+          {
+            "name": "現在配置人員数",
+            "type": "integer",
+            "required": true,
+            "description": "拠点に現在配置されている人員数"
+          },
+          {
+            "name": "稼働状況",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "拠点の稼働状況（稼働中、休止中、計画中など）"
+          },
+          {
+            "name": "責任者名",
+            "type": "varchar(100)",
+            "required": false,
+            "description": "拠点の責任者名"
+          },
+          {
+            "name": "連絡先",
+            "type": "varchar(100)",
+            "required": false,
+            "description": "拠点の連絡先電話番号またはメールアドレス"
+          },
+          {
+            "name": "作成日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "レコード作成日時"
+          },
+          {
+            "name": "更新日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "レコード最終更新日時"
+          },
+          {
+            "name": "作成者",
+            "type": "varchar(100)",
+            "required": false,
+            "description": "レコード作成者のユーザーID"
+          },
+          {
+            "name": "更新者",
+            "type": "varchar(100)",
+            "required": false,
+            "description": "レコード最終更新者のユーザーID"
+          }
+        ]
+      },
+      {
+        "tableName": "チーム",
+        "purpose": "作業進捗・人員配置最適化エンジンにおけるチーム情報の管理。チームの基本属性、所属拠点、稼働状況を一元管理し、人員配置と進捗追跡の基盤となる。",
+        "columns": [
+          {
+            "name": "チームID",
+            "type": "uuid",
+            "required": true,
+            "description": "チームの一意識別子。主キー。"
+          },
+          {
+            "name": "チーム名",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "チームの名称。"
+          },
+          {
+            "name": "拠点ID",
+            "type": "uuid",
+            "required": true,
+            "description": "所属拠点の識別子。拠点テーブルへの外部キー。"
+          },
+          {
+            "name": "チームリーダーID",
+            "type": "uuid",
+            "required": false,
+            "description": "チームリーダーの従業員ID。"
+          },
+          {
+            "name": "チーム説明",
+            "type": "text",
+            "required": false,
+            "description": "チームの役割や特性に関する説明。"
+          },
+          {
+            "name": "稼働状況",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "チームの稼働状態。稼働中/休止中/解散等。"
+          },
+          {
+            "name": "定員人数",
+            "type": "integer",
+            "required": false,
+            "description": "チームの定員人数。"
+          },
+          {
+            "name": "作成日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "チーム情報の作成日時。"
+          },
+          {
+            "name": "更新日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "チーム情報の最終更新日時。"
+          },
+          {
+            "name": "作成者",
+            "type": "varchar(100)",
+            "required": false,
+            "description": "チーム情報を作成したユーザー。"
+          }
+        ]
+      },
+      {
+        "tableName": "作業者習熟度",
+        "purpose": "作業者の職務別スキルレベルと習熟度を管理し、作業配置最適化の判断基準となる情報を保持する",
+        "columns": [
+          {
+            "name": "習熟度ID",
+            "type": "uuid",
+            "required": true,
+            "description": "作業者習熟度レコードの一意識別子"
+          },
+          {
+            "name": "作業者ID",
+            "type": "uuid",
+            "required": true,
+            "description": "作業者テーブルへの外部キー参照"
+          },
+          {
+            "name": "職務区分",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "習熟度を評価する職務の種類コード"
+          },
+          {
+            "name": "習熟度レベル",
+            "type": "integer",
+            "required": true,
+            "description": "スキルレベルを1-5段階で評価した数値"
+          },
+          {
+            "name": "評価日",
+            "type": "timestamp",
+            "required": true,
+            "description": "習熟度を評価した日時"
+          },
+          {
+            "name": "評価者ID",
+            "type": "uuid",
+            "required": false,
+            "description": "習熟度を評価した管理者のID"
+          },
+          {
+            "name": "備考",
+            "type": "text",
+            "required": false,
+            "description": "習熟度評価に関する補足情報や特記事項"
+          },
+          {
+            "name": "作成日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "レコード作成日時"
+          },
+          {
+            "name": "更新日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "レコード最終更新日時"
+          }
+        ]
+      },
+      {
+        "tableName": "作業指示",
+        "purpose": "作業の指示内容、割当人員、進捗状況を一元管理し、作業進捗と人員配置の最適化を支援するトランザクションテーブル",
+        "columns": [
+          {
+            "name": "作業指示ID",
+            "type": "uuid",
+            "required": true,
+            "description": "作業指示の一意識別子"
+          },
+          {
+            "name": "拠点ID",
+            "type": "uuid",
+            "required": true,
+            "description": "作業が実施される拠点への外部キー"
+          },
+          {
+            "name": "チームID",
+            "type": "uuid",
+            "required": true,
+            "description": "作業を担当するチームへの外部キー"
+          },
+          {
+            "name": "作業指示番号",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "業務システムで使用される作業指示の一意番号"
+          },
+          {
+            "name": "作業名",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "作業の名称"
+          },
+          {
+            "name": "作業説明",
+            "type": "text",
+            "required": false,
+            "description": "作業の詳細説明"
+          },
+          {
+            "name": "予定開始日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "作業の予定開始日時"
+          },
+          {
+            "name": "予定終了日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "作業の予定終了日時"
+          },
+          {
+            "name": "実績開始日時",
+            "type": "timestamp",
+            "required": false,
+            "description": "作業の実績開始日時"
+          },
+          {
+            "name": "実績終了日時",
+            "type": "timestamp",
+            "required": false,
+            "description": "作業の実績終了日時"
+          },
+          {
+            "name": "進捗状況",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "作業の進捗状況(未開始/進行中/完了/中断等)"
+          },
+          {
+            "name": "進捗率",
+            "type": "integer",
+            "required": false,
+            "description": "作業の進捗率(0-100)"
+          },
+          {
+            "name": "必要人数",
+            "type": "integer",
+            "required": true,
+            "description": "作業に必要な人員数"
+          },
+          {
+            "name": "優先度",
+            "type": "varchar(100)",
+            "required": false,
+            "description": "作業の優先度(高/中/低等)"
+          },
+          {
+            "name": "作成日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "作業指示の作成日時"
+          },
+          {
+            "name": "作成者",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "作業指示を作成したユーザー"
+          },
+          {
+            "name": "更新日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "作業指示の最終更新日時"
+          },
+          {
+            "name": "更新者",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "作業指示を最後に更新したユーザー"
+          }
+        ]
+      },
+      {
+        "tableName": "作業実績",
+        "purpose": "作業者が実施した作業の実績を記録し、進捗管理・人員配置最適化・習熟度向上の基礎データとなるトランザクションテーブル",
+        "columns": [
+          {
+            "name": "作業実績ID",
+            "type": "uuid",
+            "required": true,
+            "description": "作業実績の一意識別子"
+          },
+          {
+            "name": "作業指示ID",
+            "type": "uuid",
+            "required": true,
+            "description": "作業指示テーブルへの外部キー"
+          },
+          {
+            "name": "作業者ID",
+            "type": "uuid",
+            "required": true,
+            "description": "作業者テーブルへの外部キー"
+          },
+          {
+            "name": "拠点ID",
+            "type": "uuid",
+            "required": true,
+            "description": "拠点テーブルへの外部キー"
+          },
+          {
+            "name": "チームID",
+            "type": "uuid",
+            "required": true,
+            "description": "チームテーブルへの外部キー"
+          },
+          {
+            "name": "作業開始日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "作業の開始日時"
+          },
+          {
+            "name": "作業終了日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "作業の終了日時"
+          },
+          {
+            "name": "実績数量",
+            "type": "integer",
+            "required": true,
+            "description": "完了した作業の数量"
+          },
+          {
+            "name": "作業ステータス",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "作業の状態(完了/中断/不良等)"
+          },
+          {
+            "name": "不良数",
+            "type": "integer",
+            "required": false,
+            "description": "発生した不良品の数量"
+          },
+          {
+            "name": "備考",
+            "type": "text",
+            "required": false,
+            "description": "作業実績に関する補足情報"
+          },
+          {
+            "name": "作成日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "レコード作成日時"
+          },
+          {
+            "name": "更新日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "レコード最終更新日時"
+          },
+          {
+            "name": "作成者ID",
+            "type": "uuid",
+            "required": true,
+            "description": "レコード作成者の識別子"
+          }
+        ]
+      },
+      {
+        "tableName": "人員配置案",
+        "purpose": "作業進捗と人員配置の最適化を支援するため、拠点・チーム・作業者の組み合わせによる配置案を管理し、複数案の比較検討と実行を可能にするテーブル",
+        "columns": [
+          {
+            "name": "人員配置案ID",
+            "type": "uuid",
+            "required": true,
+            "description": "人員配置案を一意に識別するID"
+          },
+          {
+            "name": "配置案名",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "人員配置案の名称（例：案A、最適化案1）"
+          },
+          {
+            "name": "拠点ID",
+            "type": "uuid",
+            "required": true,
+            "description": "配置対象の拠点を示す外部キー"
+          },
+          {
+            "name": "チームID",
+            "type": "uuid",
+            "required": true,
+            "description": "配置対象のチームを示す外部キー"
+          },
+          {
+            "name": "作業指示ID",
+            "type": "uuid",
+            "required": true,
+            "description": "対象となる作業指示を示す外部キー"
+          },
+          {
+            "name": "配置開始日",
+            "type": "timestamp",
+            "required": true,
+            "description": "人員配置案の適用開始日時"
+          },
+          {
+            "name": "配置終了日",
+            "type": "timestamp",
+            "required": false,
+            "description": "人員配置案の適用終了日時"
+          },
+          {
+            "name": "予想工数",
+            "type": "integer",
+            "required": true,
+            "description": "この配置案での予想総工数（時間単位）"
+          },
+          {
+            "name": "予想完了日",
+            "type": "timestamp",
+            "required": false,
+            "description": "この配置案での予想完了日時"
+          },
+          {
+            "name": "ステータス",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "配置案のステータス（案、承認待ち、実行中、完了、キャンセル等）"
+          },
+          {
+            "name": "説明",
+            "type": "text",
+            "required": false,
+            "description": "配置案の詳細説明や検討理由"
+          },
+          {
+            "name": "作成日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "配置案が作成された日時"
+          },
+          {
+            "name": "作成者",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "配置案を作成したユーザー"
+          },
+          {
+            "name": "更新日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "配置案が最後に更新された日時"
+          },
+          {
+            "name": "更新者",
+            "type": "varchar(100)",
+            "required": false,
+            "description": "配置案を最後に更新したユーザー"
+          }
+        ]
+      },
+      {
+        "tableName": "人員配置実行状況",
+        "purpose": "人員配置案の実行状況を追跡し、計画と実績のギャップを管理するトランザクションテーブル",
+        "columns": [
+          {
+            "name": "人員配置実行状況ID",
+            "type": "uuid",
+            "required": true,
+            "description": "人員配置実行状況の一意識別子"
+          },
+          {
+            "name": "人員配置案ID",
+            "type": "uuid",
+            "required": true,
+            "description": "参照する人員配置案の識別子"
+          },
+          {
+            "name": "作業指示ID",
+            "type": "uuid",
+            "required": true,
+            "description": "参照する作業指示の識別子"
+          },
+          {
+            "name": "作業者ID",
+            "type": "uuid",
+            "required": true,
+            "description": "配置された作業者の識別子"
+          },
+          {
+            "name": "拠点ID",
+            "type": "uuid",
+            "required": true,
+            "description": "作業が実施される拠点の識別子"
+          },
+          {
+            "name": "チームID",
+            "type": "uuid",
+            "required": false,
+            "description": "作業者が属するチームの識別子"
+          },
+          {
+            "name": "配置状態",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "配置の状態（計画中、配置済、実行中、完了、キャンセル）"
+          },
+          {
+            "name": "計画開始日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "人員配置案で計画された作業開始日時"
+          },
+          {
+            "name": "計画終了日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "人員配置案で計画された作業終了日時"
+          },
+          {
+            "name": "実績開始日時",
+            "type": "timestamp",
+            "required": false,
+            "description": "実際の作業開始日時"
+          },
+          {
+            "name": "実績終了日時",
+            "type": "timestamp",
+            "required": false,
+            "description": "実際の作業終了日時"
+          },
+          {
+            "name": "計画工数",
+            "type": "integer",
+            "required": true,
+            "description": "計画された作業工数（分単位）"
+          },
+          {
+            "name": "実績工数",
+            "type": "integer",
+            "required": false,
+            "description": "実際の作業工数（分単位）"
+          },
+          {
+            "name": "進捗率",
+            "type": "integer",
+            "required": false,
+            "description": "作業の進捗率（0-100）"
+          },
+          {
+            "name": "遅延フラグ",
+            "type": "boolean",
+            "required": true,
+            "description": "計画比で遅延しているかどうか"
+          },
+          {
+            "name": "備考",
+            "type": "text",
+            "required": false,
+            "description": "配置実行に関する備考やコメント"
+          },
+          {
+            "name": "作成日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "レコード作成日時"
+          },
+          {
+            "name": "更新日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "レコード最終更新日時"
+          },
+          {
+            "name": "作成者",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "レコード作成者のユーザーID"
+          },
+          {
+            "name": "更新者",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "レコード最終更新者のユーザーID"
+          }
+        ]
+      },
+      {
+        "tableName": "進捗データ",
+        "purpose": "作業指示に対する実績進捗を日次で記録し、作業完了率・遅延判定・人員配置最適化の基礎データとなるトランザクションテーブル",
+        "columns": [
+          {
+            "name": "進捗データID",
+            "type": "uuid",
+            "required": true,
+            "description": "進捗データの一意識別子"
+          },
+          {
+            "name": "作業指示ID",
+            "type": "uuid",
+            "required": true,
+            "description": "対象となる作業指示への外部キー"
+          },
+          {
+            "name": "拠点ID",
+            "type": "uuid",
+            "required": true,
+            "description": "作業が実施される拠点への外部キー"
+          },
+          {
+            "name": "チームID",
+            "type": "uuid",
+            "required": true,
+            "description": "作業を担当するチームへの外部キー"
+          },
+          {
+            "name": "進捗日",
+            "type": "timestamp",
+            "required": true,
+            "description": "進捗を記録した日付"
+          },
+          {
+            "name": "計画数量",
+            "type": "integer",
+            "required": true,
+            "description": "その日の計画作業数量"
+          },
+          {
+            "name": "実績数量",
+            "type": "integer",
+            "required": true,
+            "description": "その日の実績作業数量"
+          },
+          {
+            "name": "完了率",
+            "type": "integer",
+            "required": true,
+            "description": "作業指示全体に対する累積完了率（パーセンテージ）"
+          },
+          {
+            "name": "遅延フラグ",
+            "type": "boolean",
+            "required": true,
+            "description": "計画比で遅延しているかの判定フラグ"
+          },
+          {
+            "name": "遅延日数",
+            "type": "integer",
+            "required": false,
+            "description": "計画からの遅延日数（負数は前倒し）"
+          },
+          {
+            "name": "備考",
+            "type": "text",
+            "required": false,
+            "description": "進捗に関する特記事項や理由"
+          },
+          {
+            "name": "作成日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "進捗データの作成日時"
+          },
+          {
+            "name": "更新日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "進捗データの最終更新日時"
+          },
+          {
+            "name": "作成者",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "進捗データを作成したユーザー識別子"
+          }
+        ]
+      },
+      {
+        "tableName": "進捗遅延リスク判定結果",
+        "purpose": "作業指示の進捗状況を監視し、遅延リスクを判定・記録して、人員配置最適化の意思決定を支援する",
+        "columns": [
+          {
+            "name": "リスク判定結果ID",
+            "type": "uuid",
+            "required": true,
+            "description": "進捗遅延リスク判定結果の一意識別子"
+          },
+          {
+            "name": "作業指示ID",
+            "type": "uuid",
+            "required": true,
+            "description": "対象となる作業指示の識別子"
+          },
+          {
+            "name": "拠点ID",
+            "type": "uuid",
+            "required": true,
+            "description": "作業が実施される拠点の識別子"
+          },
+          {
+            "name": "チームID",
+            "type": "uuid",
+            "required": true,
+            "description": "作業を担当するチームの識別子"
+          },
+          {
+            "name": "判定日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "リスク判定を実施した日時"
+          },
+          {
+            "name": "リスクレベル",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "判定されたリスクレベル(低/中/高/極高)"
+          },
+          {
+            "name": "遅延予測日数",
+            "type": "integer",
+            "required": false,
+            "description": "予測される遅延日数(負の値は前倒し)"
+          },
+          {
+            "name": "進捗率",
+            "type": "integer",
+            "required": true,
+            "description": "現在の進捗率(0-100)"
+          },
+          {
+            "name": "計画進捗率",
+            "type": "integer",
+            "required": true,
+            "description": "本来あるべき計画進捗率(0-100)"
+          },
+          {
+            "name": "判定理由",
+            "type": "text",
+            "required": false,
+            "description": "リスク判定の根拠となった理由"
+          },
+          {
+            "name": "推奨対応",
+            "type": "text",
+            "required": false,
+            "description": "リスク軽減のための推奨対応内容"
+          },
+          {
+            "name": "対応状況",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "推奨対応の実施状況(未対応/対応中/対応完了)"
+          },
+          {
+            "name": "作成日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "レコード作成日時"
+          },
+          {
+            "name": "更新日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "レコード最終更新日時"
+          },
+          {
+            "name": "作成者",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "レコード作成者の識別子"
+          }
+        ]
+      },
+      {
+        "tableName": "作業指示受領履歴",
+        "purpose": "作業者が作業指示を受領した際の履歴を記録し、指示の配信状況、受領確認、受領時刻などを追跡管理するためのトランザクションテーブル",
+        "columns": [
+          {
+            "name": "受領履歴ID",
+            "type": "uuid",
+            "required": true,
+            "description": "作業指示受領履歴の一意識別子"
+          },
+          {
+            "name": "作業指示ID",
+            "type": "uuid",
+            "required": true,
+            "description": "関連する作業指示の識別子"
+          },
+          {
+            "name": "作業者ID",
+            "type": "uuid",
+            "required": true,
+            "description": "作業指示を受領した作業者の識別子"
+          },
+          {
+            "name": "受領日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "作業者が作業指示を受領した日時"
+          },
+          {
+            "name": "受領確認状態",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "受領確認の状態（未確認、確認済み、辞退など）"
+          },
+          {
+            "name": "確認日時",
+            "type": "timestamp",
+            "required": false,
+            "description": "作業者が受領を確認した日時"
+          },
+          {
+            "name": "配信方法",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "指示の配信方法（アプリ通知、メール、システム画面など）"
+          },
+          {
+            "name": "備考",
+            "type": "text",
+            "required": false,
+            "description": "受領に関する追加情報やコメント"
+          },
+          {
+            "name": "作成日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "レコード作成日時"
+          },
+          {
+            "name": "更新日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "レコード最終更新日時"
+          }
+        ]
+      },
+      {
+        "tableName": "ハンディターミナル連携ログ",
+        "purpose": "ハンディターミナルからの作業実績・位置情報・ステータス更新などの連携データを記録し、システム間の同期状況と作業者の活動を追跡管理する",
+        "columns": [
+          {
+            "name": "ハンディターミナル連携ログID",
+            "type": "uuid",
+            "required": true,
+            "description": "ハンディターミナル連携ログの一意識別子"
+          },
+          {
+            "name": "作業者ID",
+            "type": "uuid",
+            "required": true,
+            "description": "連携を行った作業者の識別子"
+          },
+          {
+            "name": "ハンディターミナルID",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "使用されたハンディターミナルの機器識別子"
+          },
+          {
+            "name": "拠点ID",
+            "type": "uuid",
+            "required": true,
+            "description": "作業が行われた拠点の識別子"
+          },
+          {
+            "name": "連携タイプ",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "連携データの種類(作業実績、位置情報、ステータス更新、チェックイン等)"
+          },
+          {
+            "name": "作業指示ID",
+            "type": "uuid",
+            "required": false,
+            "description": "関連する作業指示の識別子"
+          },
+          {
+            "name": "連携内容",
+            "type": "text",
+            "required": true,
+            "description": "ハンディターミナルから送信された連携データの詳細内容"
+          },
+          {
+            "name": "連携ステータス",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "連携処理の状態(成功、失敗、保留中等)"
+          },
+          {
+            "name": "エラーメッセージ",
+            "type": "text",
+            "required": false,
+            "description": "連携失敗時のエラー詳細"
+          },
+          {
+            "name": "送信日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "ハンディターミナルからデータが送信された日時"
+          },
+          {
+            "name": "受信日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "サーバーがデータを受信した日時"
+          },
+          {
+            "name": "処理完了日時",
+            "type": "timestamp",
+            "required": false,
+            "description": "連携データの処理が完了した日時"
+          },
+          {
+            "name": "作成日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "ログレコードが作成された日時"
+          },
+          {
+            "name": "更新日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "ログレコードが最後に更新された日時"
+          }
+        ]
+      },
+      {
+        "tableName": "WMS連携ログ",
+        "purpose": "WMS(倉庫管理システム)との連携履歴を記録し、データ同期状況、エラー内容、連携タイミングを追跡管理するトランザクションテーブル",
+        "columns": [
+          {
+            "name": "wms_log_id",
+            "type": "uuid",
+            "required": true,
+            "description": "WMS連携ログの一意識別子"
+          },
+          {
+            "name": "連携種別",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "連携の種類(作業指示受信、作業実績送信、在庫同期等)"
+          },
+          {
+            "name": "連携方向",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "連携の方向(受信、送信)"
+          },
+          {
+            "name": "拠点_id",
+            "type": "uuid",
+            "required": true,
+            "description": "連携対象の拠点ID"
+          },
+          {
+            "name": "連携ステータス",
+            "type": "varchar(100)",
+            "required": true,
+            "description": "連携結果(成功、失敗、部分成功、保留中)"
+          },
+          {
+            "name": "連携開始日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "連携処理の開始日時"
+          },
+          {
+            "name": "連携完了日時",
+            "type": "timestamp",
+            "required": false,
+            "description": "連携処理の完了日時"
+          },
+          {
+            "name": "処理件数",
+            "type": "integer",
+            "required": false,
+            "description": "連携で処理されたレコード件数"
+          },
+          {
+            "name": "成功件数",
+            "type": "integer",
+            "required": false,
+            "description": "連携で成功したレコード件数"
+          },
+          {
+            "name": "失敗件数",
+            "type": "integer",
+            "required": false,
+            "description": "連携で失敗したレコード件数"
+          },
+          {
+            "name": "エラーメッセージ",
+            "type": "text",
+            "required": false,
+            "description": "連携失敗時のエラー詳細内容"
+          },
+          {
+            "name": "リトライ回数",
+            "type": "integer",
+            "required": false,
+            "description": "連携失敗時のリトライ実行回数"
+          },
+          {
+            "name": "wms_request_id",
+            "type": "varchar(100)",
+            "required": false,
+            "description": "WMS側のリクエストID(トレーサビリティ用)"
+          },
+          {
+            "name": "作成日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "ログレコード作成日時"
+          },
+          {
+            "name": "更新日時",
+            "type": "timestamp",
+            "required": true,
+            "description": "ログレコード更新日時"
+          },
+          {
+            "name": "作成者",
+            "type": "varchar(100)",
+            "required": false,
+            "description": "ログレコード作成者またはシステム名"
+          }
+        ]
+      }
+    ]
+  }
+]

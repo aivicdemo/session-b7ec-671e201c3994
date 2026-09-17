@@ -1,0 +1,1833 @@
+{
+  "systemId": "itg-4",
+  "systemName": "システム運用・スケーラビリティ管理ダッシュボード",
+  "cssTheme": "```css\n:root {\n  /* Primary & Accent */\n  --primary: #f59e0b;\n  --primary-hover: #d97706;\n\n  /* Background Palette - 明るく爽やかなベース */\n  --bg-main: #fefdf8;\n  --bg-card: #faf8f3;\n  --bg-sidebar: #f5f1e8;\n\n  /* Top Bar - 明るさを保ちながら視覚的な分離 */\n  --top-bar-bg: #fffbf0;\n  --top-bar-border: #f3e8d8;\n  --top-bar-text: #1f2937;\n\n  /* Text Colors */\n  --text: #1f2937;\n  --text-muted: #6b7280;\n\n  /* Borders & Dividers */\n  --border: #e5ddd0;\n  --border-width: 1px;\n\n  /* Typography */\n  --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;\n\n  /* Spacing & Sizing */\n  --space-unit: 8px;\n  --control-height: 40px;\n  --radius-card: 12px;\n  --radius-control: 8px;\n\n  /* Shadows - 柔らかく明るい環境に合わせた浮遊感 */\n  --shadow-card: 0 2px 8px rgba(31, 41, 55, 0.08), 0 1px 3px rgba(31, 41, 55, 0.04);\n\n  /* Motion */\n  --motion-duration: 200ms;\n\n  /* Surface Texture - 明るく温かみのある紙のような質感 */\n  --surface-texture: \n    linear-gradient(90deg, transparent 0%, rgba(245, 158, 11, 0.02) 50%, transparent 100%),\n    repeating-linear-gradient(\n      0deg,\n      transparent 0px,\n      rgba(245, 158, 11, 0.01) 1px,\n      transparent 2px,\n      transparent 4px\n    );\n  --surface-texture-size: 100% 100%;\n  --surface-texture-position: 0 0;\n}\n```",
+  "screens": [
+    {
+      "id": "scr-1789462440034",
+      "name": "システム運用ダッシュボード",
+      "purpose": "拠点別のシステム負荷・データ量・ユーザー数の月次トレンドを自動集計し、スケーラビリティ分析と負荷管理を一元的に可視化・監視するダッシュボード",
+      "items": [
+        "拠点選択フィルター",
+        "月次トレンドグラフ（システム負荷）",
+        "月次トレンドグラフ（データ量）",
+        "月次トレンドグラフ（ユーザー数）",
+        "月次集計結果サマリーパネル",
+        "スケーラビリティ分析結果表示",
+        "負荷分析ダッシュボード",
+        "データ収集カバー率インジケーター",
+        "統一ダッシュボード更新ステータス",
+        "月次集計自動更新設定",
+        "トレンドデータエクスポートボタン",
+        "拠点別詳細ドリルダウンリンク"
+      ]
+    }
+  ],
+  "screenPanels": [
+    {
+      "screenId": "scr-1789462440034",
+      "panelHtml": "<div style=\"display: flex; flex-direction: column; gap: 32px; padding: 24px; background: var(--bg-main); color: var(--text); font-family: var(--font-family);\">\n  \n  <!-- Breadcrumb / Sub-header -->\n  <div style=\"font-size: 12px; color: var(--text-muted); letter-spacing: 0.3px;\">\n    作業管理システム&nbsp;/&nbsp;システム運用・スケーラビリティ管理ダッシュボード&nbsp;/&nbsp;システム運用ダッシュボード\n  </div>\n\n  <!-- Section 1: Filter & Update Settings (80px) -->\n  <div style=\"display: flex; align-items: center; gap: 24px; padding: 16px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; background-image: var(--surface-texture); background-size: var(--surface-texture-size); background-position: var(--surface-texture-position);\">\n    \n    <!-- Facility Filter -->\n    <div style=\"flex: 1; min-width: 300px;\">\n      <label style=\"display: block; font-size: 11px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;\">拠点選択</label>\n      <div id=\"facility-filter-container\" style=\"display: flex; flex-wrap: wrap; gap: 8px; align-items: center;\">\n        <!-- Checkboxes will be dynamically populated -->\n      </div>\n    </div>\n\n    <!-- Auto-Update Interval -->\n    <div style=\"display: flex; align-items: flex-end; gap: 12px;\">\n      <div>\n        <label for=\"update-interval-select\" style=\"display: block; font-size: 11px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;\">自動更新間隔</label>\n        <select id=\"update-interval-select\" data-testid=\"update-interval-select\" style=\"padding: 8px 12px; border: 1px solid rgba(229, 221, 208, 0.8); border-radius: 8px; background: var(--bg-main); color: var(--text); font-size: 13px; cursor: pointer; height: 36px;\">\n          <option value=\"30\">30秒</option>\n          <option value=\"60\">1分</option>\n          <option value=\"300\" selected>5分</option>\n          <option value=\"0\">手動</option>\n        </select>\n      </div>\n      <button id=\"refresh-now-btn\" data-testid=\"refresh-now-button\" style=\"padding: 8px 16px; background: var(--primary); color: #fff; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; height: 36px; transition: background 200ms;\">更新</button>\n    </div>\n  </div>\n\n  <!-- Section 2: Monthly KPI Summary (140px) -->\n  <div style=\"display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;\">\n    \n    <div class=\"card\" style=\"padding: 20px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; background-image: var(--surface-texture); background-size: var(--surface-texture-size); background-position: var(--surface-texture-position);\">\n      <div style=\"font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;\">当月ユーザー数</div>\n      <div style=\"font-size: 28px; font-weight: 700; color: var(--text); font-family: 'Monaco', 'Courier New', monospace; margin-bottom: 6px;\" data-testid=\"kpi-active-users\">—</div>\n      <div style=\"font-size: 12px; color: var(--text-muted);\">\n        <span id=\"kpi-users-change\" style=\"font-weight: 600;\">前月比 —</span>\n      </div>\n    </div>\n\n    <div class=\"card\" style=\"padding: 20px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; background-image: var(--surface-texture); background-size: var(--surface-texture-size); background-position: var(--surface-texture-position);\">\n      <div style=\"font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;\">月次操作件数</div>\n      <div style=\"font-size: 28px; font-weight: 700; color: var(--text); font-family: 'Monaco', 'Courier New', monospace; margin-bottom: 6px;\" data-testid=\"kpi-operations\">—</div>\n      <div style=\"font-size: 12px; color: var(--text-muted);\">件数</div>\n    </div>\n\n    <div class=\"card\" style=\"padding: 20px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; background-image: var(--surface-texture); background-size: var(--surface-texture-size); background-position: var(--surface-texture-position);\">\n      <div style=\"font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;\">平均システム負荷率</div>\n      <div style=\"font-size: 28px; font-weight: 700; color: var(--text); font-family: 'Monaco', 'Courier New', monospace; margin-bottom: 6px;\" data-testid=\"kpi-avg-load\">—</div>\n      <div style=\"font-size: 12px; color: var(--text-muted);\">%</div>\n    </div>\n\n    <div class=\"card\" style=\"padding: 20px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; background-image: var(--surface-texture); background-size: var(--surface-texture-size); background-position: var(--surface-texture-position);\">\n      <div style=\"font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;\">ピーク負荷率</div>\n      <div style=\"font-size: 28px; font-weight: 700; color: var(--text); font-family: 'Monaco', 'Courier New', monospace; margin-bottom: 6px;\" data-testid=\"kpi-peak-load\">—</div>\n      <div style=\"font-size: 12px; color: var(--text-muted);\">%</div>\n    </div>\n\n    <div class=\"card\" style=\"padding: 20px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; background-image: var(--surface-texture); background-size: var(--surface-texture-size); background-position: var(--surface-texture-position);\">\n      <div style=\"font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;\">月次データ量</div>\n      <div style=\"font-size: 28px; font-weight: 700; color: var(--text); font-family: 'Monaco', 'Courier New', monospace; margin-bottom: 6px;\" data-testid=\"kpi-data-volume\">—</div>\n      <div style=\"font-size: 12px; color: var(--text-muted);\">\n        <span id=\"kpi-data-change\" style=\"font-weight: 600;\">前月比 —</span>\n      </div>\n    </div>\n  </div>\n\n  <!-- Section 3: Monthly Trend Graphs (400px) -->\n  <div style=\"display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 16px;\">\n    \n    <!-- System Load Trend -->\n    <div class=\"card\" style=\"padding: 20px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; background-image: var(--surface-texture); background-size: var(--surface-texture-size); background-position: var(--surface-texture-position);\">\n      <div style=\"font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 16px;\">システム負荷トレンド（過去12ヶ月）</div>\n      <div class=\"chart-wrap\" style=\"position: relative; height: 280px; max-height: 300px;\">\n        <canvas id=\"chart-system-load\"></canvas>\n      </div>\n    </div>\n\n    <!-- Data Volume Trend -->\n    <div class=\"card\" style=\"padding: 20px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; background-image: var(--surface-texture); background-size: var(--surface-texture-size); background-position: var(--surface-texture-position);\">\n      <div style=\"font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 16px;\">データ量トレンド（GB）</div>\n      <div class=\"chart-wrap\" style=\"position: relative; height: 280px; max-height: 300px;\">\n        <canvas id=\"chart-data-volume\"></canvas>\n      </div>\n    </div>\n\n    <!-- User Count Trend -->\n    <div class=\"card\" style=\"padding: 20px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; background-image: var(--surface-texture); background-size: var(--surface-texture-size); background-position: var(--surface-texture-position);\">\n      <div style=\"font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 16px;\">ユーザー数トレンド</div>\n      <div class=\"chart-wrap\" style=\"position: relative; height: 280px; max-height: 300px;\">\n        <canvas id=\"chart-user-count\"></canvas>\n      </div>\n    </div>\n  </div>\n\n  <!-- Section 4: Scalability Analysis & Load Status (300px) -->\n  <div style=\"display: grid; grid-template-columns: 1fr 1fr; gap: 16px;\">\n    \n    <!-- Scalability Analysis -->\n    <div class=\"card\" style=\"padding: 20px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; background-image: var(--surface-texture); background-size: var(--surface-texture-size); background-position: var(--surface-texture-position);\">\n      <div style=\"font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 16px;\">スケーラビリティ分析結果</div>\n      <div id=\"scalability-results\" style=\"display: flex; flex-direction: column; gap: 12px;\">\n        <!-- Results will be populated dynamically -->\n      </div>\n    </div>\n\n    <!-- Load Analysis Dashboard -->\n    <div class=\"card\" style=\"padding: 20px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; background-image: var(--surface-texture); background-size: var(--surface-texture-size); background-position: var(--surface-texture-position);\">\n      <div style=\"font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 16px;\">負荷分析ダッシュボード</div>\n      <div id=\"load-analysis-results\" style=\"display: flex; flex-direction: column; gap: 12px;\">\n        <!-- Results will be populated dynamically -->\n      </div>\n    </div>\n  </div>\n\n  <!-- Section 5: Data Collection Coverage & Update Status -->\n  <div style=\"display: grid; grid-template-columns: 1fr 1fr; gap: 16px;\">\n    \n    <!-- Data Collection Coverage -->\n    <div class=\"card\" style=\"padding: 20px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; background-image: var(--surface-texture); background-size: var(--surface-texture-size); background-position: var(--surface-texture-position);\">\n      <div style=\"font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 12px;\">データ収集カバー率</div>\n      <div style=\"display: flex; align-items: center; gap: 12px;\">\n        <div style=\"flex: 1;\">\n          <div style=\"height: 8px; background: var(--bg-main); border-radius: 4px; overflow: hidden; border: 1px solid var(--border);\">\n            <div id=\"coverage-bar\" style=\"height: 100%; background: var(--primary); width: 0%; transition: width 300ms;\"></div>\n          </div>\n        </div>\n        <div style=\"font-size: 14px; font-weight: 700; color: var(--text); font-family: 'Monaco', 'Courier New', monospace; min-width: 50px;\" data-testid=\"coverage-percentage\">0%</div>\n      </div>\n      <div style=\"font-size: 12px; color: var(--text-muted); margin-top: 8px;\" id=\"coverage-text\">—</div>\n    </div>\n\n    <!-- Update Status -->\n    <div class=\"card\" style=\"padding: 20px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; background-image: var(--surface-texture); background-size: var(--surface-texture-size); background-position: var(--surface-texture-position);\">\n      <div style=\"font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 12px;\">ダッシュボード更新ステータス</div>\n      <div style=\"font-size: 12px; color: var(--text-muted); line-height: 1.6;\">\n        <div>最終更新: <span id=\"last-update-time\" style=\"color: var(--text); font-weight: 600;\">—</span></div>\n        <div style=\"margin-top: 6px;\">次回更新予定: <span id=\"next-update-time\" style=\"color: var(--text); font-weight: 600;\">—</span></div>\n      </div>\n    </div>\n  </div>\n\n  <!-- Section 6: Export & Actions -->\n  <div style=\"display: flex; gap: 12px; justify-content: flex-end;\">\n    <button id=\"export-csv-btn\" data-testid=\"export-csv-button\" style=\"padding: 10px 20px; background: transparent; color: var(--text); border: 1px solid var(--border); border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 200ms;\">\n      CSVエクスポート\n    </button>\n  </div>\n\n</div>\n\n<!-- Hidden Modal for Drill-down (initially hidden) -->\n<div id=\"drilldown-modal\" class=\"modal-overlay\" style=\"display: none; position: fixed; inset: 0; z-index: 1000; background: rgba(0, 0, 0, 0.55); display: flex; align-items: center; justify-content: center;\">\n  <div style=\"background: var(--bg-card); color: var(--text); padding: 24px; border-radius: 12px; max-width: 90vw; max-height: 90vh; overflow: auto; box-shadow: 0 8px 32px rgba(0,0,0,0.4);\">\n    <div style=\"display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;\">\n      <h3 style=\"font-size: 16px; font-weight: 700; margin: 0;\" id=\"drilldown-title\">拠点詳細</h3>\n      <button id=\"drilldown-close\" style=\"background: transparent; border: none; font-size: 20px; cursor: pointer; color: var(--text-muted);\">×</button>\n    </div>\n    <div id=\"drilldown-content\" style=\"font-size: 13px; color: var(--text); line-height: 1.6;\">\n      <!-- Content will be populated -->\n    </div>\n  </div>\n</div>",
+      "initJs": "function(container, apiUrl, tables) {\n  // ============================================\n  // Data References\n  // ============================================\n  const facilityTable = tables.find(t => t.tableName === '拠点マスタ') || { records: [] };\n  const loadDataTable = tables.find(t => t.tableName === 'システム負荷データ') || { records: [] };\n  const dataVolumeTable = tables.find(t => t.tableName === 'データ量トレンド') || { records: [] };\n  const userTrendTable = tables.find(t => t.tableName === 'ユーザー数トレンド') || { records: [] };\n  const monthlySummaryTable = tables.find(t => t.tableName === '月次集計結果') || { records: [] };\n\n  let selectedFacilities = [];\n  let chartInstances = {};\n  let autoUpdateInterval = null;\n\n  // ============================================\n  // Initialize Facility Filter\n  // ============================================\n  function initFacilityFilter() {\n    const filterContainer = container.querySelector('#facility-filter-container');\n    filterContainer.innerHTML = '';\n\n    facilityTable.records.forEach(facility => {\n      const label = document.createElement('label');\n      label.style.cssText = 'display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 13px; color: var(--text);';\n      \n      const checkbox = document.createElement('input');\n      checkbox.type = 'checkbox';\n      checkbox.value = facility.id;\n      checkbox.checked = true;\n      checkbox.style.cssText = 'cursor: pointer; accent-color: var(--primary);';\n      checkbox.addEventListener('change', () => {\n        selectedFacilities = Array.from(filterContainer.querySelectorAll('input[type=\"checkbox\"]:checked')).map(cb => cb.value);\n        refreshDashboard();\n      });\n\n      label.appendChild(checkbox);\n      label.appendChild(document.createTextNode(facility.拠点名 || facility.facilityName || 'Unknown'));\n      filterContainer.appendChild(label);\n    });\n\n    // Initialize selected facilities\n    selectedFacilities = facilityTable.records.map(f => f.id);\n  }\n\n  // ============================================\n  // Aggregate Data by Month\n  // ============================================\n  function aggregateByMonth(records, dateField, valueField) {\n    const monthMap = {};\n    records.forEach(record => {\n      if (!record[dateField]) return;\n      const monthKey = record[dateField].slice(0, 7); // YYYY-MM\n      if (!monthMap[monthKey]) monthMap[monthKey] = [];\n      monthMap[monthKey].push(record[valueField] || 0);\n    });\n\n    const sorted = Object.keys(monthMap).sort();\n    return {\n      labels: sorted,\n      data: sorted.map(m => {\n        const values = monthMap[m];\n        return values.length > 0 ? Math.round(values.reduce((a, b) => a + b, 0) / values.length) : 0;\n      })\n    };\n  }\n\n  // ============================================\n  // Render System Load Chart\n  // ============================================\n  function renderSystemLoadChart() {\n    const filtered = loadDataTable.records.filter(r => selectedFacilities.includes(r.拠点ID));\n    const aggregated = aggregateByMonth(filtered, '測定日時', 'CPU使用率');\n\n    const ctx = container.querySelector('#chart-system-load').getContext('2d');\n    \n    if (chartInstances['load']) chartInstances['load'].destroy();\n    \n    chartInstances['load'] = new window.Chart(ctx, {\n      type: 'line',\n      data: {\n        labels: aggregated.labels,\n        datasets: [\n          {\n            label: 'CPU使用率 (%)',\n            data: aggregated.data,\n            borderColor: '#f59e0b',\n            backgroundColor: 'rgba(245, 158, 11, 0.08)',\n            borderWidth: 2,\n            fill: true,\n            tension: 0.3,\n            pointRadius: 4,\n            pointBackgroundColor: '#f59e0b',\n            pointBorderColor: '#fff',\n            pointBorderWidth: 2\n          },\n          {\n            label: '警告閾値 (80%)',\n            data: Array(aggregated.labels.length).fill(80),\n            borderColor: '#dc2626',\n            borderWidth: 2,\n            borderDash: [5, 5],\n            fill: false,\n            pointRadius: 0,\n            tension: 0\n          }\n        ]\n      },\n      options: {\n        responsive: true,\n        maintainAspectRatio: false,\n        plugins: {\n          legend: {\n            display: true,\n            position: 'bottom',\n            labels: { font: { size: 12 }, color: '#6b7280', padding: 12 }\n          },\n          tooltip: {\n            backgroundColor: 'rgba(0,0,0,0.8)',\n            titleColor: '#fff',\n            bodyColor: '#fff',\n            borderColor: '#f59e0b',\n            borderWidth: 1,\n            padding: 8,\n            displayColors: true\n          }\n        },\n        scales: {\n          y: {\n            beginAtZero: true,\n            max: 100,\n            ticks: { color: '#6b7280', font: { size: 11 } },\n            grid: { color: 'rgba(229, 221, 208, 0.3)' }\n          },\n          x: {\n            ticks: { color: '#6b7280', font: { size: 11 } },\n            grid: { display: false }\n          }\n        }\n      }\n    });\n  }\n\n  // ============================================\n  // Render Data Volume Chart\n  // ============================================\n  function renderDataVolumeChart() {\n    const filtered = dataVolumeTable.records.filter(r => selectedFacilities.includes(r.拠点ID));\n    const aggregated = aggregateByMonth(filtered, '測定日時', 'データサイズMB');\n\n    const ctx = container.querySelector('#chart-data-volume').getContext('2d');\n    \n    if (chartInstances['volume']) chartInstances['volume'].destroy();\n    \n    chartInstances['volume'] = new window.Chart(ctx, {\n      type: 'bar',\n      data: {\n        labels: aggregated.labels,\n        datasets: [\n          {\n            label: 'データ量 (GB)',\n            data: aggregated.data.map(v => Math.round(v / 1024)),\n            backgroundColor: '#f59e0b',\n            borderColor: '#d97706',\n            borderWidth: 1,\n            borderRadius: 4\n          }\n        ]\n      },\n      options: {\n        responsive: true,\n        maintainAspectRatio: false,\n        plugins: {\n          legend: { display: true, position: 'bottom', labels: { font: { size: 12 }, color: '#6b7280', padding: 12 } },\n          tooltip: { backgroundColor: 'rgba(0,0,0,0.8)', titleColor: '#fff', bodyColor: '#fff', padding: 8 }\n        },\n        scales: {\n          y: {\n            beginAtZero: true,\n            ticks: { color: '#6b7280', font: { size: 11 } },\n            grid: { color: 'rgba(229, 221, 208, 0.3)' }\n          },\n          x: {\n            ticks: { color: '#6b7280', font: { size: 11 } },\n            grid: { display: false }\n          }\n        }\n      }\n    });\n  }\n\n  // ============================================\n  // Render User Count Chart\n  // ============================================\n  function renderUserCountChart() {\n    const filtered = userTrendTable.records.filter(r => selectedFacilities.includes(r.拠点ID));\n    const aggregated = aggregateByMonth(filtered, '集計日時', 'アクティブユーザー数');\n\n    const ctx = container.querySelector('#chart-user-count').getContext('2d');\n    \n    if (chartInstances['users']) chartInstances['users'].destroy();\n    \n    chartInstances['users'] = new window.Chart(ctx, {\n      type: 'line',\n      data: {\n        labels: aggregated.labels,\n        datasets: [\n          {\n            label: 'アクティブユーザー数',\n            data: aggregated.data,\n            borderColor: '#f59e0b',\n            backgroundColor: 'rgba(245, 158, 11, 0.08)',\n            borderWidth: 2,\n            fill: true,\n            tension: 0.3,\n            pointRadius: 4,\n            pointBackgroundColor: '#f59e0b',\n            pointBorderColor: '#fff',\n            pointBorderWidth: 2\n          }\n        ]\n      },\n      options: {\n        responsive: true,\n        maintainAspectRatio: false,\n        plugins: {\n          legend: { display: true, position: 'bottom', labels: { font: { size: 12 }, color: '#6b7280', padding: 12 } },\n          tooltip: { backgroundColor: 'rgba(0,0,0,0.8)', titleColor: '#fff', bodyColor: '#fff', padding: 8 }\n        },\n        scales: {\n          y: {\n            beginAtZero: true,\n            ticks: { color: '#6b7280', font: { size: 11 } },\n            grid: { color: 'rgba(229, 221, 208, 0.3)' }\n          },\n          x: {\n            ticks: { color: '#6b7280', font: { size: 11 } },\n            grid: { display: false }\n          }\n        }\n      }\n    });\n  }\n\n  // ============================================\n  // Update KPI Cards\n  // ============================================\n  function updateKPICards() {\n    const filtered = monthlySummaryTable.records.filter(r => selectedFacilities.includes(r.拠点ID));\n    \n    if (filtered.length === 0) {\n      container.querySelector('[data-testid=\"kpi-active-users\"]').textContent = '—';\n      container.querySelector('[data-testid=\"kpi-operations\"]').textContent = '—';\n      container.querySelector('[data-testid=\"kpi-avg-load\"]').textContent = '—';\n      container.querySelector('[data-testid=\"kpi-peak-load\"]').textContent = '—';\n      container.querySelector('[data-testid=\"kpi-data-volume\"]').textContent = '—';\n      return;\n    }\n\n    const totalUsers = filtered.reduce((sum, r) => sum + (r.月次ユーザー数 || 0), 0);\n    const totalOps = filtered.reduce((sum, r) => sum + (r.月次操作件数 || 0), 0);\n    const avgLoad = Math.round(filtered.reduce((sum, r) => sum + (r.平均システム負荷率 || 0), 0) / filtered.length);\n    const peakLoad = Math.max(...filtered.map(r => r.ピークシステム負荷率 || 0));\n    const totalData = filtered.reduce((sum, r) => sum + (r.月次データ量GB || 0), 0);\n\n    container.querySelector('[data-testid=\"kpi-active-users\"]').textContent = totalUsers.toLocaleString();\n    container.querySelector('[data-testid=\"kpi-operations\"]').textContent = totalOps.toLocaleString();\n    container.querySelector('[data-testid=\"kpi-avg-load\"]').textContent = avgLoad;\n    container.querySelector('[data-testid=\"kpi-peak-load\"]').textContent = peakLoad;\n    container.querySelector('[data-testid=\"kpi-data-volume\"]').textContent = totalData.toLocaleString();\n\n    // Update change indicators\n    const userChange = filtered[0]?.前月比ユーザー数増減率 || 0;\n    const dataChange = filtered[0]?.前月比データ量増減率 || 0;\n\n    const userChangeEl = container.querySelector('#kpi-users-change');\n    userChangeEl.textContent = `前月比 ${userChange > 0 ? '+' : ''}${userChange}%`;\n    userChangeEl.style.color = userChange > 0 ? '#f59e0b' : '#6b7280';\n\n    const dataChangeEl = container.querySelector('#kpi-data-change');\n    dataChangeEl.textContent = `前月比 ${dataChange > 0 ? '+' : ''}${dataChange}%`;\n    dataChangeEl.style.color = dataChange > 0 ? '#f59e0b' : '#6b7280';\n  }\n\n  // ============================================\n  // Render Scalability Analysis\n  // ============================================\n  function renderScalabilityAnalysis() {\n    const resultsContainer = container.querySelector('#scalability-results');\n    resultsContainer.innerHTML = '';\n\n    const capacityGroups = {};\n    facilityTable.records.filter(f => selectedFacilities.includes(f.id)).forEach(f => {\n      const cap = f.容量区分 || '未分類';\n      if (!capacityGroups[cap]) capacityGroups[cap] = [];\n      capacityGroups[cap].push(f);\n    });\n\n    Object.entries(capacityGroups).forEach(([capacity, facilities]) => {\n      const card = document.createElement('div');\n      card.style.cssText = 'padding: 12px; background: var(--bg-main); border: 1px solid var(--border); border-radius: 8px; cursor: pointer; transition: all 200ms;';\n      card.onmouseover = () => card.style.background = '#faf8f3';\n      card.onmouseout = () => card.style.background = 'var(--bg-main)';\n\n      const title = document.createElement('div');\n      title.style.cssText = 'font-size: 12px; font-weight: 700; color: var(--text); margin-bottom: 4px;';\n      title.textContent = `${capacity} (${facilities.length}拠点)`;\n\n      const desc = document.createElement('div');\n      desc.style.cssText = 'font-size: 11px; color: var(--text-muted); line-height: 1.4;';\n      \n      let recommendation = '';\n      if (capacity === '小規模') {\n        recommendation = '現在の構成で対応可能。年1回の定期レビュー推奨。';\n      } else if (capacity === '中規模') {\n        recommendation = 'CPU/メモリ増強を検討。キャッシング層の導入を推奨。';\n      } else if (capacity === '大規模') {\n        recommendation = '水平スケーリング（複数サーバー化）を推奨。ロードバランサー導入検討。';\n      } else {\n        recommendation = '容量区分を確認してください。';\n      }\n      desc.textContent = recommendation;\n\n      card.appendChild(title);\n      card.appendChild(desc);\n      resultsContainer.appendChild(card);\n    });\n  }\n\n  // ============================================\n  // Render Load Analysis Dashboard\n  // ============================================\n  function renderLoadAnalysis() {\n    const resultsContainer = container.querySelector('#load-analysis-results');\n    resultsContainer.innerHTML = '';\n\n    const filtered = loadDataTable.records.filter(r => selectedFacilities.includes(r.拠点ID));\n    \n    if (filtered.length === 0) {\n      const noData = document.createElement('div');\n      noData.style.cssText = 'font-size: 12px; color: var(--text-muted);';\n      noData.textContent = 'データなし';\n      resultsContainer.appendChild(noData);\n      return;\n    }\n\n    // Group by facility and get latest status\n    const facilityStatus = {};\n    filtered.forEach(record => {\n      const fid = record.拠点ID;\n      if (!facilityStatus[fid] || new Date(record.測定日時) > new Date(facilityStatus[fid].測定日時)) {\n        facilityStatus[fid] = record;\n      }\n    });\n\n    Object.entries(facilityStatus).forEach(([fid, record]) => {\n      const facility = facilityTable.records.find(f => f.id === fid);\n      const facilityName = facility?.拠点名 || 'Unknown';\n\n      const cpu = record.CPU使用率 || 0;\n      const status = cpu >= 80 ? '警告' : cpu >= 60 ? '注意' : '正常';\n      const statusColor = cpu >= 80 ? '#dc2626' : cpu >= 60 ? '#f59e0b' : '#10b981';\n\n      const card = document.createElement('div');\n      card.style.cssText = 'padding: 12px; background: var(--bg-main); border: 1px solid var(--border); border-radius: 8px; cursor: pointer; transition: all 200ms;';\n      card.onclick = () => showDrilldown(fid, facilityName);\n      card.onmouseover = () => card.style.background = '#faf8f3';\n      card.onmouseout = () => card.style.background = 'var(--bg-main)';\n\n      const nameRow = document.createElement('div');\n      nameRow.style.cssText = 'display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;';\n      \n      const name = document.createElement('span');\n      name.style.cssText = 'font-size: 12px; font-weight: 600; color: var(--text);';\n      name.textContent = facilityName;\n\n      const badge = document.createElement('span');\n      badge.style.cssText = `font-size: 11px; font-weight: 700; padding: 2px 8px; background: ${statusColor}; color: #fff; border-radius: 4px;`;\n      badge.textContent = status;\n\n      nameRow.appendChild(name);\n      nameRow.appendChild(badge);\n\n      const details = document.createElement('div');\n      details.style.cssText = 'font-size: 11px; color: var(--text-muted); line-height: 1.4;';\n      details.innerHTML = `CPU: ${cpu}% | メモリ: ${record.メモリ使用率 || 0}% | ディスク: ${record.ディスク使用率 || 0}%`;\n\n      card.appendChild(nameRow);\n      card.appendChild(details);\n      resultsContainer.appendChild(card);\n    });\n  }\n\n  // ============================================\n  // Show Drilldown Modal\n  // ============================================\n  function showDrilldown(facilityId, facilityName) {\n    const modal = container.querySelector('#drilldown-modal');\n    const title = container.querySelector('#drilldown-title');\n    const content = container.querySelector('#drilldown-content');\n\n    title.textContent = `${facilityName} - 詳細分析`;\n\n    const facility = facilityTable.records.find(f => f.id === facilityId);\n    const latestLoad = loadDataTable.records\n      .filter(r => r.拠点ID === facilityId)\n      .sort((a, b) => new Date(b.測定日時) - new Date(a.測定日時))[0];\n\n    let html = '<div style=\"display: flex; flex-direction: column; gap: 12px;\">';\n    \n    if (facility) {\n      html += `<div><strong>拠点コード:</strong> ${facility.拠点コード || '—'}</div>`;\n      html += `<div><strong>都道府県:</strong> ${facility.都道府県 || '—'}</div>`;\n      html += `<div><strong>容量区分:</strong> ${facility.容量区分 || '—'}</div>`;\n      html += `<div><strong>最大ユーザー数:</strong> ${facility.最大ユーザー数 || '—'}</div>`;\n    }\n\n    if (latestLoad) {\n      html += `<div style=\"margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border);\"><strong>最新負荷情報:</strong></div>`;\n      html += `<div>測定日時: ${latestLoad.測定日時 || '—'}</div>`;\n      html += `<div>CPU使用率: ${latestLoad.CPU使用率 || 0}%</div>`;\n      html += `<div>メモリ使用率: ${latestLoad.メモリ使用率 || 0}%</div>`;\n      html += `<div>ディスク使用率: ${latestLoad.ディスク使用率 || 0}%</div>`;\n      html += `<div>アクティブユーザー数: ${latestLoad.アクティブユーザー数 || 0}</div>`;\n      html += `<div>平均応答時間: ${latestLoad.平均応答時間 || 0}ms</div>`;\n    }\n\n    html += '</div>';\n    content.innerHTML = html;\n    modal.style.display = 'flex';\n  }\n\n  // ============================================\n  // Update Coverage Indicator\n  // ============================================\n  function updateCoverageIndicator() {\n    const totalFacilities = facilityTable.records.filter(f => selectedFacilities.includes(f.id)).length;\n    const facilitiesWithData = new Set(loadDataTable.records.filter(r => selectedFacilities.includes(r.拠点ID)).map(r => r.拠点ID)).size;\n    \n    const coverage = totalFacilities > 0 ? Math.round((facilitiesWithData / totalFacilities) * 100) : 0;\n    \n    container.querySelector('#coverage-bar').style.width = coverage + '%';\n    container.querySelector('[data-testid=\"coverage-percentage\"]').textContent = coverage + '%';\n    container.querySelector('#coverage-text').textContent = `${facilitiesWithData} / ${totalFacilities} 拠点からデータ取得`;\n  }\n\n  // ============================================\n  // Update Timestamps\n  // ============================================\n  function updateTimestamps() {\n    const now = new Date();\n    const lastUpdate = new Date(now.getTime() - Math.random() * 3600000); // Simulated\n    const nextUpdate = new Date(now.getTime() + 300000); // 5 min from now\n\n    container.querySelector('#last-update-time').textContent = lastUpdate.toLocaleString('ja-JP');\n    container.querySelector('#next-update-time').textContent = nextUpdate.toLocaleString('ja-JP');\n  }\n\n  // ============================================\n  // Refresh Dashboard\n  // ============================================\n  function refreshDashboard() {\n    updateKPICards();\n    renderSystemLoadChart();\n    renderDataVolumeChart();\n    renderUserCountChart();\n    renderScalabilityAnalysis();\n    renderLoadAnalysis();\n    updateCoverageIndicator();\n    updateTimestamps();\n  }\n\n  // ============================================\n  // Export CSV\n  // ============================================\n  function exportCSV() {\n    const filtered = monthlySummaryTable.records.filter(r => selectedFacilities.includes(r.拠点ID));\n    \n    if (filtered.length === 0) {\n      alert('エクスポートするデータがありません');\n      return;\n    }\n\n    const headers = ['集計年月', '拠点ID', '月次ユーザー数', '月次操作件数', '平均システム負荷率', 'ピーク負荷率', '月次データ量GB', '前月比ユーザー数増減率', '前月比データ量増減率'];\n    const rows = filtered.map(r => [\n      r.集計年月 || '',\n      r.拠点ID || '',\n      r.月次ユーザー数 || '',\n      r.月次操作件数 || '',\n      r.平均システム負荷率 || '',\n      r.ピークシステム負荷率 || '',\n      r.月次データ量GB || '',\n      r.前月比ユーザー数増減率 || '',\n      r.前月比データ量増減率 || ''\n    ]);\n\n    const csv = '\\uFEFF' + [headers, ...rows].map(row => \n      row.map(cell => typeof cell === 'string' && cell.includes(',') ? `\"${cell}\"` : cell).join(',')\n    ).join('\\n');\n\n    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });\n    const link = document.createElement('a');\n    link.href = URL.createObjectURL(blob);\n    link.download = `system-operations-dashboard-${new Date().toISOString().slice(0, 10)}.csv`;\n    link.click();\n  }\n\n  // ============================================\n  // Event Listeners\n  // ============================================\n  container.querySelector('#refresh-now-btn').addEventListener('click', refreshDashboard);\n  container.querySelector('#export-csv-btn').addEventListener('click', exportCSV);\n  \n  container.querySelector('#update-interval-select').addEventListener('change', (e) => {\n    const interval = parseInt(e.target.value);\n    if (autoUpdateInterval) clearInterval(autoUpdateInterval);\n    if (interval > 0) {\n      autoUpdateInterval = setInterval(refreshDashboard, interval * 1000);\n    }\n  });\n\n  container.querySelector('#drilldown-close').addEventListener('click', () => {\n    container.querySelector('#drilldown-modal').style.display = 'none';\n  });\n\n  container.querySelector('#drilldown-modal').addEventListener('click', (e) => {\n    if (e.target.id === 'drilldown-modal') {\n      container.querySelector('#drilldown-modal').style.display = 'none';\n    }\n  });\n\n  // Escape key to close modal\n  document.addEventListener('keydown', (e) => {\n    if (e.key === 'Escape') {\n      container.querySelector('#drilldown-modal').style.display = 'none';\n    }\n  });\n\n  // ============================================\n  // Initial Render\n  // ============================================\n  initFacilityFilter();\n  refreshDashboard();\n\n  // Start auto-update with default 5-minute interval\n  autoUpdateInterval = setInterval(refreshDashboard, 300000);\n}",
+      "method": "ai"
+    }
+  ],
+  "tableDefinitions": [
+    {
+      "tableName": "ユーザー",
+      "purpose": "システムユーザーの認証・認可・プロフィール管理を行い、作業者・管理者・システム管理者などの役割に基づいたアクセス制御を実現する",
+      "columns": [
+        {
+          "name": "ユーザーID",
+          "type": "uuid",
+          "required": true,
+          "description": "ユーザーの一意識別子"
+        },
+        {
+          "name": "ユーザー名",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "ログイン時に使用するユーザー名"
+        },
+        {
+          "name": "メールアドレス",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "ユーザーの連絡先メールアドレス"
+        },
+        {
+          "name": "パスワードハッシュ",
+          "type": "varchar(255)",
+          "required": true,
+          "description": "暗号化されたパスワード"
+        },
+        {
+          "name": "氏名",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "ユーザーの実名"
+        },
+        {
+          "name": "役割",
+          "type": "varchar(50)",
+          "required": true,
+          "description": "ユーザーの役割（作業者・チームリーダー・管理者・システム管理者など）"
+        },
+        {
+          "name": "拠点ID",
+          "type": "uuid",
+          "required": false,
+          "description": "ユーザーが属する拠点の識別子"
+        },
+        {
+          "name": "チームID",
+          "type": "uuid",
+          "required": false,
+          "description": "ユーザーが属するチームの識別子"
+        },
+        {
+          "name": "ステータス",
+          "type": "varchar(20)",
+          "required": true,
+          "description": "ユーザーのステータス（有効・無効・休止中など）"
+        },
+        {
+          "name": "最終ログイン日時",
+          "type": "timestamp",
+          "required": false,
+          "description": "ユーザーが最後にログインした日時"
+        },
+        {
+          "name": "作成日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "ユーザーレコードの作成日時"
+        },
+        {
+          "name": "更新日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "ユーザーレコードの最終更新日時"
+        },
+        {
+          "name": "作成者",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "ユーザーレコードを作成したユーザー"
+        },
+        {
+          "name": "更新者",
+          "type": "varchar(100)",
+          "required": false,
+          "description": "ユーザーレコードを最後に更新したユーザー"
+        }
+      ]
+    },
+    {
+      "tableName": "操作ログ",
+      "purpose": "ユーザーがシステム内で実行した操作を記録し、監査証跡、トラブルシューティング、セキュリティ監視に利用するトランザクションテーブル",
+      "columns": [
+        {
+          "name": "操作ログID",
+          "type": "uuid",
+          "required": true,
+          "description": "操作ログの一意識別子"
+        },
+        {
+          "name": "ユーザーID",
+          "type": "uuid",
+          "required": true,
+          "description": "操作を実行したユーザーの識別子、ユーザーテーブルへの外部キー"
+        },
+        {
+          "name": "操作種別",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "実行された操作の種類(作成、更新、削除、検証実行、テスト実行、ダウンロード等)"
+        },
+        {
+          "name": "対象テーブル",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "操作の対象となったテーブル名またはエンティティ名"
+        },
+        {
+          "name": "対象ID",
+          "type": "uuid",
+          "required": false,
+          "description": "操作の対象となったレコードの識別子"
+        },
+        {
+          "name": "操作内容",
+          "type": "text",
+          "required": false,
+          "description": "操作の詳細説明、変更内容、パラメータ等"
+        },
+        {
+          "name": "変更前値",
+          "type": "text",
+          "required": false,
+          "description": "更新操作の場合の変更前の値"
+        },
+        {
+          "name": "変更後値",
+          "type": "text",
+          "required": false,
+          "description": "更新操作の場合の変更後の値"
+        },
+        {
+          "name": "実行結果",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "操作の実行結果(成功、失敗、エラー等)"
+        },
+        {
+          "name": "エラーメッセージ",
+          "type": "text",
+          "required": false,
+          "description": "操作が失敗した場合のエラーメッセージ"
+        },
+        {
+          "name": "IPアドレス",
+          "type": "varchar(100)",
+          "required": false,
+          "description": "操作を実行したクライアントのIPアドレス"
+        },
+        {
+          "name": "セッションID",
+          "type": "varchar(100)",
+          "required": false,
+          "description": "操作が実行されたセッションの識別子"
+        },
+        {
+          "name": "作成日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "操作ログが記録された日時"
+        }
+      ]
+    },
+    {
+      "tableName": "拠点マスタ",
+      "purpose": "システム運用における複数拠点の基本情報を一元管理し、ユーザーの拠点割当やシステムリソースの拠点別配置を支援するマスタテーブル",
+      "columns": [
+        {
+          "name": "拠点ID",
+          "type": "uuid",
+          "required": true,
+          "description": "拠点を一意に識別するプライマリキー"
+        },
+        {
+          "name": "拠点名",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "拠点の表示名称（例：東京本社、大阪支社）"
+        },
+        {
+          "name": "拠点コード",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "拠点を識別するユニークなコード（例：TK001、OS002）"
+        },
+        {
+          "name": "都道府県",
+          "type": "varchar(100)",
+          "required": false,
+          "description": "拠点が所在する都道府県"
+        },
+        {
+          "name": "住所",
+          "type": "text",
+          "required": false,
+          "description": "拠点の詳細住所"
+        },
+        {
+          "name": "電話番号",
+          "type": "varchar(100)",
+          "required": false,
+          "description": "拠点の連絡先電話番号"
+        },
+        {
+          "name": "ステータス",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "拠点の運用状態（稼働中、休止中、廃止等）"
+        },
+        {
+          "name": "容量区分",
+          "type": "varchar(100)",
+          "required": false,
+          "description": "拠点のスケーラビリティ区分（小規模、中規模、大規模等）"
+        },
+        {
+          "name": "最大ユーザー数",
+          "type": "integer",
+          "required": false,
+          "description": "拠点で管理可能な最大ユーザー数"
+        },
+        {
+          "name": "備考",
+          "type": "text",
+          "required": false,
+          "description": "拠点に関する追加情報や特記事項"
+        },
+        {
+          "name": "作成日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "レコード作成日時"
+        },
+        {
+          "name": "更新日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "レコード最終更新日時"
+        },
+        {
+          "name": "作成者",
+          "type": "uuid",
+          "required": true,
+          "description": "レコード作成者のユーザーID（ユーザーテーブルへの外部キー）"
+        },
+        {
+          "name": "更新者",
+          "type": "uuid",
+          "required": true,
+          "description": "レコード最終更新者のユーザーID（ユーザーテーブルへの外部キー）"
+        }
+      ]
+    },
+    {
+      "tableName": "システム負荷データ",
+      "purpose": "システムの運用状況をリアルタイムで監視し、スケーラビリティ管理のための負荷情報を記録・分析するテーブル",
+      "columns": [
+        {
+          "name": "負荷データID",
+          "type": "uuid",
+          "required": true,
+          "description": "システム負荷データの一意識別子"
+        },
+        {
+          "name": "拠点ID",
+          "type": "uuid",
+          "required": true,
+          "description": "拠点マスタへの外部キー参照"
+        },
+        {
+          "name": "測定日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "負荷データを測定した日時"
+        },
+        {
+          "name": "CPU使用率",
+          "type": "integer",
+          "required": true,
+          "description": "CPU使用率のパーセンテージ値(0-100)"
+        },
+        {
+          "name": "メモリ使用率",
+          "type": "integer",
+          "required": true,
+          "description": "メモリ使用率のパーセンテージ値(0-100)"
+        },
+        {
+          "name": "ディスク使用率",
+          "type": "integer",
+          "required": true,
+          "description": "ディスク使用率のパーセンテージ値(0-100)"
+        },
+        {
+          "name": "アクティブユーザー数",
+          "type": "integer",
+          "required": true,
+          "description": "測定時点でのアクティブユーザー数"
+        },
+        {
+          "name": "平均応答時間",
+          "type": "integer",
+          "required": true,
+          "description": "システムの平均応答時間(ミリ秒)"
+        },
+        {
+          "name": "エラー発生件数",
+          "type": "integer",
+          "required": false,
+          "description": "測定期間中に発生したエラー件数"
+        },
+        {
+          "name": "ネットワーク帯域幅使用率",
+          "type": "integer",
+          "required": false,
+          "description": "ネットワーク帯域幅の使用率パーセンテージ値(0-100)"
+        },
+        {
+          "name": "警告フラグ",
+          "type": "boolean",
+          "required": true,
+          "description": "負荷が閾値を超えているかを示すフラグ"
+        },
+        {
+          "name": "作成日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "レコード作成日時"
+        },
+        {
+          "name": "作成者",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "レコード作成者のユーザーID"
+        }
+      ]
+    },
+    {
+      "tableName": "データ量トレンド",
+      "purpose": "システム運用におけるデータ量の時系列変化を記録・監視し、スケーラビリティ管理のための容量計画と性能分析を支援する",
+      "columns": [
+        {
+          "name": "トレンドID",
+          "type": "uuid",
+          "required": true,
+          "description": "データ量トレンドレコードの一意識別子"
+        },
+        {
+          "name": "測定日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "データ量を測定した日時"
+        },
+        {
+          "name": "拠点ID",
+          "type": "uuid",
+          "required": true,
+          "description": "拠点マスタへの外部キー参照"
+        },
+        {
+          "name": "テーブル名",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "測定対象のテーブル名"
+        },
+        {
+          "name": "レコード数",
+          "type": "integer",
+          "required": true,
+          "description": "該当テーブルのレコード総数"
+        },
+        {
+          "name": "データサイズMB",
+          "type": "integer",
+          "required": true,
+          "description": "テーブルの物理的なデータサイズ(MB単位)"
+        },
+        {
+          "name": "増加率パーセント",
+          "type": "integer",
+          "required": false,
+          "description": "前回測定時点からの増加率(%)"
+        },
+        {
+          "name": "作成日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "レコード作成日時"
+        },
+        {
+          "name": "更新日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "レコード最終更新日時"
+        },
+        {
+          "name": "作成者",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "レコード作成者のユーザーID"
+        }
+      ]
+    },
+    {
+      "tableName": "ユーザー数トレンド",
+      "purpose": "システム運用スケーラビリティ管理のためにユーザー数の時系列変化を記録・分析し、容量計画とパフォーマンス予測を支援するトレンドデータテーブル",
+      "columns": [
+        {
+          "name": "トレンドID",
+          "type": "uuid",
+          "required": true,
+          "description": "ユーザー数トレンドレコードの一意識別子"
+        },
+        {
+          "name": "集計日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "ユーザー数を集計した日時"
+        },
+        {
+          "name": "アクティブユーザー数",
+          "type": "integer",
+          "required": true,
+          "description": "集計日時時点でのアクティブユーザーの総数"
+        },
+        {
+          "name": "新規ユーザー数",
+          "type": "integer",
+          "required": false,
+          "description": "集計期間中に新規登録されたユーザー数"
+        },
+        {
+          "name": "離脱ユーザー数",
+          "type": "integer",
+          "required": false,
+          "description": "集計期間中に退会・非アクティブ化したユーザー数"
+        },
+        {
+          "name": "拠点ID",
+          "type": "uuid",
+          "required": false,
+          "description": "拠点マスタへの外部キー、拠点別集計の場合に使用"
+        },
+        {
+          "name": "集計粒度",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "集計の時間単位(日次/週次/月次等)"
+        },
+        {
+          "name": "作成日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "トレンドレコードが作成された日時"
+        },
+        {
+          "name": "更新日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "トレンドレコードが最後に更新された日時"
+        },
+        {
+          "name": "作成者",
+          "type": "varchar(100)",
+          "required": false,
+          "description": "トレンドレコードを作成したシステムまたはユーザー"
+        }
+      ]
+    },
+    {
+      "tableName": "月次集計結果",
+      "purpose": "システム運用・スケーラビリティ管理のための月次単位の集計データを管理し、ユーザー数、システム負荷、データ量などの主要指標を記録・分析する",
+      "columns": [
+        {
+          "name": "集計結果ID",
+          "type": "uuid",
+          "required": true,
+          "description": "月次集計結果の一意識別子"
+        },
+        {
+          "name": "集計年月",
+          "type": "varchar(7)",
+          "required": true,
+          "description": "集計対象の年月（YYYY-MM形式）"
+        },
+        {
+          "name": "拠点ID",
+          "type": "uuid",
+          "required": true,
+          "description": "拠点マスタへの外部キー、集計対象の拠点"
+        },
+        {
+          "name": "月次ユーザー数",
+          "type": "integer",
+          "required": true,
+          "description": "当月のアクティブユーザー数"
+        },
+        {
+          "name": "月次操作件数",
+          "type": "integer",
+          "required": true,
+          "description": "当月の総操作ログ件数"
+        },
+        {
+          "name": "平均システム負荷率",
+          "type": "integer",
+          "required": true,
+          "description": "当月のシステム負荷率の平均値（パーセンテージ）"
+        },
+        {
+          "name": "ピークシステム負荷率",
+          "type": "integer",
+          "required": true,
+          "description": "当月のシステム負荷率の最大値（パーセンテージ）"
+        },
+        {
+          "name": "月次データ量GB",
+          "type": "integer",
+          "required": true,
+          "description": "当月のデータ量合計（GB単位）"
+        },
+        {
+          "name": "前月比ユーザー数増減率",
+          "type": "integer",
+          "required": false,
+          "description": "前月比のユーザー数増減率（パーセンテージ）"
+        },
+        {
+          "name": "前月比データ量増減率",
+          "type": "integer",
+          "required": false,
+          "description": "前月比のデータ量増減率（パーセンテージ）"
+        },
+        {
+          "name": "作成日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "集計結果の作成日時"
+        },
+        {
+          "name": "更新日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "集計結果の最終更新日時"
+        },
+        {
+          "name": "作成者",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "集計結果を作成したユーザーまたはシステム"
+        }
+      ]
+    },
+    {
+      "tableName": "ダッシュボード設定",
+      "purpose": "システム運用・スケーラビリティ管理ダッシュボードの表示設定、ウィジェット配置、フィルタ条件、更新頻度などを管理するマスタテーブル",
+      "columns": [
+        {
+          "name": "ダッシュボード設定ID",
+          "type": "uuid",
+          "required": true,
+          "description": "ダッシュボード設定の一意識別子"
+        },
+        {
+          "name": "ユーザーID",
+          "type": "uuid",
+          "required": true,
+          "description": "設定を所有するユーザーの外部キー参照"
+        },
+        {
+          "name": "拠点ID",
+          "type": "uuid",
+          "required": false,
+          "description": "拠点マスタへの外部キー参照、拠点別ダッシュボード設定の場合に使用"
+        },
+        {
+          "name": "ダッシュボード名",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "ダッシュボードの表示名"
+        },
+        {
+          "name": "説明",
+          "type": "text",
+          "required": false,
+          "description": "ダッシュボードの説明"
+        },
+        {
+          "name": "デフォルトフラグ",
+          "type": "boolean",
+          "required": true,
+          "description": "ユーザーのデフォルトダッシュボードとして使用するかどうか"
+        },
+        {
+          "name": "自動更新間隔秒",
+          "type": "integer",
+          "required": true,
+          "description": "ダッシュボードの自動更新間隔（秒単位、0は自動更新なし）"
+        },
+        {
+          "name": "表示対象メトリクス",
+          "type": "text",
+          "required": false,
+          "description": "表示するメトリクスの種別（システム負荷、データ量トレンド、ユーザー数トレンド等）をカンマ区切りで指定"
+        },
+        {
+          "name": "フィルタ条件",
+          "type": "text",
+          "required": false,
+          "description": "ダッシュボードに適用するフィルタ条件（期間、拠点、ステータス等）"
+        },
+        {
+          "name": "レイアウトタイプ",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "ダッシュボードのレイアウト種別（標準、コンパクト、カスタム等）"
+        },
+        {
+          "name": "作成日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "ダッシュボード設定の作成日時"
+        },
+        {
+          "name": "更新日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "ダッシュボード設定の最終更新日時"
+        },
+        {
+          "name": "作成者",
+          "type": "uuid",
+          "required": true,
+          "description": "ダッシュボード設定を作成したユーザーID"
+        },
+        {
+          "name": "更新者",
+          "type": "uuid",
+          "required": true,
+          "description": "ダッシュボード設定を最後に更新したユーザーID"
+        }
+      ]
+    }
+  ],
+  "presetSeedData": {
+    "ユーザー": [
+      {
+        "ユーザーID": "rec-001",
+        "ユーザー名": "admin_system",
+        "メールアドレス": "admin@company.jp",
+        "パスワードハッシュ": "$2b$12$abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQR",
+        "氏名": "山田太郎",
+        "役割": "システム管理者",
+        "拠点ID": "rec-0001",
+        "チームID": "rec-0101",
+        "ステータス": "有効",
+        "最終ログイン日時": "2025-01-15T09:30:00+09:00",
+        "作成日時": "2024-04-01T10:00:00+09:00",
+        "更新日時": "2025-01-15T09:30:00+09:00",
+        "作成者": "system",
+        "更新者": "山田太郎"
+      },
+      {
+        "ユーザーID": "rec-001",
+        "ユーザー名": "tanaka.taro",
+        "メールアドレス": "tanaka.taro@manufacturing.co.jp",
+        "パスワードハッシュ": "$2b$12$abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQR",
+        "氏名": "田中太郎",
+        "役割": "作業者",
+        "拠点ID": "rec-101",
+        "チームID": "rec-201",
+        "ステータス": "有効",
+        "最終ログイン日時": "2025-01-15 08:30:00",
+        "作成日時": "2024-04-01 09:00:00",
+        "更新日時": "2025-01-15 08:30:00",
+        "作成者": "yamada.hanako",
+        "更新者": "tanaka.taro"
+      },
+      {
+        "ユーザーID": "rec-001",
+        "ユーザー名": "tanaka.taro",
+        "メールアドレス": "tanaka.taro@company.jp",
+        "パスワードハッシュ": "$2b$12$abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQR",
+        "氏名": "田中太郎",
+        "役割": "チームリーダー",
+        "拠点ID": "rec-loc-003",
+        "チームID": "rec-team-005",
+        "ステータス": "有効",
+        "最終ログイン日時": "2025-01-15T09:30:00+09:00",
+        "作成日時": "2024-04-10T14:20:00+09:00",
+        "更新日時": "2025-01-10T16:45:00+09:00",
+        "作成者": "佐藤次郎",
+        "更新者": "田中太郎"
+      },
+      {
+        "ユーザーID": "rec-001",
+        "ユーザー名": "tanaka.taro",
+        "メールアドレス": "tanaka.taro@company.jp",
+        "パスワードハッシュ": "$2b$12$abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
+        "氏名": "田中太郎",
+        "役割": "管理者",
+        "拠点ID": "rec-101",
+        "チームID": "rec-201",
+        "ステータス": "有効",
+        "最終ログイン日時": "2025-01-15T09:30:00+09:00",
+        "作成日時": "2024-04-01T10:00:00+09:00",
+        "更新日時": "2025-01-15T09:30:00+09:00",
+        "作成者": "システム管理者",
+        "更新者": "田中太郎"
+      },
+      {
+        "ユーザーID": "rec-001",
+        "ユーザー名": "yamada.hanako",
+        "メールアドレス": "yamada.hanako@company.jp",
+        "パスワードハッシュ": "$2b$12$abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQR",
+        "氏名": "山田花子",
+        "役割": "作業者",
+        "拠点ID": "rec-loc-002",
+        "チームID": "rec-team-005",
+        "ステータス": "有効",
+        "最終ログイン日時": null,
+        "作成日時": "2025-01-15T09:30:00+09:00",
+        "更新日時": "2025-01-15T09:30:00+09:00",
+        "作成者": "佐藤太郎",
+        "更新者": "佐藤太郎"
+      },
+      {
+        "ユーザーID": "rec-001",
+        "ユーザー名": "tanaka.taro",
+        "メールアドレス": "tanaka.taro@company.jp",
+        "パスワードハッシュ": "$2b$12$abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQR",
+        "氏名": "田中太郎",
+        "役割": "作業者",
+        "拠点ID": "rec-0101",
+        "チームID": "rec-0201",
+        "ステータス": "休止中",
+        "最終ログイン日時": "2024-12-10T17:45:00+09:00",
+        "作成日時": "2023-04-15T09:30:00+09:00",
+        "更新日時": "2024-12-15T14:20:00+09:00",
+        "作成者": "suzuki.hanako",
+        "更新者": "yamamoto.jiro"
+      },
+      {
+        "ユーザーID": "rec-001",
+        "ユーザー名": "tanaka.taro",
+        "メールアドレス": "tanaka.taro@company.jp",
+        "パスワードハッシュ": "$2b$12$abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQRST",
+        "氏名": "田中太郎",
+        "役割": "作業者",
+        "拠点ID": "rec-101",
+        "チームID": "rec-201",
+        "ステータス": "無効",
+        "最終ログイン日時": "2025-01-15T14:32:00+09:00",
+        "作成日時": "2023-04-10T09:00:00+09:00",
+        "更新日時": "2025-01-31T10:15:00+09:00",
+        "作成者": "suzuki.hanako",
+        "更新者": "yamamoto.jiro"
+      },
+      {
+        "ユーザーID": "rec-001",
+        "ユーザー名": "tanaka.taro",
+        "メールアドレス": "tanaka.taro@company.jp",
+        "パスワードハッシュ": "$2b$12$abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQR",
+        "氏名": "田中太郎",
+        "役割": "チームリーダー",
+        "拠点ID": "rec-0042",
+        "チームID": "rec-0156",
+        "ステータス": "有効",
+        "最終ログイン日時": "2025-01-15T09:30:45Z",
+        "作成日時": "2023-06-20T10:15:00Z",
+        "更新日時": "2025-01-10T14:22:30Z",
+        "作成者": "admin",
+        "更新者": "佐藤花子"
+      },
+      {
+        "ユーザーID": "rec-001",
+        "ユーザー名": "tanaka.taro",
+        "メールアドレス": "tanaka.taro@company.jp",
+        "パスワードハッシュ": "$2b$12$K9x7mL2pQvN8wR3jF5sT6eHj9kL4mN2oP1qR5sT8uV3wX6yZ9aB1c",
+        "氏名": "田中太郎",
+        "役割": "チームリーダー",
+        "拠点ID": "rec-002",
+        "チームID": "rec-003",
+        "ステータス": "有効",
+        "最終ログイン日時": "2025-01-15 14:32:00",
+        "作成日時": "2024-03-20 09:15:00",
+        "更新日時": "2025-01-14 11:45:00",
+        "作成者": "admin",
+        "更新者": "tanaka.taro"
+      },
+      {
+        "ユーザーID": "rec-001",
+        "ユーザー名": "tanaka.taro",
+        "メールアドレス": "tanaka.taro@company.jp",
+        "パスワードハッシュ": "$2b$12$abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQ",
+        "氏名": "田中太郎",
+        "役割": "チームリーダー",
+        "拠点ID": "rec-loc-005",
+        "チームID": "rec-team-012",
+        "ステータス": "有効",
+        "最終ログイン日時": "2025-01-15 09:32:18",
+        "作成日時": "2024-04-10 14:22:05",
+        "更新日時": "2025-01-10 16:45:30",
+        "作成者": "admin_yamada",
+        "更新者": "admin_suzuki"
+      }
+    ],
+    "操作ログ": [
+      {
+        "操作ログID": "rec-001",
+        "ユーザーID": "rec-002",
+        "操作種別": "作成",
+        "対象テーブル": "ユーザー",
+        "対象ID": "rec-003",
+        "操作内容": "新規ユーザーアカウント作成、営業部門ロール割り当て",
+        "変更前値": null,
+        "変更後値": "ユーザー名:鈴木花子、メール:hanako.suzuki@company.jp、部門:営業、ロール:営業担当者",
+        "実行結果": "成功",
+        "エラーメッセージ": null,
+        "IPアドレス": "192.168.1.105",
+        "セッションID": "sess-20250115-admin-001",
+        "作成日時": "2025-01-15T09:32:47+09:00"
+      },
+      {
+        "操作ログID": "rec-001",
+        "ユーザーID": "rec-u-0847",
+        "操作種別": "更新",
+        "対象テーブル": "顧客マスタ",
+        "対象ID": "rec-c-5032",
+        "操作内容": "顧客マスタの住所情報を更新。配送先住所を変更",
+        "変更前値": "東京都渋谷区道玄坂1-2-3 ビジネスビル5階",
+        "変更後値": "東京都渋谷区渋谷3-10-15 新社屋ビル2階",
+        "実行結果": "成功",
+        "エラーメッセージ": null,
+        "IPアドレス": "203.0.113.45",
+        "セッションID": "sess-20250115-a7d2e9f1",
+        "作成日時": "2025-01-15T14:32:18Z"
+      },
+      {
+        "操作ログID": "rec-001",
+        "ユーザーID": "rec-usr-042",
+        "操作種別": "ダウンロード",
+        "対象テーブル": "月次請求データ",
+        "対象ID": "rec-inv-202501",
+        "操作内容": "2025年1月分の請求データをCSV形式でダウンロード、会計システム連携用",
+        "変更前値": null,
+        "変更後値": null,
+        "実行結果": "成功",
+        "エラーメッセージ": null,
+        "IPアドレス": "192.168.1.105",
+        "セッションID": "sess-a7f2d9e1c4b6",
+        "作成日時": "2025-02-03T09:15:32+09:00"
+      },
+      {
+        "操作ログID": "rec-001",
+        "ユーザーID": "rec-u-0847",
+        "操作種別": "検証実行",
+        "対象テーブル": "顧客マスタ",
+        "対象ID": "rec-cust-5234",
+        "操作内容": "本番環境の顧客マスタテーブルに対して整合性チェック実行。外部キー制約、重複チェック、NULL値検証を実施",
+        "変更前値": "",
+        "変更後値": "",
+        "実行結果": "成功",
+        "エラーメッセージ": "",
+        "IPアドレス": "192.168.10.45",
+        "セッションID": "sess-20250115-7f3a9d2b",
+        "作成日時": "2025-01-15T09:23:47+09:00"
+      },
+      {
+        "操作ログID": "rec-001",
+        "ユーザーID": "rec-admin-001",
+        "操作種別": "削除",
+        "対象テーブル": "ユーザー権限マスタ",
+        "対象ID": "rec-perm-042",
+        "操作内容": "営業部ユーザーの売上データテーブルアクセス権を削除しようとしました",
+        "変更前値": "アクセス権あり（閲覧、編集、削除可能）",
+        "変更後値": "該当なし",
+        "実行結果": "失敗",
+        "エラーメッセージ": "権限不足：このテーブルの権限管理操作にはシステム管理者権限（レベル5以上）が必要です。現在のユーザー権限レベルは3です",
+        "IPアドレス": "192.168.1.105",
+        "セッションID": "sess-20250115-7a4c9d2e",
+        "作成日時": "2025-01-15T14:32:47Z"
+      },
+      {
+        "操作ログID": "rec-001",
+        "ユーザーID": "rec-user-042",
+        "操作種別": "テスト実行",
+        "対象テーブル": "商品検索機能",
+        "対象ID": "rec-feature-2024-08",
+        "操作内容": "新機能の商品検索パフォーマンステスト実施、10万件データでの応答時間測定",
+        "変更前値": null,
+        "変更後値": null,
+        "実行結果": "成功",
+        "エラーメッセージ": null,
+        "IPアドレス": "192.168.1.105",
+        "セッションID": "sess-20250117-8f3c2d9e",
+        "作成日時": "2025-01-17T14:32:45+09:00"
+      },
+      {
+        "操作ログID": "rec-001",
+        "ユーザーID": "rec-002",
+        "操作種別": "削除",
+        "対象テーブル": "取引データ",
+        "対象ID": "rec-003",
+        "操作内容": "顧客ID不正、金額桁違い、納期過去日付の取引レコードを削除",
+        "変更前値": "顧客ID: null、金額: 999999999円、納期: 2023-12-01",
+        "変更後値": "削除済み",
+        "実行結果": "成功",
+        "エラーメッセージ": "",
+        "IPアドレス": "192.168.1.45",
+        "セッションID": "sess-a7f3d9e2c1b4",
+        "作成日時": "2024-11-15 14:32:18"
+      },
+      {
+        "操作ログID": "rec-001",
+        "ユーザーID": "rec-u-042",
+        "操作種別": "権限付与",
+        "対象テーブル": "操作ログ",
+        "対象ID": "rec-001",
+        "操作内容": "セキュリティ監査担当者 山田花子に操作ログテーブルの参照権限を付与",
+        "変更前値": "権限なし",
+        "変更後値": "参照権限(SELECT)",
+        "実行結果": "成功",
+        "エラーメッセージ": null,
+        "IPアドレス": "192.168.10.25",
+        "セッションID": "sess-8f7d9e2c",
+        "作成日時": "2024-11-15T14:32:18Z"
+      },
+      {
+        "操作ログID": "rec-001",
+        "ユーザーID": "rec-sys-001",
+        "操作種別": "削除",
+        "対象テーブル": "セッション",
+        "対象ID": "rec-sess-2847",
+        "操作内容": "期限切れセッションレコードの自動削除バッチ処理",
+        "変更前値": "セッションID: sess_a7f9e2c1, ユーザーID: rec-user-0342, 有効期限: 2024-12-15 23:59:59",
+        "変更後値": null,
+        "実行結果": "成功",
+        "エラーメッセージ": null,
+        "IPアドレス": "127.0.0.1",
+        "セッションID": "batch-auto-delete-20250116",
+        "作成日時": "2025-01-16 02:30:45"
+      },
+      {
+        "操作ログID": "rec-001",
+        "ユーザーID": "rec-u-0847",
+        "操作種別": "更新",
+        "対象テーブル": "顧客情報",
+        "対象ID": "rec-cust-5234",
+        "操作内容": "顧客情報一括更新処理（住所・電話番号・担当者情報）",
+        "変更前値": "住所: 東京都渋谷区道玄坂1-2-3、電話: 03-XXXX-5678、担当者: 佐藤花子",
+        "変更後値": "住所: 東京都渋谷区道玄坂1-2-4、電話: 03-XXXX-5679、担当者: 鈴木一郎",
+        "実行結果": "失敗",
+        "エラーメッセージ": "ネットワークタイムアウト: サーバーからの応答がありません。一括更新処理は中断されました",
+        "IPアドレス": "192.168.1.105",
+        "セッションID": "sess-20250115-a7f3e2c1",
+        "作成日時": "2025-01-15 14:32:47"
+      }
+    ],
+    "拠点マスタ": [
+      {
+        "拠点ID": "rec-001",
+        "拠点名": "東京本社",
+        "拠点コード": "TK001",
+        "都道府県": "東京都",
+        "住所": "東京都千代田区丸の内1-1-1 ビジネスビル10階",
+        "電話番号": "03-XXXX-XXXX",
+        "ステータス": "稼働中",
+        "容量区分": "大規模",
+        "最大ユーザー数": 5000,
+        "備考": "全社システム運用の中核拠点。経営管理部門、システム部門、データセンター機能を集約。",
+        "作成日時": "2024-01-15T09:30:00Z",
+        "更新日時": "2025-01-10T14:45:00Z",
+        "作成者": "rec-u-001",
+        "更新者": "rec-u-002"
+      },
+      {
+        "拠点ID": "rec-001",
+        "拠点名": "福岡営業所",
+        "拠点コード": "FK001",
+        "都道府県": "福岡県",
+        "住所": "福岡県福岡市博多区中洲5-1-1 福岡ビジネスセンター3階",
+        "電話番号": "092-123-4567",
+        "ステータス": "稼働中",
+        "容量区分": "中規模",
+        "最大ユーザー数": 150,
+        "備考": "九州地域の営業・サポート拠点。営業スタッフ25名、サポート10名が配置。",
+        "作成日時": "2024-04-15T09:30:00Z",
+        "更新日時": "2025-01-20T14:15:00Z",
+        "作成者": "rec-user-001",
+        "更新者": "rec-user-002"
+      },
+      {
+        "拠点ID": "rec-001",
+        "拠点名": "福岡サテライトオフィス",
+        "拠点コード": "FK001",
+        "都道府県": "福岡県",
+        "住所": "福岡県福岡市中央区天神1-1-1 ビジネスビル3F",
+        "電話番号": "092-XXX-XXXX",
+        "ステータス": "稼働中",
+        "容量区分": "小規模",
+        "最大ユーザー数": 25,
+        "備考": "2024年11月開設。営業チーム拠点として運用開始。",
+        "作成日時": "2024-11-01T09:30:00+09:00",
+        "更新日時": "2024-11-01T09:30:00+09:00",
+        "作成者": "rec-u001",
+        "更新者": "rec-u001"
+      },
+      {
+        "拠点ID": "rec-001",
+        "拠点名": "名古屋営業所",
+        "拠点コード": "NG001",
+        "都道府県": "愛知県",
+        "住所": "名古屋市中区栄3-15-7 ビジネスビル5F",
+        "電話番号": "052-201-3456",
+        "ステータス": "廃止予定",
+        "容量区分": "中規模",
+        "最大ユーザー数": 150,
+        "備考": "2025年3月末に名古屋支社へ統合予定。現在段階的クローズ進行中。",
+        "作成日時": "2023-06-15T09:30:00Z",
+        "更新日時": "2024-11-20T14:45:00Z",
+        "作成者": "rec-u-0001",
+        "更新者": "rec-u-0042"
+      },
+      {
+        "拠点ID": "rec-001",
+        "拠点名": "名古屋災害対策センター",
+        "拠点コード": "NGY-BCP-001",
+        "都道府県": "愛知県",
+        "住所": "名古屋市中区栄3-15-7 セキュリティビル5階",
+        "電話番号": "052-243-8901",
+        "ステータス": "休止中",
+        "容量区分": "中規模",
+        "最大ユーザー数": 150,
+        "備考": "東海地域の災害時バックアップ施設。平時は定期点検と訓練実施。",
+        "作成日時": "2024-04-15T09:30:00Z",
+        "更新日時": "2025-01-20T14:45:00Z",
+        "作成者": "rec-u-001",
+        "更新者": "rec-u-002"
+      },
+      {
+        "拠点ID": "rec-001",
+        "拠点名": "関東自動車部品製造センター",
+        "拠点コード": "KT-MFG-001",
+        "都道府県": "神奈川県",
+        "住所": "神奈川県横浜市鶴見区末広町1-2-3",
+        "電話番号": "045-123-4567",
+        "ステータス": "稼働中",
+        "容量区分": "大規模",
+        "最大ユーザー数": 850,
+        "備考": "24時間3交代運用。派遣社員含む。品質管理システムと連携。",
+        "作成日時": "2024-04-15T09:30:00Z",
+        "更新日時": "2025-01-20T14:45:00Z",
+        "作成者": "rec-user-001",
+        "更新者": "rec-user-015"
+      },
+      {
+        "拠点ID": "rec-001",
+        "拠点名": "札幌営業所",
+        "拠点コード": "CTS001",
+        "都道府県": "北海道",
+        "住所": "札幌市中央区大通西5丁目11番地",
+        "電話番号": "011-555-2847",
+        "ステータス": "休止中",
+        "容量区分": "小規模",
+        "最大ユーザー数": 25,
+        "備考": "テレワーク導入に伴い2025年1月より運用休止。機器・什器は本社に集約。",
+        "作成日時": "2023-06-15T09:30:00Z",
+        "更新日時": "2024-12-20T14:15:00Z",
+        "作成者": "rec-u-0001",
+        "更新者": "rec-u-0015"
+      },
+      {
+        "拠点ID": "rec-001",
+        "拠点名": "アジア太平洋地域統括ハブ（名古屋）",
+        "拠点コード": "NGY-HUB-001",
+        "都道府県": "愛知県",
+        "住所": "名古屋市中村区名駅1-1-1 グローバルビジネスセンター15階",
+        "電話番号": "052-XXX-XXXX",
+        "ステータス": "稼働中",
+        "容量区分": "大規模",
+        "最大ユーザー数": 500,
+        "備考": "海外展開の統括拠点。アジア太平洋地域の営業・物流・カスタマーサポート機能を集約。2025年Q2フル稼働予定。",
+        "作成日時": "2024-10-15T09:30:00Z",
+        "更新日時": "2025-01-20T14:15:00Z",
+        "作成者": "rec-user-001",
+        "更新者": "rec-user-002"
+      }
+    ],
+    "システム負荷データ": [
+      {
+        "負荷データID": "rec-001",
+        "拠点ID": "rec-site-0042",
+        "測定日時": "2024-11-15T10:30:00",
+        "CPU使用率": 45,
+        "メモリ使用率": 62,
+        "ディスク使用率": 58,
+        "アクティブユーザー数": 287,
+        "平均応答時間": 245,
+        "エラー発生件数": 2,
+        "ネットワーク帯域幅使用率": 51,
+        "警告フラグ": false,
+        "作成日時": "2024-11-15T10:30:15",
+        "作成者": "田中太郎"
+      },
+      {
+        "負荷データID": "rec-001",
+        "拠点ID": "rec-site-0042",
+        "測定日時": "2024-12-31T23:45:00+09:00",
+        "CPU使用率": 94,
+        "メモリ使用率": 88,
+        "ディスク使用率": 76,
+        "アクティブユーザー数": 342,
+        "平均応答時間": 3240,
+        "エラー発生件数": 127,
+        "ネットワーク帯域幅使用率": 82,
+        "警告フラグ": true,
+        "作成日時": "2024-12-31T23:50:15+09:00",
+        "作成者": "佐藤花子"
+      },
+      {
+        "負荷データID": "rec-001",
+        "拠点ID": "loc-tokyo-01",
+        "測定日時": "2024-11-28T08:45:00+09:00",
+        "CPU使用率": 87,
+        "メモリ使用率": 82,
+        "ディスク使用率": 45,
+        "アクティブユーザー数": 342,
+        "平均応答時間": 1850,
+        "エラー発生件数": 12,
+        "ネットワーク帯域幅使用率": 76,
+        "警告フラグ": true,
+        "作成日時": "2024-11-28T08:46:15+09:00",
+        "作成者": "鈴木健一"
+      },
+      {
+        "負荷データID": "rec-001",
+        "拠点ID": "site-0847",
+        "測定日時": "2024-12-15T02:35:00+09:00",
+        "CPU使用率": 68,
+        "メモリ使用率": 94,
+        "ディスク使用率": 72,
+        "アクティブユーザー数": 3,
+        "平均応答時間": 2840,
+        "エラー発生件数": 2,
+        "ネットワーク帯域幅使用率": 58,
+        "警告フラグ": true,
+        "作成日時": "2024-12-15T02:36:15+09:00",
+        "作成者": "山田花子"
+      },
+      {
+        "負荷データID": "rec-001",
+        "拠点ID": "site-0847",
+        "測定日時": "2024-11-15T14:32:00+09:00",
+        "CPU使用率": 68,
+        "メモリ使用率": 72,
+        "ディスク使用率": 45,
+        "アクティブユーザー数": 342,
+        "平均応答時間": 2840,
+        "エラー発生件数": 127,
+        "ネットワーク帯域幅使用率": 94,
+        "警告フラグ": true,
+        "作成日時": "2024-11-15T14:35:22+09:00",
+        "作成者": "山田花子"
+      },
+      {
+        "負荷データID": "rec-001",
+        "拠点ID": "rec-site-0042",
+        "測定日時": "2024-11-28 14:30:00",
+        "CPU使用率": 42,
+        "メモリ使用率": 58,
+        "ディスク使用率": 65,
+        "アクティブユーザー数": 127,
+        "平均応答時間": 245,
+        "エラー発生件数": 2,
+        "ネットワーク帯域幅使用率": 38,
+        "警告フラグ": false,
+        "作成日時": "2024-11-28 14:35:00",
+        "作成者": "山田太郎"
+      },
+      {
+        "負荷データID": "rec-001",
+        "拠点ID": "rec-site-0042",
+        "測定日時": "2024-12-14T22:30:00+09:00",
+        "CPU使用率": 87,
+        "メモリ使用率": 92,
+        "ディスク使用率": 78,
+        "アクティブユーザー数": 2847,
+        "平均応答時間": 1240,
+        "エラー発生件数": 23,
+        "ネットワーク帯域幅使用率": 84,
+        "警告フラグ": true,
+        "作成日時": "2024-12-14T22:35:15+09:00",
+        "作成者": "山田花子"
+      },
+      {
+        "負荷データID": "rec-001",
+        "拠点ID": "loc-0847",
+        "測定日時": "2024-11-15T14:32:00+09:00",
+        "CPU使用率": 87,
+        "メモリ使用率": 92,
+        "ディスク使用率": 68,
+        "アクティブユーザー数": 15840,
+        "平均応答時間": 3240,
+        "エラー発生件数": 127,
+        "ネットワーク帯域幅使用率": 94,
+        "警告フラグ": true,
+        "作成日時": "2024-11-15T14:35:22+09:00",
+        "作成者": "鈴木健一"
+      },
+      {
+        "負荷データID": "rec-001",
+        "拠点ID": "loc-0047",
+        "測定日時": "2024-11-15T02:30:00+09:00",
+        "CPU使用率": 72,
+        "メモリ使用率": 68,
+        "ディスク使用率": 89,
+        "アクティブユーザー数": 12,
+        "平均応答時間": 2840,
+        "エラー発生件数": 3,
+        "ネットワーク帯域幅使用率": 54,
+        "警告フラグ": true,
+        "作成日時": "2024-11-15T02:35:12+09:00",
+        "作成者": "佐藤花子"
+      },
+      {
+        "負荷データID": "rec-001",
+        "拠点ID": "loc-0847",
+        "測定日時": "2024-11-15T14:32:00+09:00",
+        "CPU使用率": 28,
+        "メモリ使用率": 35,
+        "ディスク使用率": 52,
+        "アクティブユーザー数": 142,
+        "平均応答時間": 245,
+        "エラー発生件数": 3,
+        "ネットワーク帯域幅使用率": 18,
+        "警告フラグ": false,
+        "作成日時": "2024-11-15T14:33:15+09:00",
+        "作成者": "山田太郎"
+      }
+    ],
+    "データ量トレンド": [
+      {
+        "トレンドID": "rec-001",
+        "測定日時": "2025-01-15T09:30:00+09:00",
+        "拠点ID": "rec-site-tokyo-01",
+        "テーブル名": "sales_transactions",
+        "レコード数": 2847300,
+        "データサイズMB": 1524,
+        "増加率パーセント": 18,
+        "作成日時": "2025-01-15T09:35:22+09:00",
+        "更新日時": "2025-01-15T09:35:22+09:00",
+        "作成者": "鈴木花子"
+      },
+      {
+        "トレンドID": "rec-001",
+        "測定日時": "2025-01-15T09:30:00+09:00",
+        "拠点ID": "rec-branch-tokyo-001",
+        "テーブル名": "顧客管理",
+        "レコード数": 2850000,
+        "データサイズMB": 18500,
+        "増加率パーセント": 28,
+        "作成日時": "2025-01-15T09:35:22+09:00",
+        "更新日時": "2025-01-15T09:35:22+09:00",
+        "作成者": "田中太郎"
+      },
+      {
+        "トレンドID": "rec-001",
+        "測定日時": "2025-01-15T09:00:00+09:00",
+        "拠点ID": "rec-loc-0042",
+        "テーブル名": "application_logs",
+        "レコード数": 28500000,
+        "データサイズMB": 4850,
+        "増加率パーセント": 12,
+        "作成日時": "2025-01-15T09:15:00+09:00",
+        "更新日時": "2025-01-15T09:15:00+09:00",
+        "作成者": "田中太郎"
+      },
+      {
+        "トレンドID": "rec-001",
+        "測定日時": "2025-02-15T14:30:00+09:00",
+        "拠点ID": "rec-branch-001",
+        "テーブル名": "会計伝票",
+        "レコード数": 2850000,
+        "データサイズMB": 18750,
+        "増加率パーセント": 8,
+        "作成日時": "2025-02-15T14:35:00+09:00",
+        "更新日時": "2025-02-15T14:35:00+09:00",
+        "作成者": "山田花子"
+      },
+      {
+        "トレンドID": "rec-001",
+        "測定日時": "2024-04-15T09:30:00+09:00",
+        "拠点ID": "rec-site-0047",
+        "テーブル名": "顧客マスタ",
+        "レコード数": 1250,
+        "データサイズMB": 85,
+        "増加率パーセント": 0,
+        "作成日時": "2024-04-15T09:30:00+09:00",
+        "更新日時": "2024-04-15T09:30:00+09:00",
+        "作成者": "山田花子"
+      },
+      {
+        "トレンドID": "rec-001",
+        "測定日時": "2025-01-15T09:30:00+09:00",
+        "拠点ID": "rec-loc-0047",
+        "テーブル名": "inventory_master",
+        "レコード数": 245680,
+        "データサイズMB": 1840,
+        "増加率パーセント": 18,
+        "作成日時": "2025-01-15T09:35:00+09:00",
+        "更新日時": "2025-01-15T09:35:00+09:00",
+        "作成者": "鈴木花子"
+      },
+      {
+        "トレンドID": "rec-001",
+        "測定日時": "2025-01-15T14:30:00+09:00",
+        "拠点ID": "rec-branch-tokyo-01",
+        "テーブル名": "顧客マスタ",
+        "レコード数": 2847500,
+        "データサイズMB": 1840,
+        "増加率パーセント": 127,
+        "作成日時": "2025-01-15T14:35:22+09:00",
+        "更新日時": "2025-01-15T14:35:22+09:00",
+        "作成者": "佐藤花子"
+      },
+      {
+        "トレンドID": "rec-001",
+        "測定日時": "2025-01-15T14:30:00+09:00",
+        "拠点ID": "rec-0042",
+        "テーブル名": "external_customer_data",
+        "レコード数": 2850000,
+        "データサイズMB": 18540,
+        "増加率パーセント": 287,
+        "作成日時": "2025-01-15T14:35:22+09:00",
+        "更新日時": "2025-01-15T14:35:22+09:00",
+        "作成者": "鈴木花子"
+      },
+      {
+        "トレンドID": "rec-001",
+        "測定日時": "2025-01-15T09:30:00+09:00",
+        "拠点ID": "rec-site-0047",
+        "テーブル名": "売上集計_日別",
+        "レコード数": 12847,
+        "データサイズMB": 856,
+        "増加率パーセント": 34,
+        "作成日時": "2025-01-15T09:35:12+09:00",
+        "更新日時": "2025-01-15T09:35:12+09:00",
+        "作成者": "鈴木花子"
+      },
+      {
+        "トレンドID": "rec-001",
+        "測定日時": "2025-01-15T14:30:00+09:00",
+        "拠点ID": "rec-site-0047",
+        "テーブル名": "顧客取引履歴",
+        "レコード数": 2847500,
+        "データサイズMB": 8924,
+        "増加率パーセント": 12,
+        "作成日時": "2025-01-15T14:35:22+09:00",
+        "更新日時": "2025-01-15T14:35:22+09:00",
+        "作成者": "佐藤花子"
+      }
+    ],
+    "ユーザー数トレンド": [
+      {
+        "トレンドID": "rec-001",
+        "集計日時": "2024-11-15T00:00:00Z",
+        "アクティブユーザー数": 12847,
+        "新規ユーザー数": 156,
+        "離脱ユーザー数": 43,
+        "拠点ID": "rec-hq-001",
+        "集計粒度": "日次",
+        "作成日時": "2024-11-16T08:30:00Z",
+        "更新日時": "2024-11-16T08:30:00Z",
+        "作成者": "田中太郎"
+      },
+      {
+        "トレンドID": "rec-001",
+        "集計日時": "2024-11-15T23:59:59+09:00",
+        "アクティブユーザー数": 45230,
+        "新規ユーザー数": 12840,
+        "離脱ユーザー数": 156,
+        "拠点ID": "rec-loc-tokyo",
+        "集計粒度": "日次",
+        "作成日時": "2024-11-16T08:30:00+09:00",
+        "更新日時": "2024-11-16T08:30:00+09:00",
+        "作成者": "鈴木花子"
+      },
+      {
+        "トレンドID": "rec-001",
+        "集計日時": "2025-03-09T23:59:59+09:00",
+        "アクティブユーザー数": 48500,
+        "新規ユーザー数": 3200,
+        "離脱ユーザー数": 850,
+        "拠点ID": "rec-base-tokyo",
+        "集計粒度": "週次",
+        "作成日時": "2025-03-10T09:15:30+09:00",
+        "更新日時": "2025-03-10T09:15:30+09:00",
+        "作成者": "佐藤花子"
+      },
+      {
+        "トレンドID": "rec-001",
+        "集計日時": "2025-01-15T09:00:00+09:00",
+        "アクティブユーザー数": 2847,
+        "新規ユーザー数": 156,
+        "離脱ユーザー数": 42,
+        "拠点ID": "rec-loc-012",
+        "集計粒度": "日次",
+        "作成日時": "2025-01-15T10:30:00+09:00",
+        "更新日時": "2025-01-15T10:30:00+09:00",
+        "作成者": "鈴木花子"
+      },
+      {
+        "トレンドID": "rec-001",
+        "集計日時": "2025-01-31T23:59:59+09:00",
+        "アクティブユーザー数": 2847,
+        "新規ユーザー数": 156,
+        "離脱ユーザー数": 42,
+        "拠点ID": "rec-branch-0015",
+        "集計粒度": "月次",
+        "作成日時": "2025-02-01T09:15:30+09:00",
+        "更新日時": "2025-02-01T09:15:30+09:00",
+        "作成者": "鈴木美咲"
+      },
+      {
+        "トレンドID": "rec-001",
+        "集計日時": "2025-01-15T23:59:59+09:00",
+        "アクティブユーザー数": 245000,
+        "新規ユーザー数": 3200,
+        "離脱ユーザー数": 18500,
+        "拠点ID": "rec-hub-tokyo",
+        "集計粒度": "日次",
+        "作成日時": "2025-01-16T08:30:00+09:00",
+        "更新日時": "2025-01-16T08:30:00+09:00",
+        "作成者": "山田花子"
+      },
+      {
+        "トレンドID": "rec-001",
+        "集計日時": "2025-01-31T23:59:59+09:00",
+        "アクティブユーザー数": 45800,
+        "新規ユーザー数": 12300,
+        "離脱ユーザー数": 2100,
+        "拠点ID": "loc-tokyo-01",
+        "集計粒度": "月次",
+        "作成日時": "2025-02-01T08:30:00+09:00",
+        "更新日時": "2025-02-01T08:30:00+09:00",
+        "作成者": "分析システム_山田太郎"
+      },
+      {
+        "トレンドID": "rec-001",
+        "集計日時": "2024-12-31T23:59:59+09:00",
+        "アクティブユーザー数": 48750,
+        "新規ユーザー数": 12340,
+        "離脱ユーザー数": 3210,
+        "拠点ID": "loc-tokyo-01",
+        "集計粒度": "月次",
+        "作成日時": "2025-01-08T09:30:00+09:00",
+        "更新日時": "2025-01-08T09:30:00+09:00",
+        "作成者": "山田花子"
+      },
+      {
+        "トレンドID": "rec-001",
+        "集計日時": "2025-01-15T23:59:59+09:00",
+        "アクティブユーザー数": 247500,
+        "新規ユーザー数": 1200,
+        "離脱ユーザー数": 8900,
+        "拠点ID": "loc-tokyo-01",
+        "集計粒度": "日次",
+        "作成日時": "2025-01-16T08:30:00+09:00",
+        "更新日時": "2025-01-16T08:30:00+09:00",
+        "作成者": "鈴木花子"
+      },
+      {
+        "トレンドID": "rec-001",
+        "集計日時": "2025-01-31T23:59:59+09:00",
+        "アクティブユーザー数": 8750,
+        "新規ユーザー数": 1240,
+        "離脱ユーザー数": 85,
+        "拠点ID": "rec-branch-tokyo",
+        "集計粒度": "月次",
+        "作成日時": "2025-02-01T09:30:00+09:00",
+        "更新日時": "2025-02-01T09:30:00+09:00",
+        "作成者": "田中太郎"
+      }
+    ],
+    "月次集計結果": [
+      {
+        "集計結果ID": "rec-001",
+        "集計年月": "2024-11",
+        "拠点ID": "loc-tokyo-001",
+        "月次ユーザー数": 1250,
+        "月次操作件数": 45800,
+        "平均システム負荷率": 62,
+        "ピークシステム負荷率": 78,
+        "月次データ量GB": 850,
+        "前月比ユーザー数増減率": 3,
+        "前月比データ量増減率": 5,
+        "作成日時": "2024-12-01 09:30:15",
+        "更新日時": "2024-12-01 09:30:15",
+        "作成者": "山田花子"
+      },
+      {
+        "集計結果ID": "rec-001",
+        "集計年月": "2025-01",
+        "拠点ID": "rec-osaka-001",
+        "月次ユーザー数": 8450,
+        "月次操作件数": 245680,
+        "平均システム負荷率": 68,
+        "ピークシステム負荷率": 92,
+        "月次データ量GB": 542,
+        "前月比ユーザー数増減率": 156,
+        "前月比データ量増減率": 189,
+        "作成日時": "2025-02-01 09:30:00",
+        "更新日時": "2025-02-01 09:30:00",
+        "作成者": "山田花子"
+      },
+      {
+        "集計結果ID": "rec-001",
+        "集計年月": "2025-01",
+        "拠点ID": "rec-fukuoka-001",
+        "月次ユーザー数": 1250,
+        "月次操作件数": 847500,
+        "平均システム負荷率": 68,
+        "ピークシステム負荷率": 92,
+        "月次データ量GB": 2840,
+        "前月比ユーザー数増減率": 15,
+        "前月比データ量増減率": 156,
+        "作成日時": "2025-02-03 09:30:00",
+        "更新日時": "2025-02-03 09:30:00",
+        "作成者": "山田花子"
+      },
+      {
+        "集計結果ID": "rec-001",
+        "集計年月": "2024-11",
+        "拠点ID": "loc-tokyo-01",
+        "月次ユーザー数": 15800,
+        "月次操作件数": 2847000,
+        "平均システム負荷率": 72,
+        "ピークシステム負荷率": 94,
+        "月次データ量GB": 1250,
+        "前月比ユーザー数増減率": 38,
+        "前月比データ量増減率": 45,
+        "作成日時": "2024-12-01T09:30:00",
+        "更新日時": "2024-12-01T09:30:00",
+        "作成者": "山田花子"
+      },
+      {
+        "集計結果ID": "rec-001",
+        "集計年月": "2025-01",
+        "拠点ID": "loc-nagoya-001",
+        "月次ユーザー数": 1250,
+        "月次操作件数": 89500,
+        "平均システム負荷率": 42,
+        "ピークシステム負荷率": 68,
+        "月次データ量GB": 520,
+        "前月比ユーザー数増減率": 3,
+        "前月比データ量増減率": 5,
+        "作成日時": "2025-02-03 09:15:30",
+        "更新日時": "2025-02-03 09:15:30",
+        "作成者": "鈴木花子"
+      },
+      {
+        "集計結果ID": "rec-001",
+        "集計年月": "2025-01",
+        "拠点ID": "rec-sap-001",
+        "月次ユーザー数": 1850,
+        "月次操作件数": 24680,
+        "平均システム負荷率": 58,
+        "ピークシステム負荷率": 82,
+        "月次データ量GB": 342,
+        "前月比ユーザー数増減率": 28,
+        "前月比データ量増減率": 19,
+        "作成日時": "2025-02-05 09:30:15",
+        "更新日時": "2025-02-05 09:30:15",
+        "作成者": "佐藤花子"
+      },
+      {
+        "集計結果ID": "rec-001",
+        "集計年月": "2025-01",
+        "拠点ID": "rec-002",
+        "月次ユーザー数": 245,
+        "月次操作件数": 8420,
+        "平均システム負荷率": 32,
+        "ピークシステム負荷率": 58,
+        "月次データ量GB": 156,
+        "前月比ユーザー数増減率": -2,
+        "前月比データ量増減率": 3,
+        "作成日時": "2025-02-03 09:15:00",
+        "更新日時": "2025-02-03 09:15:00",
+        "作成者": "佐藤花子"
+      },
+      {
+        "集計結果ID": "rec-001",
+        "集計年月": "2025-01",
+        "拠点ID": "loc-kyoto-001",
+        "月次ユーザー数": 1250,
+        "月次操作件数": 89400,
+        "平均システム負荷率": 42,
+        "ピークシステム負荷率": 68,
+        "月次データ量GB": 285,
+        "前月比ユーザー数増減率": 3,
+        "前月比データ量増減率": -22,
+        "作成日時": "2025-02-03T09:15:30",
+        "更新日時": "2025-02-03T09:15:30",
+        "作成者": "山田花子"
+      },
+      {
+        "集計結果ID": "rec-001",
+        "集計年月": "2024-11",
+        "拠点ID": "loc-kobe-001",
+        "月次ユーザー数": 1247,
+        "月次操作件数": 45892,
+        "平均システム負荷率": 38,
+        "ピークシステム負荷率": 62,
+        "月次データ量GB": 847,
+        "前月比ユーザー数増減率": 2,
+        "前月比データ量増減率": 3,
+        "作成日時": "2024-12-01T09:15:32+09:00",
+        "更新日時": "2024-12-01T09:15:32+09:00",
+        "作成者": "佐藤花子"
+      }
+    ],
+    "ダッシュボード設定": [
+      {
+        "ダッシュボード設定ID": "rec-001",
+        "ユーザーID": "rec-u-042",
+        "拠点ID": "rec-b-001",
+        "ダッシュボード名": "本社システム運用監視",
+        "説明": "本社システム運用チームによる全体システム監視用デフォルトダッシュボード",
+        "デフォルトフラグ": true,
+        "自動更新間隔秒": 60,
+        "表示対象メトリクス": "システム負荷,サーバーリソース使用率,エラー発生件数,応答時間,ユーザー接続数",
+        "フィルタ条件": "期間:当日,拠点:本社,ステータス:稼働中",
+        "レイアウトタイプ": "標準",
+        "作成日時": "2024-04-15T09:30:00+09:00",
+        "更新日時": "2025-01-20T14:15:00+09:00",
+        "作成者": "rec-u-001",
+        "更新者": "rec-u-042"
+      },
+      {
+        "ダッシュボード設定ID": "rec-001",
+        "ユーザーID": "rec-u-042",
+        "拠点ID": "rec-b-tokyo-01",
+        "ダッシュボード名": "東京拠点営業時間帯リアルタイムパフォーマンス",
+        "説明": "東京拠点の営業時間帯（9:00-18:00）におけるシステムパフォーマンスと顧客対応状況の監視",
+        "デフォルトフラグ": true,
+        "自動更新間隔秒": 60,
+        "表示対象メトリクス": "システム負荷,レスポンスタイム,エラー発生率,ユーザーセッション数,API呼び出し件数",
+        "フィルタ条件": "期間:営業時間帯(9:00-18:00),拠点:東京,ステータス:全て",
+        "レイアウトタイプ": "標準",
+        "作成日時": "2024-10-15T09:30:00+09:00",
+        "更新日時": "2025-01-08T14:22:00+09:00",
+        "作成者": "rec-u-015",
+        "更新者": "rec-u-042"
+      },
+      {
+        "ダッシュボード設定ID": "rec-001",
+        "ユーザーID": "rec-002",
+        "拠点ID": "rec-003",
+        "ダッシュボード名": "夜間バッチ処理監視",
+        "説明": "夜間バッチ処理の実行状況と処理結果を監視するダッシュボード",
+        "デフォルトフラグ": true,
+        "自動更新間隔秒": 300,
+        "表示対象メトリクス": "バッチ実行状況,処理件数,エラー件数,実行時間,リソース使用率",
+        "フィルタ条件": "実行日時:前日のみ,ステータス:全て,拠点:東京センター",
+        "レイアウトタイプ": "標準",
+        "作成日時": "2024-11-15T09:30:00Z",
+        "更新日時": "2025-01-20T14:45:00Z",
+        "作成者": "rec-004",
+        "更新者": "rec-005"
+      },
+      {
+        "ダッシュボード設定ID": "rec-001",
+        "ユーザーID": "rec-usr-042",
+        "拠点ID": "rec-loc-001",
+        "ダッシュボード名": "2025年1月経営層月次サマリー",
+        "説明": "経営層向けの月次KPI集計ダッシュボード",
+        "デフォルトフラグ": true,
+        "自動更新間隔秒": 3600,
+        "表示対象メトリクス": "売上高,営業利益率,顧客数,受注件数,プロジェクト進捗率",
+        "フィルタ条件": "期間:2025年1月,拠点:全社,ステータス:完了案件のみ",
+        "レイアウトタイプ": "標準",
+        "作成日時": "2025-01-06T09:15:00+09:00",
+        "更新日時": "2025-01-15T14:30:00+09:00",
+        "作成者": "rec-usr-018",
+        "更新者": "rec-usr-018"
+      },
+      {
+        "ダッシュボード設定ID": "rec-001",
+        "ユーザーID": "rec-002",
+        "拠点ID": "rec-003",
+        "ダッシュボード名": "大阪拠点DB負荷監視",
+        "説明": "大阪拠点のデータベースサーバーリソース監視用ダッシュボード",
+        "デフォルトフラグ": true,
+        "自動更新間隔秒": 60,
+        "表示対象メトリクス": "CPU使用率,メモリ使用率,ディスク使用率,クエリ応答時間,接続数",
+        "フィルタ条件": "拠点=大阪,期間=過去24時間,環境=本番",
+        "レイアウトタイプ": "標準",
+        "作成日時": "2024-11-15T09:30:00+09:00",
+        "更新日時": "2025-01-20T14:15:00+09:00",
+        "作成者": "rec-004",
+        "更新者": "rec-005"
+      },
+      {
+        "ダッシュボード設定ID": "rec-001",
+        "ユーザーID": "rec-002",
+        "拠点ID": "rec-003",
+        "ダッシュボード名": "本番環境リソース監視",
+        "説明": "CPU、メモリ、ディスク使用率と障害アラートを一元監視するダッシュボード",
+        "デフォルトフラグ": true,
+        "自動更新間隔秒": 60,
+        "表示対象メトリクス": "CPU使用率,メモリ使用率,ディスク使用率,ネットワーク帯域,プロセス数,障害ステータス",
+        "フィルタ条件": "環境:本番,期間:過去24時間,拠点:東京DC",
+        "レイアウトタイプ": "カスタム",
+        "作成日時": "2024-08-15T09:30:00+09:00",
+        "更新日時": "2025-01-20T14:45:30+09:00",
+        "作成者": "rec-004",
+        "更新者": "rec-005"
+      },
+      {
+        "ダッシュボード設定ID": "rec-001",
+        "ユーザーID": "rec-u-042",
+        "拠点ID": "rec-b-008",
+        "ダッシュボード名": "営業部門ユーザー数トレンド",
+        "説明": "営業部門の月次ユーザー数推移と活動状況を監視するカスタムダッシュボード",
+        "デフォルトフラグ": true,
+        "自動更新間隔秒": 1800,
+        "表示対象メトリクス": "ユーザー数トレンド,新規ユーザー数,アクティブユーザー数,部門別比較",
+        "フィルタ条件": "期間:過去12ヶ月,拠点:東京営業所,ステータス:全て",
+        "レイアウトタイプ": "カスタム",
+        "作成日時": "2024-09-15T10:30:00+09:00",
+        "更新日時": "2025-01-22T14:45:00+09:00",
+        "作成者": "rec-u-015",
+        "更新者": "rec-u-042"
+      },
+      {
+        "ダッシュボード設定ID": "rec-001",
+        "ユーザーID": "rec-u-042",
+        "拠点ID": "rec-b-007",
+        "ダッシュボード名": "障害対応リアルタイムアラート",
+        "説明": "本社システム障害対応チーム向けの即時監視ダッシュボード",
+        "デフォルトフラグ": true,
+        "自動更新間隔秒": 30,
+        "表示対象メトリクス": "システム負荷,エラー率,応答時間,アラート件数,ユーザー影響度",
+        "フィルタ条件": "重要度:高以上,期間:直近24時間,拠点:本社東京,ステータス:未解決",
+        "レイアウトタイプ": "カスタム",
+        "作成日時": "2024-11-15T09:30:00+09:00",
+        "更新日時": "2025-01-22T14:15:00+09:00",
+        "作成者": "rec-u-018",
+        "更新者": "rec-u-042"
+      },
+      {
+        "ダッシュボード設定ID": "rec-001",
+        "ユーザーID": "rec-u-042",
+        "拠点ID": null,
+        "ダッシュボード名": "全拠点比較分析ダッシュボード",
+        "説明": "東京・大阪・名古屋拠点の売上・顧客数・在庫を横並び比較",
+        "デフォルトフラグ": true,
+        "自動更新間隔秒": 300,
+        "表示対象メトリクス": "売上高,顧客数トレンド,在庫回転率,営業利益率,前月比",
+        "フィルタ条件": "期間:当月1日～末日,拠点:東京・大阪・名古屋,ステータス:完了",
+        "レイアウトタイプ": "カスタム",
+        "作成日時": "2024-11-15T09:30:00+09:00",
+        "更新日時": "2025-01-20T14:45:00+09:00",
+        "作成者": "rec-u-042",
+        "更新者": "rec-u-055"
+      },
+      {
+        "ダッシュボード設定ID": "rec-001",
+        "ユーザーID": "rec-002",
+        "拠点ID": "rec-003",
+        "ダッシュボード名": "新機能リリース性能検証ダッシュボード",
+        "説明": "v2.5リリース後の性能監視用一時ダッシュボード",
+        "デフォルトフラグ": false,
+        "自動更新間隔秒": 30,
+        "表示対象メトリクス": "システム負荷,レスポンスタイム,エラー率,メモリ使用率,API呼び出し数",
+        "フィルタ条件": "期間:2025-01-15~2025-01-31,環境:本番,新機能フラグ:有効",
+        "レイアウトタイプ": "カスタム",
+        "作成日時": "2025-01-15T09:30:00+09:00",
+        "更新日時": "2025-01-20T14:15:00+09:00",
+        "作成者": "rec-004",
+        "更新者": "rec-005"
+      }
+    ]
+  },
+  "shellHtml": "<!doctype html>\n<html lang=\"ja\">\n<head>\n  <meta charset=\"UTF-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n  <title>作業管理システム - システム運用・スケーラビリティ管理ダッシュボード</title>\n  <style>\n:root {\n  --primary: #f59e0b;\n  --primary-hover: #d97706;\n  --bg-main: #fefdf8;\n  --bg-card: #faf8f3;\n  --bg-sidebar: #f5f1e8;\n  --top-bar-bg: #fffbf0;\n  --top-bar-border: #f3e8d8;\n  --top-bar-text: #1f2937;\n  --text: #1f2937;\n  --text-muted: #6b7280;\n  --border: #e5ddd0;\n  --border-width: 1px;\n  --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;\n  --space-unit: 8px;\n  --control-height: 40px;\n  --radius-card: 12px;\n  --radius-control: 8px;\n  --shadow-card: 0 2px 8px rgba(31, 41, 55, 0.08), 0 1px 3px rgba(31, 41, 55, 0.04);\n  --motion-duration: 200ms;\n  --surface-texture: linear-gradient(90deg, transparent 0%, rgba(245, 158, 11, 0.02) 50%, transparent 100%), repeating-linear-gradient(0deg, transparent 0px, rgba(245, 158, 11, 0.01) 1px, transparent 2px, transparent 4px);\n  --surface-texture-size: 100% 100%;\n  --surface-texture-position: 0 0;\n}\n\n* {\n  margin: 0;\n  padding: 0;\n  box-sizing: border-box;\n}\n\nhtml, body {\n  height: 100%;\n  font-family: var(--font-family);\n  color: var(--text);\n  background-color: var(--bg-main);\n}\n\nbody {\n  display: flex;\n  flex-direction: column;\n}\n\n[data-aivic-shell-pattern] {\n  display: flex;\n  flex-direction: column;\n  height: 100vh;\n  overflow: hidden;\n}\n\n.shell-header {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  height: 56px;\n  background-color: var(--top-bar-bg);\n  border-bottom: var(--border-width) solid var(--top-bar-border);\n  padding: 0 calc(var(--space-unit) * 3);\n  flex-shrink: 0;\n  gap: calc(var(--space-unit) * 2);\n}\n\n.shell-header-left {\n  display: flex;\n  align-items: center;\n  gap: calc(var(--space-unit) * 3);\n  flex: 1;\n}\n\n.shell-logo-block {\n  display: flex;\n  flex-direction: column;\n  gap: 2px;\n}\n\n.shell-logo {\n  font-size: 16px;\n  font-weight: 600;\n  color: var(--text);\n  letter-spacing: -0.3px;\n}\n\n.shell-logo-system {\n  font-size: 12px;\n  color: var(--text-muted);\n  font-weight: 400;\n}\n\n.shell-nav-top {\n  display: flex;\n  gap: calc(var(--space-unit) * 0.5);\n  align-items: center;\n}\n\n.shell-nav-item {\n  display: inline-flex;\n  align-items: center;\n  height: 32px;\n  padding: 0 calc(var(--space-unit) * 2);\n  font-size: 13px;\n  font-weight: 500;\n  color: var(--top-bar-text);\n  background: transparent;\n  border: none;\n  cursor: pointer;\n  border-radius: var(--radius-control);\n  transition: background-color var(--motion-duration), color var(--motion-duration);\n  white-space: nowrap;\n}\n\n.shell-nav-item:hover {\n  background-color: rgba(245, 158, 11, 0.1);\n}\n\n.shell-nav-item.aivic-active {\n  background-color: var(--primary);\n  color: #fff;\n}\n\n.shell-header-right {\n  display: flex;\n  align-items: center;\n  gap: calc(var(--space-unit) * 2);\n}\n\n.shell-user-area {\n  display: flex;\n  align-items: center;\n  gap: calc(var(--space-unit) * 1.5);\n}\n\n.shell-user-avatar {\n  width: 32px;\n  height: 32px;\n  border-radius: 50%;\n  background-color: var(--primary);\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  color: #fff;\n  font-size: 13px;\n  font-weight: 600;\n  flex-shrink: 0;\n}\n\n.shell-user-name {\n  font-size: 13px;\n  color: var(--top-bar-text);\n  font-weight: 500;\n}\n\n.shell-user-logout {\n  font-size: 12px;\n  color: var(--text-muted);\n  text-decoration: none;\n  transition: color var(--motion-duration);\n  cursor: pointer;\n}\n\n.shell-user-logout:hover {\n  color: var(--primary);\n  text-decoration: underline;\n}\n\n.shell-body {\n  display: flex;\n  flex: 1;\n  overflow: hidden;\n}\n\n.content-area {\n  flex: 1;\n  overflow-y: auto;\n  overflow-x: hidden;\n  background-color: var(--bg-main);\n  background-image: var(--surface-texture);\n  background-size: var(--surface-texture-size);\n  background-position: var(--surface-texture-position);\n}\n\n[data-aivic-panel] {\n  display: block;\n  min-height: 100%;\n}\n\n.shell-footer {\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  height: 40px;\n  background-color: var(--bg-card);\n  border-top: var(--border-width) solid var(--border);\n  font-size: 12px;\n  color: var(--text-muted);\n  flex-shrink: 0;\n}\n\n@media (max-width: 1024px) {\n  .shell-header {\n    padding: 0 calc(var(--space-unit) * 2);\n  }\n\n  .shell-nav-item {\n    padding: 0 calc(var(--space-unit) * 1.5);\n    font-size: 12px;\n  }\n\n  .shell-logo {\n    font-size: 15px;\n  }\n\n  .shell-logo-system {\n    font-size: 11px;\n  }\n}\n\n@media (max-width: 768px) {\n  .shell-header {\n    padding: 0 calc(var(--space-unit) * 1.5);\n  }\n\n  .shell-header-left {\n    gap: calc(var(--space-unit) * 2);\n  }\n\n  .shell-logo {\n    font-size: 14px;\n  }\n\n  .shell-nav-top {\n    gap: 0;\n  }\n\n  .shell-nav-item {\n    padding: 0 calc(var(--space-unit) * 1.25);\n    font-size: 11px;\n  }\n\n  .shell-user-name {\n    display: none;\n  }\n}\n\n@media (max-width: 640px) {\n  .shell-header {\n    padding: 0 calc(var(--space-unit) * 1);\n  }\n\n  .shell-logo-system {\n    display: none;\n  }\n\n  .shell-nav-top {\n    display: none;\n  }\n}\n  </style>\n  <!--AIVIC_GLOBALS-->\n</head>\n<body>\n  <div data-aivic-shell-pattern=\"command_center\" data-aivic-nav-position=\"top\" data-aivic-density=\"balanced\">\n    <header class=\"shell-header\">\n      <div class=\"shell-header-left\">\n        <div class=\"shell-logo-block\">\n          <div class=\"shell-logo\">作業管理システム</div>\n          <div class=\"shell-logo-system\">システム運用・スケーラビリティ管理</div>\n        </div>\n        <nav class=\"shell-nav-top\">\n          <button class=\"shell-nav-item aivic-active\" data-aivic-nav=\"scr-1789462440034\" onclick=\"window.showScreen('scr-1789462440034')\">ダッシュボード</button>\n        </nav>\n      </div>\n      <div class=\"shell-header-right\">\n        <div class=\"shell-user-area\">\n          <div class=\"shell-user-avatar\">U</div>\n          <div class=\"shell-user-name\">ユーザー</div>\n          <a class=\"shell-user-logout\" href=\"./login.html\">ログアウト</a>\n        </div>\n      </div>\n    </header>\n    <div class=\"shell-body\">\n      <main class=\"content-area\">\n        <div data-aivic-panel=\"scr-1789462440034\"></div>\n      </main>\n    </div>\n    <footer class=\"shell-footer\">\n      © 2025 作業管理システム. All rights reserved.\n    </footer>\n  </div>\n  <!--AIVIC_RUNTIME-->\n</body>\n</html>",
+  "screenTaste": "明るい色使い"
+}

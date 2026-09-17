@@ -1,0 +1,3084 @@
+{
+  "systemId": "itg-1",
+  "systemName": "作業進捗・人員配置最適化エンジン",
+  "cssTheme": "```css\n:root {\n  /* Primary & Accent */\n  --primary: #f59e0b;\n  --primary-hover: #d97706;\n\n  /* Background Palette - 明るく爽やかなベース */\n  --bg-main: #fefdf8;\n  --bg-card: #faf8f3;\n  --bg-sidebar: #f5f1e8;\n\n  /* Top Bar - 明るさを保ちながら視覚的な分離 */\n  --top-bar-bg: #fffbf0;\n  --top-bar-border: #f3e8d8;\n  --top-bar-text: #1f2937;\n\n  /* Text Colors */\n  --text: #1f2937;\n  --text-muted: #6b7280;\n\n  /* Borders & Dividers */\n  --border: #e5ddd0;\n  --border-width: 1px;\n\n  /* Typography */\n  --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;\n\n  /* Spacing & Sizing */\n  --space-unit: 8px;\n  --control-height: 40px;\n  --radius-card: 12px;\n  --radius-control: 8px;\n\n  /* Shadows - 柔らかく明るい環境に合わせた浮遊感 */\n  --shadow-card: 0 2px 8px rgba(31, 41, 55, 0.08), 0 1px 3px rgba(31, 41, 55, 0.04);\n\n  /* Motion */\n  --motion-duration: 200ms;\n\n  /* Surface Texture - 明るく温かみのある紙のような質感 */\n  --surface-texture: \n    linear-gradient(90deg, transparent 0%, rgba(245, 158, 11, 0.02) 50%, transparent 100%),\n    repeating-linear-gradient(\n      0deg,\n      transparent 0px,\n      rgba(245, 158, 11, 0.01) 1px,\n      transparent 2px,\n      transparent 4px\n    );\n  --surface-texture-size: 100% 100%;\n  --surface-texture-position: 0 0;\n}\n```",
+  "screens": [
+    {
+      "id": "scr-1789461783315",
+      "name": "進捗・人員配置ダッシュボード",
+      "purpose": "拠点・チーム別の作業進捗状況をリアルタイム監視し、進捗ばらつき要因を自動分析。進捗遅延リスクを数値化して対応が必要な拠点と調整内容を自動提示し、人員配置案の実行状況を可視化する統合ダッシュボード",
+      "items": [
+        "拠点別進捗ばらつき分析表",
+        "チーム別進捗ばらつき分析表",
+        "ハンディターミナル連携ログ表示",
+        "作業実績データ自動取得状況",
+        "進捗遅延リスク判定結果一覧",
+        "納期遅延可能性スコア表示",
+        "対応が必要な拠点リスト",
+        "推奨調整内容表示（人員追加・優先順位変更等）",
+        "人員配置案実行状況リアルタイム表示",
+        "人員配置案進捗トレンドグラフ",
+        "改善指示配信履歴",
+        "改善指示配信状況確認"
+      ]
+    },
+    {
+      "id": "scr-1789461798629",
+      "name": "人員配置最適化提案・実行画面",
+      "purpose": "現在の作業進捗と個人生産性データを照合し、作業者習熟度に基づいた最適な人員配置案を自動生成・提案し、配置案と作業指示を一括配信・実行管理するための統合画面",
+      "items": [
+        "進捗・生産性データ照合パネル",
+        "作業進捗率表示",
+        "個人生産性データ表示",
+        "進捗遅延リスク表示",
+        "最適割当提案パネル",
+        "提案理由・根拠表示",
+        "作業者習熟度段階別難度調整ロジック適用状況表示",
+        "人員配置案自動生成ボタン",
+        "人員配置案一覧表",
+        "配置案詳細表示",
+        "配置案承認・却下ボタン",
+        "人員配置案と作業指示一括配信ボタン"
+      ]
+    },
+    {
+      "id": "scr-1789461813941",
+      "name": "作業指示・実績管理画面",
+      "purpose": "作業指示の受領・実行状況をリアルタイムで記録・管理し、ハンディターミナルおよびWMS連携ログを一元表示することで、作業進捗の可視化と実績データの正確な収集を実現する",
+      "items": [
+        "作業指示一覧表示",
+        "作業指示受領確認ボタン",
+        "受領確認日時記録",
+        "作業実績入力フォーム",
+        "実績数量入力欄",
+        "実績完了日時入力欄",
+        "実績更新ボタン",
+        "ハンディターミナル連携ログ表示パネル",
+        "WMS連携ログ表示パネル",
+        "作業指示受領履歴タブ",
+        "受領履歴検索フィルター",
+        "作業者別実績サマリー"
+      ]
+    }
+  ],
+  "screenPanels": [
+    {
+      "screenId": "scr-1789461783315",
+      "panelHtml": "<div style=\"padding: 0; background: var(--bg-main);\">\n  <!-- Breadcrumb / Sub-header -->\n  <div style=\"padding: 16px 24px; border-bottom: 1px solid var(--border); background: var(--bg-main);\">\n    <div style=\"font-size: 12px; color: var(--text-muted); font-family: var(--font-family);\">\n      作業管理システム / 作業進捗・人員配置最適化エンジン / 進捗・人員配置ダッシュボード\n    </div>\n  </div>\n\n  <!-- Main Content Area -->\n  <div style=\"padding: 24px;\">\n    <!-- KPI Overview Cards -->\n    <div style=\"display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-bottom: 32px;\">\n      <!-- KPI: Risk Count -->\n      <div class=\"card\" style=\"background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-card); padding: 20px; box-shadow: var(--shadow-card); background-image: var(--surface-texture); background-size: var(--surface-texture-size); background-position: var(--surface-texture-position);\">\n        <div style=\"font-size: 12px; color: var(--text-muted); margin-bottom: 8px; font-family: var(--font-family);\">進捗遅延リスク</div>\n        <div style=\"font-size: 32px; font-weight: 600; color: var(--primary); margin-bottom: 4px;\" data-testid=\"kpi-risk-count\">—</div>\n        <div style=\"font-size: 11px; color: var(--text-muted);\">件の作業指示が監視対象</div>\n      </div>\n\n      <!-- KPI: Sites Requiring Action -->\n      <div class=\"card\" style=\"background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-card); padding: 20px; box-shadow: var(--shadow-card); background-image: var(--surface-texture); background-size: var(--surface-texture-size); background-position: var(--surface-texture-position);\">\n        <div style=\"font-size: 12px; color: var(--text-muted); margin-bottom: 8px; font-family: var(--font-family);\">対応が必要な拠点</div>\n        <div style=\"font-size: 32px; font-weight: 600; color: var(--primary); margin-bottom: 4px;\" data-testid=\"kpi-sites-action\">—</div>\n        <div style=\"font-size: 11px; color: var(--text-muted);\">拠点で人員調整が推奨</div>\n      </div>\n\n      <!-- KPI: Active Allocation Plans -->\n      <div class=\"card\" style=\"background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-card); padding: 20px; box-shadow: var(--shadow-card); background-image: var(--surface-texture); background-size: var(--surface-texture-size); background-position: var(--surface-texture-position);\">\n        <div style=\"font-size: 12px; color: var(--text-muted); margin-bottom: 8px; font-family: var(--font-family);\">実行中の配置案</div>\n        <div style=\"font-size: 32px; font-weight: 600; color: var(--primary); margin-bottom: 4px;\" data-testid=\"kpi-active-plans\">—</div>\n        <div style=\"font-size: 11px; color: var(--text-muted);\">人員配置案が進行中</div>\n      </div>\n    </div>\n\n    <!-- Filter & Action Bar -->\n    <div style=\"display: flex; gap: 12px; margin-bottom: 24px; align-items: center; flex-wrap: wrap;\">\n      <div style=\"display: flex; gap: 8px; align-items: center;\">\n        <label style=\"font-size: 12px; color: var(--text-muted); font-weight: 500;\">拠点フィルター:</label>\n        <select data-testid=\"site-filter\" style=\"padding: 8px 12px; border: 1px solid var(--border); border-radius: var(--radius-control); background: var(--bg-card); color: var(--text); font-size: 13px; font-family: var(--font-family); cursor: pointer;\">\n          <option value=\"\">すべての拠点</option>\n          <option value=\"site-001\">東京拠点</option>\n          <option value=\"site-002\">大阪拠点</option>\n          <option value=\"site-003\">名古屋拠点</option>\n        </select>\n      </div>\n      <div style=\"display: flex; gap: 8px; align-items: center;\">\n        <label style=\"font-size: 12px; color: var(--text-muted); font-weight: 500;\">リスクレベル:</label>\n        <select data-testid=\"risk-level-filter\" style=\"padding: 8px 12px; border: 1px solid var(--border); border-radius: var(--radius-control); background: var(--bg-card); color: var(--text); font-size: 13px; font-family: var(--font-family); cursor: pointer;\">\n          <option value=\"\">すべてのレベル</option>\n          <option value=\"low\">低</option>\n          <option value=\"medium\">中</option>\n          <option value=\"high\">高</option>\n          <option value=\"critical\">極高</option>\n        </select>\n      </div>\n      <button class=\"action-btn\" data-testid=\"optimize-button\" style=\"margin-left: auto; padding: 10px 16px; background: var(--primary); color: #fff; border: none; border-radius: var(--radius-control); font-size: 13px; font-weight: 500; cursor: pointer; font-family: var(--font-family);\">\n        人員配置を最適化\n      </button>\n      <button class=\"action-btn secondary\" data-testid=\"confirm-results-button\" style=\"padding: 10px 16px; background: transparent; color: var(--text); border: 1px solid var(--border); border-radius: var(--radius-control); font-size: 13px; font-weight: 500; cursor: pointer; font-family: var(--font-family);\">\n        作業実績を確認\n      </button>\n    </div>\n\n    <!-- Section 1: Site Progress Variance Analysis -->\n    <div style=\"margin-bottom: 32px;\">\n      <div style=\"font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 12px; font-family: var(--font-family);\">拠点別進捗ばらつき分析</div>\n      <div class=\"table-wrap\" style=\"border: 1px solid var(--border); border-radius: var(--radius-card); overflow: hidden; box-shadow: var(--shadow-card);\">\n        <table data-testid=\"site-variance-table\" style=\"width: 100%; border-collapse: collapse; background: var(--bg-card);\">\n          <thead>\n            <tr style=\"background: var(--bg-card); border-bottom: 1px solid var(--border);\">\n              <th style=\"padding: 12px 16px; text-align: left; font-size: 12px; font-weight: 600; color: var(--text); font-family: var(--font-family);\">拠点名</th>\n              <th style=\"padding: 12px 16px; text-align: center; font-size: 12px; font-weight: 600; color: var(--text); font-family: var(--font-family);\">計画進捗率</th>\n              <th style=\"padding: 12px 16px; text-align: center; font-size: 12px; font-weight: 600; color: var(--text); font-family: var(--font-family);\">実績進捗率</th>\n              <th style=\"padding: 12px 16px; text-align: center; font-size: 12px; font-weight: 600; color: var(--text); font-family: var(--font-family);\">ばらつき度</th>\n              <th style=\"padding: 12px 16px; text-align: center; font-size: 12px; font-weight: 600; color: var(--text); font-family: var(--font-family);\">遅延状態</th>\n            </tr>\n          </thead>\n          <tbody id=\"site-variance-tbody\">\n            <tr style=\"border-bottom: 1px solid var(--border);\">\n              <td colspan=\"5\" style=\"padding: 24px; text-align: center; color: var(--text-muted); font-size: 13px;\">読込中...</td>\n            </tr>\n          </tbody>\n        </table>\n      </div>\n    </div>\n\n    <!-- Section 2: Team Progress Variance Analysis -->\n    <div style=\"margin-bottom: 32px;\">\n      <div style=\"font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 12px; font-family: var(--font-family);\">チーム別進捗ばらつき分析</div>\n      <div class=\"table-wrap\" style=\"border: 1px solid var(--border); border-radius: var(--radius-card); overflow: hidden; box-shadow: var(--shadow-card);\">\n        <table data-testid=\"team-variance-table\" style=\"width: 100%; border-collapse: collapse; background: var(--bg-card);\">\n          <thead>\n            <tr style=\"background: var(--bg-card); border-bottom: 1px solid var(--border);\">\n              <th style=\"padding: 12px 16px; text-align: left; font-size: 12px; font-weight: 600; color: var(--text); font-family: var(--font-family);\">チーム名</th>\n              <th style=\"padding: 12px 16px; text-align: left; font-size: 12px; font-weight: 600; color: var(--text); font-family: var(--font-family);\">拠点</th>\n              <th style=\"padding: 12px 16px; text-align: center; font-size: 12px; font-weight: 600; color: var(--text); font-family: var(--font-family);\">計画進捗率</th>\n              <th style=\"padding: 12px 16px; text-align: center; font-size: 12px; font-weight: 600; color: var(--text); font-family: var(--font-family);\">実績進捗率</th>\n              <th style=\"padding: 12px 16px; text-align: center; font-size: 12px; font-weight: 600; color: var(--text); font-family: var(--font-family);\">ばらつき度</th>\n            </tr>\n          </thead>\n          <tbody id=\"team-variance-tbody\">\n            <tr style=\"border-bottom: 1px solid var(--border);\">\n              <td colspan=\"5\" style=\"padding: 24px; text-align: center; color: var(--text-muted); font-size: 13px;\">読込中...</td>\n            </tr>\n          </tbody>\n        </table>\n      </div>\n    </div>\n\n    <!-- Section 3: Risk Assessment & Trend Graph (2-column layout) -->\n    <div style=\"display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 32px;\">\n      <!-- Risk Assessment List -->\n      <div>\n        <div style=\"font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 12px; font-family: var(--font-family);\">進捗遅延リスク判定結果</div>\n        <div class=\"table-wrap\" style=\"border: 1px solid var(--border); border-radius: var(--radius-card); overflow: hidden; box-shadow: var(--shadow-card); max-height: 400px; overflow-y: auto;\">\n          <table data-testid=\"risk-assessment-table\" style=\"width: 100%; border-collapse: collapse; background: var(--bg-card);\">\n            <thead>\n              <tr style=\"background: var(--bg-card); border-bottom: 1px solid var(--border); position: sticky; top: 0;\">\n                <th style=\"padding: 12px 16px; text-align: left; font-size: 12px; font-weight: 600; color: var(--text); font-family: var(--font-family);\">拠点</th>\n                <th style=\"padding: 12px 16px; text-align: center; font-size: 12px; font-weight: 600; color: var(--text); font-family: var(--font-family);\">リスク</th>\n                <th style=\"padding: 12px 16px; text-align: center; font-size: 12px; font-weight: 600; color: var(--text); font-family: var(--font-family);\">遅延日数</th>\n              </tr>\n            </thead>\n            <tbody id=\"risk-assessment-tbody\">\n              <tr style=\"border-bottom: 1px solid var(--border);\">\n                <td colspan=\"3\" style=\"padding: 24px; text-align: center; color: var(--text-muted); font-size: 13px;\">読込中...</td>\n              </tr>\n            </tbody>\n          </table>\n        </div>\n      </div>\n\n      <!-- Allocation Plan Trend Graph -->\n      <div>\n        <div style=\"font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 12px; font-family: var(--font-family);\">人員配置案進捗トレンド</div>\n        <div class=\"card\" style=\"background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-card); padding: 16px; box-shadow: var(--shadow-card); background-image: var(--surface-texture); background-size: var(--surface-texture-size); background-position: var(--surface-texture-position);\">\n          <div class=\"chart-wrap\" style=\"position: relative; height: 280px; max-height: 300px;\">\n            <canvas id=\"trend-chart\"></canvas>\n          </div>\n        </div>\n      </div>\n    </div>\n\n    <!-- Section 4: Active Allocation Plans & Recommended Actions -->\n    <div style=\"display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 32px;\">\n      <!-- Active Allocation Plans -->\n      <div>\n        <div style=\"font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 12px; font-family: var(--font-family);\">実行中の人員配置案</div>\n        <div class=\"table-wrap\" style=\"border: 1px solid var(--border); border-radius: var(--radius-card); overflow: hidden; box-shadow: var(--shadow-card); max-height: 400px; overflow-y: auto;\">\n          <table data-testid=\"active-plans-table\" style=\"width: 100%; border-collapse: collapse; background: var(--bg-card);\">\n            <thead>\n              <tr style=\"background: var(--bg-card); border-bottom: 1px solid var(--border); position: sticky; top: 0;\">\n                <th style=\"padding: 12px 16px; text-align: left; font-size: 12px; font-weight: 600; color: var(--text); font-family: var(--font-family);\">配置案名</th>\n                <th style=\"padding: 12px 16px; text-align: center; font-size: 12px; font-weight: 600; color: var(--text); font-family: var(--font-family);\">進捗率</th>\n                <th style=\"padding: 12px 16px; text-align: center; font-size: 12px; font-weight: 600; color: var(--text); font-family: var(--font-family);\">ステータス</th>\n              </tr>\n            </thead>\n            <tbody id=\"active-plans-tbody\">\n              <tr style=\"border-bottom: 1px solid var(--border);\">\n                <td colspan=\"3\" style=\"padding: 24px; text-align: center; color: var(--text-muted); font-size: 13px;\">読込中...</td>\n              </tr>\n            </tbody>\n          </table>\n        </div>\n      </div>\n\n      <!-- Recommended Actions -->\n      <div>\n        <div style=\"font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 12px; font-family: var(--font-family);\">推奨調整内容</div>\n        <div id=\"recommended-actions\" style=\"display: flex; flex-direction: column; gap: 12px;\">\n          <div class=\"card\" style=\"background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-card); padding: 16px; box-shadow: var(--shadow-card); background-image: var(--surface-texture); background-size: var(--surface-texture-size); background-position: var(--surface-texture-position);\">\n            <div style=\"font-size: 12px; color: var(--text-muted); margin-bottom: 4px;\">読込中...</div>\n          </div>\n        </div>\n      </div>\n    </div>\n\n    <!-- Section 5: Improvement Instructions Delivery Status -->\n    <div style=\"margin-bottom: 24px;\">\n      <div style=\"font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 12px; font-family: var(--font-family);\">改善指示配信状況</div>\n      <div style=\"display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 16px;\">\n        <div class=\"card\" style=\"background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-card); padding: 16px; box-shadow: var(--shadow-card); text-align: center; background-image: var(--surface-texture); background-size: var(--surface-texture-size); background-position: var(--surface-texture-position);\">\n          <div style=\"font-size: 24px; font-weight: 600; color: var(--primary);\" data-testid=\"delivery-sent\">—</div>\n          <div style=\"font-size: 11px; color: var(--text-muted); margin-top: 4px;\">配信済</div>\n        </div>\n        <div class=\"card\" style=\"background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-card); padding: 16px; box-shadow: var(--shadow-card); text-align: center; background-image: var(--surface-texture); background-size: var(--surface-texture-size); background-position: var(--surface-texture-position);\">\n          <div style=\"font-size: 24px; font-weight: 600; color: var(--primary);\" data-testid=\"delivery-confirmed\">—</div>\n          <div style=\"font-size: 11px; color: var(--text-muted); margin-top: 4px;\">受領確認済</div>\n        </div>\n        <div class=\"card\" style=\"background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-card); padding: 16px; box-shadow: var(--shadow-card); text-align: center; background-image: var(--surface-texture); background-size: var(--surface-texture-size); background-position: var(--surface-texture-position);\">\n          <div style=\"font-size: 24px; font-weight: 600; color: var(--primary);\" data-testid=\"delivery-executing\">—</div>\n          <div style=\"font-size: 11px; color: var(--text-muted); margin-top: 4px;\">実行中</div>\n        </div>\n        <div class=\"card\" style=\"background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-card); padding: 16px; box-shadow: var(--shadow-card); text-align: center; background-image: var(--surface-texture); background-size: var(--surface-texture-size); background-position: var(--surface-texture-position);\">\n          <div style=\"font-size: 24px; font-weight: 600; color: var(--primary);\" data-testid=\"delivery-completed\">—</div>\n          <div style=\"font-size: 11px; color: var(--text-muted); margin-top: 4px;\">完了</div>\n        </div>\n      </div>\n      <div class=\"table-wrap\" style=\"border: 1px solid var(--border); border-radius: var(--radius-card); overflow: hidden; box-shadow: var(--shadow-card);\">\n        <table data-testid=\"delivery-history-table\" style=\"width: 100%; border-collapse: collapse; background: var(--bg-card);\">\n          <thead>\n            <tr style=\"background: var(--bg-card); border-bottom: 1px solid var(--border);\">\n              <th style=\"padding: 12px 16px; text-align: left; font-size: 12px; font-weight: 600; color: var(--text); font-family: var(--font-family);\">配信日時</th>\n              <th style=\"padding: 12px 16px; text-align: left; font-size: 12px; font-weight: 600; color: var(--text); font-family: var(--font-family);\">対象拠点</th>\n              <th style=\"padding: 12px 16px; text-align: left; font-size: 12px; font-weight: 600; color: var(--text); font-family: var(--font-family);\">指示内容</th>\n              <th style=\"padding: 12px 16px; text-align: center; font-size: 12px; font-weight: 600; color: var(--text); font-family: var(--font-family);\">配信ステータス</th>\n            </tr>\n          </thead>\n          <tbody id=\"delivery-history-tbody\">\n            <tr style=\"border-bottom: 1px solid var(--border);\">\n              <td colspan=\"4\" style=\"padding: 24px; text-align: center; color: var(--text-muted); font-size: 13px;\">読込中...</td>\n            </tr>\n          </tbody>\n        </table>\n      </div>\n    </div>\n  </div>\n</div>\n\n<!-- Modal: Delivery Instructions -->\n<div id=\"delivery-modal\" class=\"modal-overlay\" style=\"display: none; position: fixed; inset: 0; z-index: 1000; background: rgba(0, 0, 0, 0.55); display: flex; align-items: center; justify-content: center;\">\n  <div style=\"background: var(--bg-card); color: var(--text); padding: 24px; border-radius: var(--radius-card); max-width: 90vw; max-height: 90vh; overflow: auto; box-shadow: 0 8px 32px rgba(0,0,0,0.4); min-width: 400px;\">\n    <div style=\"font-size: 16px; font-weight: 600; margin-bottom: 16px; font-family: var(--font-family);\">改善指示を配信</div>\n    <div style=\"margin-bottom: 16px;\">\n      <label style=\"display: block; font-size: 12px; color: var(--text-muted); margin-bottom: 6px; font-weight: 500;\">配信対象拠点</label>\n      <select data-testid=\"delivery-site-select\" style=\"width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: var(--radius-control); background: var(--bg-card); color: var(--text); font-size: 13px; font-family: var(--font-family); cursor: pointer;\">\n        <option value=\"\">選択してください</option>\n        <option value=\"site-001\">東京拠点</option>\n        <option value=\"site-002\">大阪拠点</option>\n        <option value=\"site-003\">名古屋拠点</option>\n      </select>\n    </div>\n    <div style=\"margin-bottom: 16px;\">\n      <label style=\"display: block; font-size: 12px; color: var(--text-muted); margin-bottom: 6px; font-weight: 500;\">指示内容</label>\n      <textarea data-testid=\"delivery-content-textarea\" style=\"width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: var(--radius-control); background: var(--bg-card); color: var(--text); font-size: 13px; font-family: var(--font-family); resize: vertical; min-height: 100px;\"></textarea>\n    </div>\n    <div style=\"display: flex; gap: 8px; justify-content: flex-end;\">\n      <button class=\"action-btn secondary\" data-testid=\"delivery-cancel-button\" style=\"padding: 10px 16px; background: transparent; color: var(--text); border: 1px solid var(--border); border-radius: var(--radius-control); font-size: 13px; font-weight: 500; cursor: pointer; font-family: var(--font-family);\">\n        キャンセル\n      </button>\n      <button class=\"action-btn\" data-testid=\"delivery-send-button\" style=\"padding: 10px 16px; background: var(--primary); color: #fff; border: none; border-radius: var(--radius-control); font-size: 13px; font-weight: 500; cursor: pointer; font-family: var(--font-family);\">\n        配信する\n      </button>\n    </div>\n  </div>\n</div>",
+      "initJs": "",
+      "method": "ai"
+    },
+    {
+      "screenId": "scr-1789461798629",
+      "panelHtml": "<div style=\"display: flex; flex-direction: column; gap: 16px; padding: 16px; background: var(--bg-main); color: var(--text); font-family: var(--font-family); min-height: 100vh;\">\n  \n  <!-- Breadcrumb / Sub-header -->\n  <div style=\"font-size: 12px; color: var(--text-muted); margin-bottom: 8px;\">\n    作業管理システム / 作業進捗・人員配置最適化エンジン / 人員配置最適化提案・実行画面\n  </div>\n\n  <!-- Screen Title -->\n  <div style=\"font-size: 24px; font-weight: 600; color: var(--text); margin-bottom: 16px;\">\n    人員配置最適化提案・実行\n  </div>\n\n  <!-- ========== SECTION 1: 進捗・生産性データ照合パネル ========== -->\n  <div style=\"display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 16px;\">\n    \n    <!-- 作業進捗率 -->\n    <div class=\"card\" style=\"background: var(--bg-card); padding: 16px; border-radius: 12px; box-shadow: var(--shadow-card); background-image: var(--surface-texture); background-size: var(--surface-texture-size); background-position: var(--surface-texture-position);\">\n      <div style=\"font-size: 12px; color: var(--text-muted); margin-bottom: 8px; font-weight: 500;\">作業進捗率</div>\n      <div style=\"font-size: 28px; font-weight: 700; color: var(--primary); margin-bottom: 12px;\" data-testid=\"progress-rate\">\n        <span id=\"progress-rate-value\">--</span>%\n      </div>\n      <div style=\"font-size: 11px; color: var(--text-muted); margin-bottom: 8px;\">計画進捗率: <span id=\"planned-progress\" style=\"color: var(--text);\">--</span>%</div>\n      <div style=\"width: 100%; height: 6px; background: rgba(0,0,0,0.08); border-radius: 3px; overflow: hidden;\">\n        <div id=\"progress-bar-actual\" style=\"height: 100%; background: var(--primary); width: 0%; transition: width 0.3s ease;\"></div>\n      </div>\n      <div style=\"font-size: 11px; color: var(--text-muted); margin-top: 8px;\">完了予定: <span id=\"planned-completion\" style=\"color: var(--text);\">--</span></div>\n    </div>\n\n    <!-- 個人生産性データ -->\n    <div class=\"card\" style=\"background: var(--bg-card); padding: 16px; border-radius: 12px; box-shadow: var(--shadow-card); background-image: var(--surface-texture); background-size: var(--surface-texture-size); background-position: var(--surface-texture-position); overflow-y: auto; max-height: 200px;\">\n      <div style=\"font-size: 12px; color: var(--text-muted); margin-bottom: 8px; font-weight: 500;\">個人生産性データ</div>\n      <div id=\"productivity-list\" style=\"font-size: 12px;\">\n        <div style=\"color: var(--text-muted); padding: 8px 0;\">読込中...</div>\n      </div>\n    </div>\n\n    <!-- 進捗遅延リスク -->\n    <div class=\"card\" style=\"background: var(--bg-card); padding: 16px; border-radius: 12px; box-shadow: var(--shadow-card); background-image: var(--surface-texture); background-size: var(--surface-texture-size); background-position: var(--surface-texture-position);\">\n      <div style=\"font-size: 12px; color: var(--text-muted); margin-bottom: 8px; font-weight: 500;\">進捗遅延リスク</div>\n      <div style=\"font-size: 16px; font-weight: 600; margin-bottom: 8px;\">\n        <span id=\"risk-level\" style=\"padding: 4px 8px; border-radius: 6px; background: rgba(0,0,0,0.05); color: var(--text);\">--</span>\n      </div>\n      <div style=\"font-size: 11px; color: var(--text-muted); margin-bottom: 6px;\">遅延予測: <span id=\"delay-days\" style=\"color: var(--text); font-weight: 600;\">--</span> 日</div>\n      <div style=\"font-size: 11px; color: var(--text-muted); margin-bottom: 8px;\">推奨対応:</div>\n      <div id=\"recommended-action\" style=\"font-size: 11px; color: var(--text); line-height: 1.4; padding: 8px; background: rgba(245,158,11,0.08); border-radius: 6px; border-left: 3px solid var(--primary);\">\n        --\n      </div>\n    </div>\n  </div>\n\n  <!-- ========== SECTION 2: 最適割当提案パネル ========== -->\n  <div class=\"card\" style=\"background: var(--bg-card); padding: 16px; border-radius: 12px; box-shadow: var(--shadow-card); background-image: var(--surface-texture); background-size: var(--surface-texture-size); background-position: var(--surface-texture-position); margin-bottom: 16px;\">\n    <div style=\"font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 12px;\">最適割当提案</div>\n    \n    <div style=\"display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;\">\n      <!-- 提案理由 -->\n      <div>\n        <div style=\"font-size: 11px; color: var(--text-muted); margin-bottom: 6px; font-weight: 500;\">提案理由</div>\n        <div id=\"proposal-reason\" style=\"font-size: 12px; color: var(--text); line-height: 1.5; padding: 8px; background: rgba(0,0,0,0.02); border-radius: 6px; border-left: 2px solid var(--primary);\">\n          読込中...\n        </div>\n      </div>\n\n      <!-- ロジック適用状況 -->\n      <div>\n        <div style=\"font-size: 11px; color: var(--text-muted); margin-bottom: 6px; font-weight: 500;\">習熟度段階別難度調整ロジック</div>\n        <div id=\"logic-status\" style=\"font-size: 12px; color: var(--text); line-height: 1.5; padding: 8px; background: rgba(0,0,0,0.02); border-radius: 6px;\">\n          読込中...\n        </div>\n      </div>\n    </div>\n\n    <!-- 自動生成ボタン -->\n    <button data-testid=\"generate-proposals-btn\" class=\"action-btn\" style=\"background: var(--primary); color: #fff; border: none; padding: 10px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; transition: background 0.2s ease;\">\n      人員配置案を自動生成\n    </button>\n  </div>\n\n  <!-- ========== SECTION 3: 人員配置案一覧 ========== -->\n  <div style=\"margin-bottom: 16px;\">\n    <div style=\"font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 12px;\">人員配置案一覧</div>\n    \n    <div id=\"proposals-container\" style=\"display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px; overflow-x: auto; padding-bottom: 8px;\">\n      <div style=\"color: var(--text-muted); font-size: 12px; padding: 16px; text-align: center; grid-column: 1/-1;\">\n        配置案がまだ生成されていません\n      </div>\n    </div>\n  </div>\n\n  <!-- ========== SECTION 4: 配置案詳細（アコーディオン） ========== -->\n  <div id=\"proposal-detail-container\" style=\"margin-bottom: 16px; display: none;\">\n    <div class=\"card\" style=\"background: var(--bg-card); padding: 16px; border-radius: 12px; box-shadow: var(--shadow-card); background-image: var(--surface-texture); background-size: var(--surface-texture-size); background-position: var(--surface-texture-position);\">\n      <div style=\"font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 12px;\">配置案詳細 - 作業者別割当</div>\n      <div class=\"table-wrap\">\n        <table data-testid=\"assignment-detail-table\" style=\"width: 100%; font-size: 12px; border-collapse: collapse;\">\n          <thead>\n            <tr style=\"background: rgba(245,158,11,0.05); border-bottom: 1px solid var(--border);\">\n              <th style=\"padding: 8px; text-align: left; color: var(--text); font-weight: 600; border-right: 1px solid var(--border);\">作業者ID</th>\n              <th style=\"padding: 8px; text-align: left; color: var(--text); font-weight: 600; border-right: 1px solid var(--border);\">作業者名</th>\n              <th style=\"padding: 8px; text-align: center; color: var(--text); font-weight: 600; border-right: 1px solid var(--border);\">習熟度</th>\n              <th style=\"padding: 8px; text-align: center; color: var(--text); font-weight: 600; border-right: 1px solid var(--border);\">計画工数(h)</th>\n              <th style=\"padding: 8px; text-align: left; color: var(--text); font-weight: 600;\">推奨理由</th>\n            </tr>\n          </thead>\n          <tbody id=\"assignment-detail-tbody\">\n            <tr>\n              <td colspan=\"5\" style=\"padding: 16px; text-align: center; color: var(--text-muted); font-size: 12px;\">\n                配置案を選択して詳細を表示\n              </td>\n            </tr>\n          </tbody>\n        </table>\n      </div>\n    </div>\n  </div>\n\n  <!-- ========== SECTION 5: アクション（承認・却下・配信） ========== -->\n  <div style=\"display: flex; gap: 12px; justify-content: flex-end; padding-top: 16px; border-top: 1px solid var(--border);\">\n    <button data-testid=\"cancel-button\" class=\"action-btn secondary\" style=\"background: transparent; color: var(--text); border: 1px solid var(--border); padding: 10px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s ease;\">\n      ダッシュボードに戻る\n    </button>\n    <button data-testid=\"reject-button\" class=\"action-btn secondary\" style=\"background: transparent; color: var(--text); border: 1px solid var(--border); padding: 10px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; display: none;\" id=\"reject-btn\">\n      配置案を却下\n    </button>\n    <button data-testid=\"approve-button\" class=\"action-btn\" style=\"background: var(--primary); color: #fff; border: none; padding: 10px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; transition: background 0.2s ease; display: none;\" id=\"approve-btn\">\n      配置案を承認\n    </button>\n    <button data-testid=\"distribute-button\" class=\"action-btn\" style=\"background: var(--primary); color: #fff; border: none; padding: 10px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; transition: background 0.2s ease; display: none;\" id=\"distribute-btn\">\n      配置案と作業指示を一括配信\n    </button>\n  </div>\n\n  <!-- ========== MODAL: 承認確認ダイアログ ========== -->\n  <div id=\"approve-modal-overlay\" class=\"modal-overlay\" style=\"display: none; position: fixed; inset: 0; z-index: 1000; background: rgba(0, 0, 0, 0.55); display: flex; align-items: center; justify-content: center;\">\n    <div style=\"background: var(--bg-card); color: var(--text); padding: 24px; border-radius: 12px; max-width: 90vw; max-height: 90vh; overflow: auto; box-shadow: 0 8px 32px rgba(0,0,0,0.4); min-width: 400px;\">\n      <div style=\"font-size: 16px; font-weight: 600; margin-bottom: 16px;\">配置案を承認しますか？</div>\n      <div id=\"approve-modal-content\" style=\"font-size: 13px; color: var(--text-muted); line-height: 1.6; margin-bottom: 20px;\">\n        確認中...\n      </div>\n      <div style=\"display: flex; gap: 12px; justify-content: flex-end;\">\n        <button data-testid=\"approve-modal-cancel\" style=\"background: transparent; color: var(--text); border: 1px solid var(--border); padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer;\">\n          キャンセル\n        </button>\n        <button data-testid=\"approve-modal-confirm\" style=\"background: var(--primary); color: #fff; border: none; padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer;\">\n          承認する\n        </button>\n      </div>\n    </div>\n  </div>\n\n  <!-- ========== MODAL: 配信確認ダイアログ ========== -->\n  <div id=\"distribute-modal-overlay\" class=\"modal-overlay\" style=\"display: none; position: fixed; inset: 0; z-index: 1000; background: rgba(0, 0, 0, 0.55); display: flex; align-items: center; justify-content: center;\">\n    <div style=\"background: var(--bg-card); color: var(--text); padding: 24px; border-radius: 12px; max-width: 90vw; max-height: 90vh; overflow: auto; box-shadow: 0 8px 32px rgba(0,0,0,0.4); min-width: 400px;\">\n      <div style=\"font-size: 16px; font-weight: 600; margin-bottom: 16px;\">配置案と作業指示を一括配信しますか？</div>\n      <div id=\"distribute-modal-content\" style=\"font-size: 13px; color: var(--text-muted); line-height: 1.6; margin-bottom: 20px;\">\n        確認中...\n      </div>\n      <div style=\"display: flex; gap: 12px; justify-content: flex-end;\">\n        <button data-testid=\"distribute-modal-cancel\" style=\"background: transparent; color: var(--text); border: 1px solid var(--border); padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer;\">\n          キャンセル\n        </button>\n        <button data-testid=\"distribute-modal-confirm\" style=\"background: var(--primary); color: #fff; border: none; padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer;\">\n          配信する\n        </button>\n      </div>\n    </div>\n  </div>\n\n  <!-- ========== MODAL: 却下確認ダイアログ ========== -->\n  <div id=\"reject-modal-overlay\" class=\"modal-overlay\" style=\"display: none; position: fixed; inset: 0; z-index: 1000; background: rgba(0, 0, 0, 0.55); display: flex; align-items: center; justify-content: center;\">\n    <div style=\"background: var(--bg-card); color: var(--text); padding: 24px; border-radius: 12px; max-width: 90vw; max-height: 90vh; overflow: auto; box-shadow: 0 8px 32px rgba(0,0,0,0.4); min-width: 400px;\">\n      <div style=\"font-size: 16px; font-weight: 600; margin-bottom: 16px;\">配置案を却下しますか？</div>\n      <div style=\"font-size: 13px; color: var(--text-muted); line-height: 1.6; margin-bottom: 16px;\">\n        <label style=\"display: block; margin-bottom: 8px;\">却下理由（オプション）</label>\n        <textarea id=\"reject-reason\" data-testid=\"reject-reason-textarea\" style=\"width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg-main); color: var(--text); font-family: var(--font-family); font-size: 12px; resize: vertical; min-height: 60px;\" placeholder=\"却下理由を入力してください...\"></textarea>\n      </div>\n      <div style=\"display: flex; gap: 12px; justify-content: flex-end;\">\n        <button data-testid=\"reject-modal-cancel\" style=\"background: transparent; color: var(--text); border: 1px solid var(--border); padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer;\">\n          キャンセル\n        </button>\n        <button data-testid=\"reject-modal-confirm\" style=\"background: var(--primary); color: #fff; border: none; padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer;\">\n          却下する\n        </button>\n      </div>\n    </div>\n  </div>\n\n</div>",
+      "initJs": "function(container, apiUrl, tables) {\n  // テーブルインデックスマッピング\n  const tableIndexMap = {};\n  tables.forEach((t, idx) => {\n    tableIndexMap[t.tableName] = idx;\n  });\n\n  let currentProposalId = null;\n  let currentProposalData = null;\n  let allProposals = [];\n\n  // ========== ユーティリティ関数 ==========\n  function formatDate(dateStr) {\n    if (!dateStr) return '--';\n    const d = new Date(dateStr);\n    return d.toLocaleDateString('ja-JP', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });\n  }\n\n  function getRiskLevelColor(level) {\n    const colors = {\n      '低': '#10b981',\n      '中': '#f59e0b',\n      '高': '#ef4444',\n      '極高': '#7c2d12'\n    };\n    return colors[level] || '#6b7280';\n  }\n\n  function closeModal(modalId) {\n    const modal = container.querySelector(`#${modalId}`);\n    if (modal) modal.style.display = 'none';\n  }\n\n  function openModal(modalId) {\n    const modal = container.querySelector(`#${modalId}`);\n    if (modal) modal.style.display = 'flex';\n  }\n\n  // ========== 初期データ読込 ==========\n  async function loadInitialData() {\n    try {\n      // 作業指示データ取得（最新の遅延リスクがある案件を取得）\n      const workInstructions = await window.aivicApi.list(tableIndexMap['作業指示'] ?? 3);\n      const progressData = await window.aivicApi.list(tableIndexMap['進捗データ'] ?? 8);\n      const riskResults = await window.aivicApi.list(tableIndexMap['進捗遅延リスク判定結果'] ?? 9);\n      const proficiencies = await window.aivicApi.list(tableIndexMap['作業者習熟度'] ?? 2);\n\n      if (!workInstructions || workInstructions.length === 0) {\n        container.querySelector('#progress-rate-value').textContent = '0';\n        container.querySelector('#planned-progress').textContent = '0';\n        return;\n      }\n\n      // 最新の作業指示を取得\n      const latestWork = workInstructions[0];\n      const latestProgress = progressData?.find(p => p.作業指示ID === latestWork.作業指示ID) || {};\n      const latestRisk = riskResults?.find(r => r.作業指示ID === latestWork.作業指示ID) || {};\n\n      // 進捗率表示\n      const actualProgress = latestProgress.完了率 || latestWork.進捗率 || 0;\n      const plannedProgress = Math.min(100, Math.floor((new Date() - new Date(latestWork.予定開始日時)) / (new Date(latestWork.予定終了日時) - new Date(latestWork.予定開始日時)) * 100));\n      \n      container.querySelector('#progress-rate-value').textContent = actualProgress;\n      container.querySelector('#planned-progress').textContent = plannedProgress;\n      container.querySelector('#progress-bar-actual').style.width = actualProgress + '%';\n      container.querySelector('#planned-completion').textContent = formatDate(latestWork.予定終了日時);\n\n      // リスク表示\n      const riskLevel = latestRisk.リスクレベル || '低';\n      const delayDays = latestRisk.遅延予測日数 || 0;\n      container.querySelector('#risk-level').textContent = riskLevel;\n      container.querySelector('#risk-level').style.background = getRiskLevelColor(riskLevel) + '20';\n      container.querySelector('#risk-level').style.color = getRiskLevelColor(riskLevel);\n      container.querySelector('#delay-days').textContent = delayDays;\n      container.querySelector('#recommended-action').textContent = latestRisk.推奨対応 || '特に対応が必要ありません';\n\n      // 生産性データ表示\n      const productivityHtml = proficiencies?.slice(0, 5).map(p => `\n        <div style=\"padding: 6px 0; border-bottom: 1px solid rgba(0,0,0,0.05);\">\n          <div style=\"font-weight: 500; color: var(--text);\">${p.作業者ID?.substring(0, 8) || 'N/A'}</div>\n          <div style=\"font-size: 11px; color: var(--text-muted);\">\n            ${p.職務区分} / Lv${p.習熟度レベル || '-'}\n          </div>\n        </div>\n      `).join('') || '<div style=\"color: var(--text-muted);\">データなし</div>';\n      container.querySelector('#productivity-list').innerHTML = productivityHtml;\n\n      // 提案理由とロジック状況を設定\n      container.querySelector('#proposal-reason').textContent = \n        `現在の進捗率 ${actualProgress}% に対し、計画進捗率は ${plannedProgress}% です。` +\n        (delayDays > 0 ? `${delayDays}日の遅延が予測されるため、最適な人員配置を提案します。` : '予定通り進行中です。');\n      \n      container.querySelector('#logic-status').innerHTML = `\n        <div style=\"margin-bottom: 6px;\">✓ 習熟度レベル別難度調整: 有効</div>\n        <div style=\"margin-bottom: 6px;\">✓ 生産性データ連携: 有効</div>\n        <div>✓ リスク判定ロジック: 有効</div>\n      `;\n\n    } catch (error) {\n      console.error('初期データ読込エラー:', error);\n    }\n  }\n\n  // ========== 配置案自動生成 ==========\n  async function generateProposals() {\n    try {\n      const workInstructions = await window.aivicApi.list(tableIndexMap['作業指示'] ?? 3);\n      const proficiencies = await window.aivicApi.list(tableIndexMap['作業者習熟度'] ?? 2);\n      \n      if (!workInstructions || workInstructions.length === 0) {\n        alert('作業指示がありません');\n        return;\n      }\n\n      const latestWork = workInstructions[0];\n      const requiredPeople = latestWork.必要人数 || 3;\n\n      // 3つの配置案を生成\n      allProposals = [\n        {\n          id: 'proposal-a-' + Date.now(),\n          name: '案A: 最小工数最適化',\n          estimatedHours: Math.floor(requiredPeople * 8),\n          estimatedCompletion: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString(),\n          status: '案',\n          assignmentCount: requiredPeople,\n          reason: '最小工数で完了を目指す配置。経験者を中心に配置。',\n          assignments: proficiencies?.slice(0, requiredPeople).map((p, idx) => ({\n            workerId: p.作業者ID,\n            workerName: `作業者${idx + 1}`,\n            proficiency: p.習熟度レベル || 3,\n            plannedHours: 8,\n            reason: `習熟度Lv${p.習熟度レベル || 3}で効率的に対応可能`\n          })) || []\n        },\n        {\n          id: 'proposal-b-' + Date.now(),\n          name: '案B: 習熟度重視',\n          estimatedHours: Math.floor(requiredPeople * 10),\n          estimatedCompletion: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(),\n          status: '案',\n          assignmentCount: requiredPeople,\n          reason: '習熟度の高い作業者を優先配置。品質と確実性を重視。',\n          assignments: proficiencies?.slice(0, requiredPeople).map((p, idx) => ({\n            workerId: p.作業者ID,\n            workerName: `作業者${idx + 1}`,\n            proficiency: p.習熟度レベル || 3,\n            plannedHours: 10,\n            reason: `高い習熟度で品質を確保`\n          })) || []\n        },\n        {\n          id: 'proposal-c-' + Date.now(),\n          name: '案C: 人員平準化',\n          estimatedHours: Math.floor(requiredPeople * 9),\n          estimatedCompletion: new Date(Date.now() + 2.5 * 24 * 60 * 60 * 1000).toISOString(),\n          status: '案',\n          assignmentCount: requiredPeople,\n          reason: '複数の習熟度レベルを組み合わせた平準配置。スキル育成も兼ねる。',\n          assignments: proficiencies?.slice(0, requiredPeople).map((p, idx) => ({\n            workerId: p.作業者ID,\n            workerName: `作業者${idx + 1}`,\n            proficiency: p.習熟度レベル || 3,\n            plannedHours: 9,\n            reason: `バランスの取れた配置で育成効果も期待`\n          })) || []\n        }\n      ];\n\n      renderProposals();\n    } catch (error) {\n      console.error('配置案生成エラー:', error);\n      alert('配置案の生成に失敗しました');\n    }\n  }\n\n  // ========== 配置案レンダリング ==========\n  function renderProposals() {\n    const container_el = container.querySelector('#proposals-container');\n    container_el.innerHTML = allProposals.map(proposal => `\n      <div class=\"card\" data-proposal-id=\"${proposal.id}\" style=\"background: var(--bg-card); padding: 14px; border-radius: 12px; box-shadow: var(--shadow-card); cursor: pointer; transition: all 0.2s ease; border: 2px solid transparent; background-image: var(--surface-texture); background-size: var(--surface-texture-size); background-position: var(--surface-texture-position);\">\n        <div style=\"font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 8px;\">${proposal.name}</div>\n        <div style=\"font-size: 12px; color: var(--text-muted); margin-bottom: 6px;\">\n          <div>予想工数: <span style=\"color: var(--primary); font-weight: 600;\">${proposal.estimatedHours}h</span></div>\n          <div>予想完了: ${formatDate(proposal.estimatedCompletion)}</div>\n          <div>割当人数: <span style=\"color: var(--primary); font-weight: 600;\">${proposal.assignmentCount}名</span></div>\n        </div>\n        <div style=\"font-size: 11px; color: var(--text-muted); padding: 8px; background: rgba(245,158,11,0.05); border-radius: 6px; margin-top: 8px;\">\n          ${proposal.reason}\n        </div>\n      </div>\n    `).join('');\n\n    // クリックイベント登録\n    container.querySelectorAll('[data-proposal-id]').forEach(el => {\n      el.addEventListener('click', () => selectProposal(el.dataset.proposalId));\n    });\n  }\n\n  // ========== 配置案選択 ==========\n  function selectProposal(proposalId) {\n    currentProposalId = proposalId;\n    currentProposalData = allProposals.find(p => p.id === proposalId);\n\n    // 選択状態を表示\n    container.querySelectorAll('[data-proposal-id]').forEach(el => {\n      if (el.dataset.proposalId === proposalId) {\n        el.style.borderColor = 'var(--primary)';\n        el.style.background = 'rgba(245,158,11,0.05)';\n      } else {\n        el.style.borderColor = 'transparent';\n        el.style.background = 'var(--bg-card)';\n      }\n    });\n\n    // 詳細表示\n    renderProposalDetail();\n    container.querySelector('#proposal-detail-container').style.display = 'block';\n\n    // アクションボタン表示\n    container.querySelector('#approve-btn').style.display = 'inline-block';\n    container.querySelector('#reject-btn').style.display = 'inline-block';\n    container.querySelector('#distribute-btn').style.display = 'inline-block';\n  }\n\n  // ========== 配置案詳細レンダリング ==========\n  function renderProposalDetail() {\n    if (!currentProposalData) return;\n\n    const tbody = container.querySelector('#assignment-detail-tbody');\n    tbody.innerHTML = currentProposalData.assignments.map(a => `\n      <tr style=\"border-bottom: 1px solid var(--border);\">\n        <td style=\"padding: 8px; color: var(--text); border-right: 1px solid var(--border);\">${a.workerId?.substring(0, 8) || 'N/A'}</td>\n        <td style=\"padding: 8px; color: var(--text); border-right: 1px solid var(--border);\">${a.workerName}</td>\n        <td style=\"padding: 8px; text-align: center; color: var(--primary); font-weight: 600; border-right: 1px solid var(--border);\">Lv${a.proficiency}</td>\n        <td style=\"padding: 8px; text-align: center; color: var(--text); border-right: 1px solid var(--border);\">${a.plannedHours}</td>\n        <td style=\"padding: 8px; color: var(--text-muted); font-size: 11px;\">${a.reason}</td>\n      </tr>\n    `).join('');\n  }\n\n  // ========== 承認処理 ==========\n  function showApproveModal() {\n    if (!currentProposalData) return;\n    const content = container.querySelector('#approve-modal-content');\n    content.innerHTML = `\n      <div><strong>${currentProposalData.name}</strong></div>\n      <div style=\"margin-top: 8px;\">予想工数: ${currentProposalData.estimatedHours}h</div>\n      <div>割当人数: ${currentProposalData.assignmentCount}名</div>\n      <div style=\"margin-top: 12px; color: var(--text);\">この配置案を承認してもよろしいですか？</div>\n    `;\n    openModal('approve-modal-overlay');\n  }\n\n  async function approveProposal() {\n    if (!currentProposalData) return;\n    try {\n      // 人員配置案テーブルに保存\n      const proposalRecord = {\n        配置案名: currentProposalData.name,\n        拠点ID: 'site-001',\n        チームID: 'team-001',\n        作業指示ID: 'work-001',\n        配置開始日: new Date().toISOString(),\n        予想工数: currentProposalData.estimatedHours,\n        予想完了日: currentProposalData.estimatedCompletion,\n        ステータス: '承認待ち',\n        説明: currentProposalData.reason\n      };\n      \n      const saved = await window.aivicApi.save(tableIndexMap['人員配置案'] ?? 6, proposalRecord);\n      if (saved) {\n        closeModal('approve-modal-overlay');\n        alert('配置案を承認しました');\n        currentProposalData.status = '承認待ち';\n      }\n    } catch (error) {\n      console.error('承認エラー:', error);\n      alert('承認処理に失敗しました');\n    }\n  }\n\n  // ========== 却下処理 ==========\n  function showRejectModal() {\n    openModal('reject-modal-overlay');\n  }\n\n  async function rejectProposal() {\n    if (!currentProposalData) return;\n    const reason = container.querySelector('#reject-reason').value;\n    try {\n      // 却下理由をログに記録（実装例）\n      console.log(`配置案 ${currentProposalData.name} を却下: ${reason}`);\n      closeModal('reject-modal-overlay');\n      alert('配置案を却下しました');\n      currentProposalData = null;\n      currentProposalId = null;\n      container.querySelector('#proposal-detail-container').style.display = 'none';\n      container.querySelector('#approve-btn').style.display = 'none';\n      container.querySelector('#reject-btn').style.display = 'none';\n      container.querySelector('#distribute-btn').style.display = 'none';\n    } catch (error) {\n      console.error('却下エラー:', error);\n      alert('却下処理に失敗しました');\n    }\n  }\n\n  // ========== 配信処理 ==========\n  function showDistributeModal() {\n    if (!currentProposalData) return;\n    const content = container.querySelector('#distribute-modal-content');\n    content.innerHTML = `\n      <div><strong>${currentProposalData.name}</strong></div>\n      <div style=\"margin-top: 8px;\">割当人数: ${currentProposalData.assignmentCount}名</div>\n      <div style=\"margin-top: 12px; color: var(--text);\">\n        この配置案と作業指示を以下に一括配信します:\n        <ul style=\"margin: 8px 0 0 16px;\">\n          <li>ハンディターミナル</li>\n          <li>WMS (倉庫管理システム)</li>\n          <li>作業者アプリ</li>\n        </ul>\n      </div>\n    `;\n    openModal('distribute-modal-overlay');\n  }\n\n  async function distributeProposal() {\n    if (!currentProposalData) return;\n    try {\n      // 人員配置実行状況テーブルに登録\n      const executionRecords = currentProposalData.assignments.map(a => ({\n        人員配置案ID: currentProposalId,\n        作業指示ID: 'work-001',\n        作業者ID: a.workerId,\n        拠点ID: 'site-001',\n        チームID: 'team-001',\n        配置状態: '計画中',\n        計画開始日時: new Date().toISOString(),\n        計画終了日時: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString(),\n        計画工数: a.plannedHours * 60\n      }));\n\n      for (const record of executionRecords) {\n        await window.aivicApi.save(tableIndexMap['人員配置実行状況'] ?? 7, record);\n      }\n\n      // WMS連携ログ記録\n      const wmsLog = {\n        連携種別: '作業指示受信',\n        連携方向: '送信',\n        拠点_id: 'site-001',\n        連携ステータス: '成功',\n        連携開始日時: new Date().toISOString(),\n        連携完了日時: new Date().toISOString(),\n        処理件数: executionRecords.length,\n        成功件数: executionRecords.length,\n        失敗件数: 0\n      };\n      await window.aivicApi.save(tableIndexMap['WMS連携ログ'] ?? 11, wmsLog);\n\n      closeModal('distribute-modal-overlay');\n      alert('配置案と作業指示を一括配信しました');\n      \n      // 画面遷移\n      setTimeout(() => {\n        window.showScreen('scr-1789461813941');\n      }, 1000);\n    } catch (error) {\n      console.error('配信エラー:', error);\n      alert('配信処理に失敗しました');\n    }\n  }\n\n  // ========== イベントリスナー登録 ==========\n  container.querySelector('[data-testid=\"generate-proposals-btn\"]').addEventListener('click', generateProposals);\n  \n  container.querySelector('[data-testid=\"approve-button\"]').addEventListener('click', showApproveModal);\n  container.querySelector('[data-testid=\"approve-modal-confirm\"]').addEventListener('click', approveProposal);\n  container.querySelector('[data-testid=\"approve-modal-cancel\"]').addEventListener('click', () => closeModal('approve-modal-overlay'));\n\n  container.querySelector('[data-testid=\"reject-button\"]').addEventListener('click', showRejectModal);\n  container.querySelector('[data-testid=\"reject-modal-confirm\"]').addEventListener('click', rejectProposal);\n  container.querySelector('[data-testid=\"reject-modal-cancel\"]').addEventListener('click', () => closeModal('reject-modal-overlay'));\n\n  container.querySelector('[data-testid=\"distribute-button\"]').addEventListener('click', showDistributeModal);\n  container.querySelector('[data-testid=\"distribute-modal-confirm\"]').addEventListener('click', distributeProposal);\n  container.querySelector('[data-testid=\"distribute-modal-cancel\"]').addEventListener('click', () => closeModal('distribute-modal-overlay'));\n\n  container.querySelector('[data-testid=\"cancel-button\"]').addEventListener('click', () => {\n    window.showScreen('scr-1789461783315');\n  });\n\n  // Esc キーでモーダルを閉じる\n  document.addEventListener('keydown', (e) => {\n    if (e.key === 'Escape') {\n      closeModal('approve-modal-overlay');\n      closeModal('reject-modal-overlay');\n      closeModal('distribute-modal-overlay');\n    }\n  });\n\n  // 初期データ読込\n  loadInitialData();\n}",
+      "method": "ai"
+    },
+    {
+      "screenId": "scr-1789461813941",
+      "panelHtml": "<div style=\"display: flex; flex-direction: column; height: 100%; background: var(--bg-main); color: var(--text); font-family: var(--font-family);\">\n  <!-- Breadcrumb / Sub-header -->\n  <div style=\"padding: 12px 16px; border-bottom: 1px solid var(--border); background: var(--bg-card); font-size: 12px; color: var(--text-muted);\">\n    作業管理システム / 作業進捗・人員配置最適化エンジン / 作業指示・実績管理画面\n  </div>\n\n  <!-- Main Content Area -->\n  <div style=\"display: flex; flex: 1; overflow: hidden; gap: 0;\">\n    \n    <!-- Left Sidebar: 受領履歴・検索・サマリー -->\n    <aside style=\"width: 280px; background: var(--bg-sidebar); border-right: 1px solid var(--border); overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 16px;\">\n      \n      <!-- 受領履歴検索フィルター -->\n      <div class=\"card\" style=\"padding: 12px; background: var(--bg-card); border-radius: var(--radius-card); box-shadow: var(--shadow-card);\">\n        <div style=\"font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;\">受領履歴検索</div>\n        \n        <div style=\"display: flex; flex-direction: column; gap: 8px;\">\n          <div>\n            <label style=\"display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 4px;\">作業指示ID</label>\n            <input type=\"text\" data-testid=\"filter-work-instruction-id\" placeholder=\"指示IDで検索\" style=\"width: 100%; padding: 6px 8px; border: 1px solid var(--border); border-radius: var(--radius-control); background: var(--bg-main); color: var(--text); font-size: 12px; box-sizing: border-box;\" />\n          </div>\n          \n          <div>\n            <label style=\"display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 4px;\">作業者ID</label>\n            <input type=\"text\" data-testid=\"filter-worker-id\" placeholder=\"作業者IDで検索\" style=\"width: 100%; padding: 6px 8px; border: 1px solid var(--border); border-radius: var(--radius-control); background: var(--bg-main); color: var(--text); font-size: 12px; box-sizing: border-box;\" />\n          </div>\n          \n          <div>\n            <label style=\"display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 4px;\">受領確認状態</label>\n            <select data-testid=\"filter-receipt-status\" style=\"width: 100%; padding: 6px 8px; border: 1px solid var(--border); border-radius: var(--radius-control); background: var(--bg-main); color: var(--text); font-size: 12px; box-sizing: border-box;\">\n              <option value=\"\">すべて</option>\n              <option value=\"未確認\">未確認</option>\n              <option value=\"確認済み\">確認済み</option>\n              <option value=\"辞退\">辞退</option>\n            </select>\n          </div>\n          \n          <button data-testid=\"filter-search-button\" style=\"padding: 6px 12px; background: var(--primary); color: #fff; border: none; border-radius: var(--radius-control); font-size: 12px; font-weight: 600; cursor: pointer; transition: background var(--motion-duration);\">検索</button>\n        </div>\n      </div>\n\n      <!-- 作業者別実績サマリー -->\n      <div class=\"card\" style=\"padding: 12px; background: var(--bg-card); border-radius: var(--radius-card); box-shadow: var(--shadow-card); flex: 1; overflow-y: auto;\">\n        <div style=\"font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;\">本日実績サマリー</div>\n        <div id=\"worker-summary-list\" style=\"display: flex; flex-direction: column; gap: 8px;\">\n          <!-- 動的に作業者別サマリーを挿入 -->\n        </div>\n      </div>\n    </aside>\n\n    <!-- Right Main Content: 作業指示一覧・実績入力・連携ログ -->\n    <main style=\"flex: 1; display: flex; flex-direction: column; overflow: hidden;\">\n      \n      <!-- 作業指示一覧 -->\n      <section style=\"flex: 0 0 auto; padding: 16px; border-bottom: 1px solid var(--border); background: var(--bg-main);\">\n        <div style=\"display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;\">\n          <h2 style=\"font-size: 14px; font-weight: 700; color: var(--text); margin: 0;\">作業指示一覧</h2>\n          <button data-testid=\"export-csv-button\" style=\"padding: 6px 12px; background: transparent; color: var(--text); border: 1px solid var(--border); border-radius: var(--radius-control); font-size: 12px; cursor: pointer; transition: all var(--motion-duration);\">CSVエクスポート</button>\n        </div>\n        \n        <div class=\"table-wrap\" style=\"max-height: 240px; overflow-y: auto; border: 1px solid var(--border); border-radius: var(--radius-control); background: var(--bg-card);\">\n          <table data-testid=\"work-instruction-list\" style=\"width: 100%; border-collapse: collapse; font-size: 12px;\">\n            <thead style=\"background: var(--bg-sidebar); position: sticky; top: 0;\">\n              <tr>\n                <th style=\"padding: 8px; text-align: left; color: var(--text); font-weight: 600; border-bottom: 1px solid var(--border);\">指示ID</th>\n                <th style=\"padding: 8px; text-align: left; color: var(--text); font-weight: 600; border-bottom: 1px solid var(--border);\">作業名</th>\n                <th style=\"padding: 8px; text-align: left; color: var(--text); font-weight: 600; border-bottom: 1px solid var(--border);\">進捗</th>\n                <th style=\"padding: 8px; text-align: center; color: var(--text); font-weight: 600; border-bottom: 1px solid var(--border);\">進捗率</th>\n                <th style=\"padding: 8px; text-align: left; color: var(--text); font-weight: 600; border-bottom: 1px solid var(--border);\">予定終了</th>\n              </tr>\n            </thead>\n            <tbody id=\"work-instruction-tbody\" style=\"background: var(--bg-card);\">\n              <!-- 動的に作業指示行を挿入 -->\n            </tbody>\n          </table>\n        </div>\n      </section>\n\n      <!-- 作業実績入力フォーム（選択時に展開） -->\n      <section id=\"performance-form-section\" style=\"flex: 0 0 auto; padding: 16px; border-bottom: 1px solid var(--border); background: var(--bg-main); display: none;\">\n        <h3 style=\"font-size: 13px; font-weight: 700; color: var(--text); margin: 0 0 12px 0;\">作業実績入力</h3>\n        \n        <div style=\"display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 12px;\">\n          <div>\n            <label style=\"display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 4px;\">作業指示ID</label>\n            <input type=\"text\" id=\"perf-work-instruction-id\" readonly style=\"width: 100%; padding: 6px 8px; border: 1px solid var(--border); border-radius: var(--radius-control); background: var(--bg-sidebar); color: var(--text); font-size: 12px; box-sizing: border-box;\" />\n          </div>\n          \n          <div>\n            <label style=\"display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 4px;\">実績数量 <span style=\"color: #ef4444;\">*</span></label>\n            <input type=\"number\" data-testid=\"performance-quantity\" id=\"perf-quantity\" min=\"0\" placeholder=\"数量を入力\" style=\"width: 100%; padding: 6px 8px; border: 1px solid var(--border); border-radius: var(--radius-control); background: var(--bg-card); color: var(--text); font-size: 12px; box-sizing: border-box;\" />\n          </div>\n          \n          <div>\n            <label style=\"display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 4px;\">不良数</label>\n            <input type=\"number\" data-testid=\"performance-defects\" id=\"perf-defects\" min=\"0\" placeholder=\"不良数を入力\" style=\"width: 100%; padding: 6px 8px; border: 1px solid var(--border); border-radius: var(--radius-control); background: var(--bg-card); color: var(--text); font-size: 12px; box-sizing: border-box;\" />\n          </div>\n        </div>\n\n        <div style=\"display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 12px;\">\n          <div>\n            <label style=\"display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 4px;\">実績完了日時 <span style=\"color: #ef4444;\">*</span></label>\n            <input type=\"datetime-local\" data-testid=\"performance-end-datetime\" id=\"perf-end-datetime\" style=\"width: 100%; padding: 6px 8px; border: 1px solid var(--border); border-radius: var(--radius-control); background: var(--bg-card); color: var(--text); font-size: 12px; box-sizing: border-box;\" />\n          </div>\n          \n          <div>\n            <label style=\"display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 4px;\">作業ステータス <span style=\"color: #ef4444;\">*</span></label>\n            <select data-testid=\"performance-status\" id=\"perf-status\" style=\"width: 100%; padding: 6px 8px; border: 1px solid var(--border); border-radius: var(--radius-control); background: var(--bg-card); color: var(--text); font-size: 12px; box-sizing: border-box;\">\n              <option value=\"\">選択してください</option>\n              <option value=\"完了\">完了</option>\n              <option value=\"中断\">中断</option>\n              <option value=\"不良\">不良</option>\n            </select>\n          </div>\n          \n          <div style=\"display: flex; align-items: flex-end;\">\n            <button data-testid=\"performance-submit-button\" id=\"perf-submit-btn\" style=\"width: 100%; padding: 6px 12px; background: var(--primary); color: #fff; border: none; border-radius: var(--radius-control); font-size: 12px; font-weight: 600; cursor: pointer; transition: background var(--motion-duration);\">実績を登録</button>\n          </div>\n        </div>\n\n        <div>\n          <label style=\"display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 4px;\">備考</label>\n          <textarea data-testid=\"performance-notes\" id=\"perf-notes\" placeholder=\"作業に関する備考を入力\" style=\"width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: var(--radius-control); background: var(--bg-card); color: var(--text); font-size: 12px; box-sizing: border-box; resize: vertical; min-height: 60px;\"></textarea>\n        </div>\n      </section>\n\n      <!-- 連携ログ表示（タブ形式） -->\n      <section style=\"flex: 1; padding: 16px; overflow: hidden; display: flex; flex-direction: column;\">\n        <div style=\"display: flex; gap: 0; margin-bottom: 12px; border-bottom: 1px solid var(--border);\">\n          <button data-testid=\"tab-handy-terminal\" class=\"log-tab active\" data-tab=\"handy-terminal\" style=\"padding: 8px 16px; background: transparent; color: var(--text); border: none; border-bottom: 2px solid var(--primary); font-size: 12px; font-weight: 600; cursor: pointer; transition: all var(--motion-duration);\">ハンディターミナル連携ログ</button>\n          <button data-testid=\"tab-wms\" class=\"log-tab\" data-tab=\"wms\" style=\"padding: 8px 16px; background: transparent; color: var(--text-muted); border: none; border-bottom: 2px solid transparent; font-size: 12px; font-weight: 600; cursor: pointer; transition: all var(--motion-duration);\">WMS連携ログ</button>\n          <button data-testid=\"tab-receipt-history\" class=\"log-tab\" data-tab=\"receipt-history\" style=\"padding: 8px 16px; background: transparent; color: var(--text-muted); border: none; border-bottom: 2px solid transparent; font-size: 12px; font-weight: 600; cursor: pointer; transition: all var(--motion-duration);\">受領履歴</button>\n        </div>\n\n        <!-- ハンディターミナル連携ログ -->\n        <div id=\"tab-handy-terminal-content\" class=\"log-tab-content\" style=\"flex: 1; overflow-y: auto;\">\n          <div class=\"table-wrap\" style=\"height: 100%; border: 1px solid var(--border); border-radius: var(--radius-control); background: var(--bg-card);\">\n            <table data-testid=\"handy-terminal-log-list\" style=\"width: 100%; border-collapse: collapse; font-size: 11px;\">\n              <thead style=\"background: var(--bg-sidebar); position: sticky; top: 0;\">\n                <tr>\n                  <th style=\"padding: 8px; text-align: left; color: var(--text); font-weight: 600; border-bottom: 1px solid var(--border);\">連携タイプ</th>\n                  <th style=\"padding: 8px; text-align: left; color: var(--text); font-weight: 600; border-bottom: 1px solid var(--border);\">ステータス</th>\n                  <th style=\"padding: 8px; text-align: left; color: var(--text); font-weight: 600; border-bottom: 1px solid var(--border);\">送信日時</th>\n                  <th style=\"padding: 8px; text-align: left; color: var(--text); font-weight: 600; border-bottom: 1px solid var(--border);\">エラー</th>\n                </tr>\n              </thead>\n              <tbody id=\"handy-terminal-log-tbody\" style=\"background: var(--bg-card);\">\n                <!-- 動的にログを挿入 -->\n              </tbody>\n            </table>\n          </div>\n        </div>\n\n        <!-- WMS連携ログ -->\n        <div id=\"tab-wms-content\" class=\"log-tab-content\" style=\"flex: 1; overflow-y: auto; display: none;\">\n          <div class=\"table-wrap\" style=\"height: 100%; border: 1px solid var(--border); border-radius: var(--radius-control); background: var(--bg-card);\">\n            <table data-testid=\"wms-log-list\" style=\"width: 100%; border-collapse: collapse; font-size: 11px;\">\n              <thead style=\"background: var(--bg-sidebar); position: sticky; top: 0;\">\n                <tr>\n                  <th style=\"padding: 8px; text-align: left; color: var(--text); font-weight: 600; border-bottom: 1px solid var(--border);\">連携種別</th>\n                  <th style=\"padding: 8px; text-align: left; color: var(--text); font-weight: 600; border-bottom: 1px solid var(--border);\">ステータス</th>\n                  <th style=\"padding: 8px; text-align: center; color: var(--text); font-weight: 600; border-bottom: 1px solid var(--border);\">処理件数</th>\n                  <th style=\"padding: 8px; text-align: center; color: var(--text); font-weight: 600; border-bottom: 1px solid var(--border);\">成功/失敗</th>\n                  <th style=\"padding: 8px; text-align: left; color: var(--text); font-weight: 600; border-bottom: 1px solid var(--border);\">完了日時</th>\n                </tr>\n              </thead>\n              <tbody id=\"wms-log-tbody\" style=\"background: var(--bg-card);\">\n                <!-- 動的にログを挿入 -->\n              </tbody>\n            </table>\n          </div>\n        </div>\n\n        <!-- 受領履歴 -->\n        <div id=\"tab-receipt-history-content\" class=\"log-tab-content\" style=\"flex: 1; overflow-y: auto; display: none;\">\n          <div class=\"table-wrap\" style=\"height: 100%; border: 1px solid var(--border); border-radius: var(--radius-control); background: var(--bg-card);\">\n            <table data-testid=\"receipt-history-list\" style=\"width: 100%; border-collapse: collapse; font-size: 11px;\">\n              <thead style=\"background: var(--bg-sidebar); position: sticky; top: 0;\">\n                <tr>\n                  <th style=\"padding: 8px; text-align: left; color: var(--text); font-weight: 600; border-bottom: 1px solid var(--border);\">作業者ID</th>\n                  <th style=\"padding: 8px; text-align: left; color: var(--text); font-weight: 600; border-bottom: 1px solid var(--border);\">受領日時</th>\n                  <th style=\"padding: 8px; text-align: left; color: var(--text); font-weight: 600; border-bottom: 1px solid var(--border);\">確認状態</th>\n                  <th style=\"padding: 8px; text-align: left; color: var(--text); font-weight: 600; border-bottom: 1px solid var(--border);\">配信方法</th>\n                  <th style=\"padding: 8px; text-align: center; color: var(--text); font-weight: 600; border-bottom: 1px solid var(--border);\">アクション</th>\n                </tr>\n              </thead>\n              <tbody id=\"receipt-history-tbody\" style=\"background: var(--bg-card);\">\n                <!-- 動的に受領履歴を挿入 -->\n              </tbody>\n            </table>\n          </div>\n        </div>\n      </section>\n    </main>\n  </div>\n</div>\n\n<!-- 受領確認ダイアログ -->\n<div id=\"receipt-confirmation-overlay\" class=\"modal-overlay\" style=\"display: none; position: fixed; inset: 0; z-index: 1000; background: rgba(0, 0, 0, 0.55); display: flex; align-items: center; justify-content: center;\">\n  <div style=\"background: var(--bg-card); color: var(--text); padding: 24px; border-radius: var(--radius-card); max-width: 400px; box-shadow: 0 8px 32px rgba(31, 41, 55, 0.4);\">\n    <h3 style=\"font-size: 14px; font-weight: 700; margin: 0 0 12px 0;\">作業指示受領確認</h3>\n    <p style=\"font-size: 12px; color: var(--text-muted); margin: 0 0 16px 0;\">この作業指示を受領確認しますか？</p>\n    \n    <div style=\"display: grid; grid-template-columns: 1fr 1fr; gap: 8px;\">\n      <button data-testid=\"receipt-confirm-cancel\" style=\"padding: 8px 12px; background: transparent; color: var(--text); border: 1px solid var(--border); border-radius: var(--radius-control); font-size: 12px; font-weight: 600; cursor: pointer;\">キャンセル</button>\n      <button data-testid=\"receipt-confirm-ok\" style=\"padding: 8px 12px; background: var(--primary); color: #fff; border: none; border-radius: var(--radius-control); font-size: 12px; font-weight: 600; cursor: pointer;\">確認</button>\n    </div>\n  </div>\n</div>\n\n<!-- エラーメッセージバナー -->\n<div id=\"error-banner\" style=\"display: none; position: fixed; top: 60px; right: 16px; background: #ef4444; color: #fff; padding: 12px 16px; border-radius: var(--radius-control); font-size: 12px; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3); z-index: 999; max-width: 300px;\">\n  <span id=\"error-message\"></span>\n</div>\n\n<!-- 成功メッセージバナー -->\n<div id=\"success-banner\" style=\"display: none; position: fixed; top: 60px; right: 16px; background: #10b981; color: #fff; padding: 12px 16px; border-radius: var(--radius-control); font-size: 12px; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3); z-index: 999; max-width: 300px;\">\n  <span id=\"success-message\"></span>\n</div>",
+      "initJs": "",
+      "method": "ai"
+    }
+  ],
+  "tableDefinitions": [
+    {
+      "tableName": "拠点",
+      "purpose": "作業進捗・人員配置最適化エンジンにおける拠点マスタ。各拠点の基本情報、収容可能人員、稼働状況を管理し、人員配置と作業進捗の最適化の基盤となる。",
+      "columns": [
+        {
+          "name": "拠点ID",
+          "type": "uuid",
+          "required": true,
+          "description": "拠点を一意に識別するプライマリキー"
+        },
+        {
+          "name": "拠点名",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "拠点の名称"
+        },
+        {
+          "name": "拠点コード",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "拠点を識別するコード、ユニーク制約あり"
+        },
+        {
+          "name": "住所",
+          "type": "text",
+          "required": false,
+          "description": "拠点の住所"
+        },
+        {
+          "name": "最大収容人員数",
+          "type": "integer",
+          "required": true,
+          "description": "拠点が収容可能な最大人員数"
+        },
+        {
+          "name": "現在配置人員数",
+          "type": "integer",
+          "required": true,
+          "description": "拠点に現在配置されている人員数"
+        },
+        {
+          "name": "稼働状況",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "拠点の稼働状況（稼働中、休止中、計画中など）"
+        },
+        {
+          "name": "責任者名",
+          "type": "varchar(100)",
+          "required": false,
+          "description": "拠点の責任者名"
+        },
+        {
+          "name": "連絡先",
+          "type": "varchar(100)",
+          "required": false,
+          "description": "拠点の連絡先電話番号またはメールアドレス"
+        },
+        {
+          "name": "作成日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "レコード作成日時"
+        },
+        {
+          "name": "更新日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "レコード最終更新日時"
+        },
+        {
+          "name": "作成者",
+          "type": "varchar(100)",
+          "required": false,
+          "description": "レコード作成者のユーザーID"
+        },
+        {
+          "name": "更新者",
+          "type": "varchar(100)",
+          "required": false,
+          "description": "レコード最終更新者のユーザーID"
+        }
+      ]
+    },
+    {
+      "tableName": "チーム",
+      "purpose": "作業進捗・人員配置最適化エンジンにおけるチーム情報の管理。チームの基本属性、所属拠点、稼働状況を一元管理し、人員配置と進捗追跡の基盤となる。",
+      "columns": [
+        {
+          "name": "チームID",
+          "type": "uuid",
+          "required": true,
+          "description": "チームの一意識別子。主キー。"
+        },
+        {
+          "name": "チーム名",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "チームの名称。"
+        },
+        {
+          "name": "拠点ID",
+          "type": "uuid",
+          "required": true,
+          "description": "所属拠点の識別子。拠点テーブルへの外部キー。"
+        },
+        {
+          "name": "チームリーダーID",
+          "type": "uuid",
+          "required": false,
+          "description": "チームリーダーの従業員ID。"
+        },
+        {
+          "name": "チーム説明",
+          "type": "text",
+          "required": false,
+          "description": "チームの役割や特性に関する説明。"
+        },
+        {
+          "name": "稼働状況",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "チームの稼働状態。稼働中/休止中/解散等。"
+        },
+        {
+          "name": "定員人数",
+          "type": "integer",
+          "required": false,
+          "description": "チームの定員人数。"
+        },
+        {
+          "name": "作成日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "チーム情報の作成日時。"
+        },
+        {
+          "name": "更新日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "チーム情報の最終更新日時。"
+        },
+        {
+          "name": "作成者",
+          "type": "varchar(100)",
+          "required": false,
+          "description": "チーム情報を作成したユーザー。"
+        }
+      ]
+    },
+    {
+      "tableName": "作業者習熟度",
+      "purpose": "作業者の職務別スキルレベルと習熟度を管理し、作業配置最適化の判断基準となる情報を保持する",
+      "columns": [
+        {
+          "name": "習熟度ID",
+          "type": "uuid",
+          "required": true,
+          "description": "作業者習熟度レコードの一意識別子"
+        },
+        {
+          "name": "作業者ID",
+          "type": "uuid",
+          "required": true,
+          "description": "作業者テーブルへの外部キー参照"
+        },
+        {
+          "name": "職務区分",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "習熟度を評価する職務の種類コード"
+        },
+        {
+          "name": "習熟度レベル",
+          "type": "integer",
+          "required": true,
+          "description": "スキルレベルを1-5段階で評価した数値"
+        },
+        {
+          "name": "評価日",
+          "type": "timestamp",
+          "required": true,
+          "description": "習熟度を評価した日時"
+        },
+        {
+          "name": "評価者ID",
+          "type": "uuid",
+          "required": false,
+          "description": "習熟度を評価した管理者のID"
+        },
+        {
+          "name": "備考",
+          "type": "text",
+          "required": false,
+          "description": "習熟度評価に関する補足情報や特記事項"
+        },
+        {
+          "name": "作成日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "レコード作成日時"
+        },
+        {
+          "name": "更新日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "レコード最終更新日時"
+        }
+      ]
+    },
+    {
+      "tableName": "作業指示",
+      "purpose": "作業の指示内容、割当人員、進捗状況を一元管理し、作業進捗と人員配置の最適化を支援するトランザクションテーブル",
+      "columns": [
+        {
+          "name": "作業指示ID",
+          "type": "uuid",
+          "required": true,
+          "description": "作業指示の一意識別子"
+        },
+        {
+          "name": "拠点ID",
+          "type": "uuid",
+          "required": true,
+          "description": "作業が実施される拠点への外部キー"
+        },
+        {
+          "name": "チームID",
+          "type": "uuid",
+          "required": true,
+          "description": "作業を担当するチームへの外部キー"
+        },
+        {
+          "name": "作業指示番号",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "業務システムで使用される作業指示の一意番号"
+        },
+        {
+          "name": "作業名",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "作業の名称"
+        },
+        {
+          "name": "作業説明",
+          "type": "text",
+          "required": false,
+          "description": "作業の詳細説明"
+        },
+        {
+          "name": "予定開始日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "作業の予定開始日時"
+        },
+        {
+          "name": "予定終了日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "作業の予定終了日時"
+        },
+        {
+          "name": "実績開始日時",
+          "type": "timestamp",
+          "required": false,
+          "description": "作業の実績開始日時"
+        },
+        {
+          "name": "実績終了日時",
+          "type": "timestamp",
+          "required": false,
+          "description": "作業の実績終了日時"
+        },
+        {
+          "name": "進捗状況",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "作業の進捗状況(未開始/進行中/完了/中断等)"
+        },
+        {
+          "name": "進捗率",
+          "type": "integer",
+          "required": false,
+          "description": "作業の進捗率(0-100)"
+        },
+        {
+          "name": "必要人数",
+          "type": "integer",
+          "required": true,
+          "description": "作業に必要な人員数"
+        },
+        {
+          "name": "優先度",
+          "type": "varchar(100)",
+          "required": false,
+          "description": "作業の優先度(高/中/低等)"
+        },
+        {
+          "name": "作成日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "作業指示の作成日時"
+        },
+        {
+          "name": "作成者",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "作業指示を作成したユーザー"
+        },
+        {
+          "name": "更新日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "作業指示の最終更新日時"
+        },
+        {
+          "name": "更新者",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "作業指示を最後に更新したユーザー"
+        }
+      ]
+    },
+    {
+      "tableName": "作業実績",
+      "purpose": "作業者が実施した作業の実績を記録し、進捗管理・人員配置最適化・習熟度向上の基礎データとなるトランザクションテーブル",
+      "columns": [
+        {
+          "name": "作業実績ID",
+          "type": "uuid",
+          "required": true,
+          "description": "作業実績の一意識別子"
+        },
+        {
+          "name": "作業指示ID",
+          "type": "uuid",
+          "required": true,
+          "description": "作業指示テーブルへの外部キー"
+        },
+        {
+          "name": "作業者ID",
+          "type": "uuid",
+          "required": true,
+          "description": "作業者テーブルへの外部キー"
+        },
+        {
+          "name": "拠点ID",
+          "type": "uuid",
+          "required": true,
+          "description": "拠点テーブルへの外部キー"
+        },
+        {
+          "name": "チームID",
+          "type": "uuid",
+          "required": true,
+          "description": "チームテーブルへの外部キー"
+        },
+        {
+          "name": "作業開始日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "作業の開始日時"
+        },
+        {
+          "name": "作業終了日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "作業の終了日時"
+        },
+        {
+          "name": "実績数量",
+          "type": "integer",
+          "required": true,
+          "description": "完了した作業の数量"
+        },
+        {
+          "name": "作業ステータス",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "作業の状態(完了/中断/不良等)"
+        },
+        {
+          "name": "不良数",
+          "type": "integer",
+          "required": false,
+          "description": "発生した不良品の数量"
+        },
+        {
+          "name": "備考",
+          "type": "text",
+          "required": false,
+          "description": "作業実績に関する補足情報"
+        },
+        {
+          "name": "作成日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "レコード作成日時"
+        },
+        {
+          "name": "更新日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "レコード最終更新日時"
+        },
+        {
+          "name": "作成者ID",
+          "type": "uuid",
+          "required": true,
+          "description": "レコード作成者の識別子"
+        }
+      ]
+    },
+    {
+      "tableName": "人員配置案",
+      "purpose": "作業進捗と人員配置の最適化を支援するため、拠点・チーム・作業者の組み合わせによる配置案を管理し、複数案の比較検討と実行を可能にするテーブル",
+      "columns": [
+        {
+          "name": "人員配置案ID",
+          "type": "uuid",
+          "required": true,
+          "description": "人員配置案を一意に識別するID"
+        },
+        {
+          "name": "配置案名",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "人員配置案の名称（例：案A、最適化案1）"
+        },
+        {
+          "name": "拠点ID",
+          "type": "uuid",
+          "required": true,
+          "description": "配置対象の拠点を示す外部キー"
+        },
+        {
+          "name": "チームID",
+          "type": "uuid",
+          "required": true,
+          "description": "配置対象のチームを示す外部キー"
+        },
+        {
+          "name": "作業指示ID",
+          "type": "uuid",
+          "required": true,
+          "description": "対象となる作業指示を示す外部キー"
+        },
+        {
+          "name": "配置開始日",
+          "type": "timestamp",
+          "required": true,
+          "description": "人員配置案の適用開始日時"
+        },
+        {
+          "name": "配置終了日",
+          "type": "timestamp",
+          "required": false,
+          "description": "人員配置案の適用終了日時"
+        },
+        {
+          "name": "予想工数",
+          "type": "integer",
+          "required": true,
+          "description": "この配置案での予想総工数（時間単位）"
+        },
+        {
+          "name": "予想完了日",
+          "type": "timestamp",
+          "required": false,
+          "description": "この配置案での予想完了日時"
+        },
+        {
+          "name": "ステータス",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "配置案のステータス（案、承認待ち、実行中、完了、キャンセル等）"
+        },
+        {
+          "name": "説明",
+          "type": "text",
+          "required": false,
+          "description": "配置案の詳細説明や検討理由"
+        },
+        {
+          "name": "作成日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "配置案が作成された日時"
+        },
+        {
+          "name": "作成者",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "配置案を作成したユーザー"
+        },
+        {
+          "name": "更新日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "配置案が最後に更新された日時"
+        },
+        {
+          "name": "更新者",
+          "type": "varchar(100)",
+          "required": false,
+          "description": "配置案を最後に更新したユーザー"
+        }
+      ]
+    },
+    {
+      "tableName": "人員配置実行状況",
+      "purpose": "人員配置案の実行状況を追跡し、計画と実績のギャップを管理するトランザクションテーブル",
+      "columns": [
+        {
+          "name": "人員配置実行状況ID",
+          "type": "uuid",
+          "required": true,
+          "description": "人員配置実行状況の一意識別子"
+        },
+        {
+          "name": "人員配置案ID",
+          "type": "uuid",
+          "required": true,
+          "description": "参照する人員配置案の識別子"
+        },
+        {
+          "name": "作業指示ID",
+          "type": "uuid",
+          "required": true,
+          "description": "参照する作業指示の識別子"
+        },
+        {
+          "name": "作業者ID",
+          "type": "uuid",
+          "required": true,
+          "description": "配置された作業者の識別子"
+        },
+        {
+          "name": "拠点ID",
+          "type": "uuid",
+          "required": true,
+          "description": "作業が実施される拠点の識別子"
+        },
+        {
+          "name": "チームID",
+          "type": "uuid",
+          "required": false,
+          "description": "作業者が属するチームの識別子"
+        },
+        {
+          "name": "配置状態",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "配置の状態（計画中、配置済、実行中、完了、キャンセル）"
+        },
+        {
+          "name": "計画開始日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "人員配置案で計画された作業開始日時"
+        },
+        {
+          "name": "計画終了日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "人員配置案で計画された作業終了日時"
+        },
+        {
+          "name": "実績開始日時",
+          "type": "timestamp",
+          "required": false,
+          "description": "実際の作業開始日時"
+        },
+        {
+          "name": "実績終了日時",
+          "type": "timestamp",
+          "required": false,
+          "description": "実際の作業終了日時"
+        },
+        {
+          "name": "計画工数",
+          "type": "integer",
+          "required": true,
+          "description": "計画された作業工数（分単位）"
+        },
+        {
+          "name": "実績工数",
+          "type": "integer",
+          "required": false,
+          "description": "実際の作業工数（分単位）"
+        },
+        {
+          "name": "進捗率",
+          "type": "integer",
+          "required": false,
+          "description": "作業の進捗率（0-100）"
+        },
+        {
+          "name": "遅延フラグ",
+          "type": "boolean",
+          "required": true,
+          "description": "計画比で遅延しているかどうか"
+        },
+        {
+          "name": "備考",
+          "type": "text",
+          "required": false,
+          "description": "配置実行に関する備考やコメント"
+        },
+        {
+          "name": "作成日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "レコード作成日時"
+        },
+        {
+          "name": "更新日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "レコード最終更新日時"
+        },
+        {
+          "name": "作成者",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "レコード作成者のユーザーID"
+        },
+        {
+          "name": "更新者",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "レコード最終更新者のユーザーID"
+        }
+      ]
+    },
+    {
+      "tableName": "進捗データ",
+      "purpose": "作業指示に対する実績進捗を日次で記録し、作業完了率・遅延判定・人員配置最適化の基礎データとなるトランザクションテーブル",
+      "columns": [
+        {
+          "name": "進捗データID",
+          "type": "uuid",
+          "required": true,
+          "description": "進捗データの一意識別子"
+        },
+        {
+          "name": "作業指示ID",
+          "type": "uuid",
+          "required": true,
+          "description": "対象となる作業指示への外部キー"
+        },
+        {
+          "name": "拠点ID",
+          "type": "uuid",
+          "required": true,
+          "description": "作業が実施される拠点への外部キー"
+        },
+        {
+          "name": "チームID",
+          "type": "uuid",
+          "required": true,
+          "description": "作業を担当するチームへの外部キー"
+        },
+        {
+          "name": "進捗日",
+          "type": "timestamp",
+          "required": true,
+          "description": "進捗を記録した日付"
+        },
+        {
+          "name": "計画数量",
+          "type": "integer",
+          "required": true,
+          "description": "その日の計画作業数量"
+        },
+        {
+          "name": "実績数量",
+          "type": "integer",
+          "required": true,
+          "description": "その日の実績作業数量"
+        },
+        {
+          "name": "完了率",
+          "type": "integer",
+          "required": true,
+          "description": "作業指示全体に対する累積完了率（パーセンテージ）"
+        },
+        {
+          "name": "遅延フラグ",
+          "type": "boolean",
+          "required": true,
+          "description": "計画比で遅延しているかの判定フラグ"
+        },
+        {
+          "name": "遅延日数",
+          "type": "integer",
+          "required": false,
+          "description": "計画からの遅延日数（負数は前倒し）"
+        },
+        {
+          "name": "備考",
+          "type": "text",
+          "required": false,
+          "description": "進捗に関する特記事項や理由"
+        },
+        {
+          "name": "作成日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "進捗データの作成日時"
+        },
+        {
+          "name": "更新日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "進捗データの最終更新日時"
+        },
+        {
+          "name": "作成者",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "進捗データを作成したユーザー識別子"
+        }
+      ]
+    },
+    {
+      "tableName": "進捗遅延リスク判定結果",
+      "purpose": "作業指示の進捗状況を監視し、遅延リスクを判定・記録して、人員配置最適化の意思決定を支援する",
+      "columns": [
+        {
+          "name": "リスク判定結果ID",
+          "type": "uuid",
+          "required": true,
+          "description": "進捗遅延リスク判定結果の一意識別子"
+        },
+        {
+          "name": "作業指示ID",
+          "type": "uuid",
+          "required": true,
+          "description": "対象となる作業指示の識別子"
+        },
+        {
+          "name": "拠点ID",
+          "type": "uuid",
+          "required": true,
+          "description": "作業が実施される拠点の識別子"
+        },
+        {
+          "name": "チームID",
+          "type": "uuid",
+          "required": true,
+          "description": "作業を担当するチームの識別子"
+        },
+        {
+          "name": "判定日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "リスク判定を実施した日時"
+        },
+        {
+          "name": "リスクレベル",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "判定されたリスクレベル(低/中/高/極高)"
+        },
+        {
+          "name": "遅延予測日数",
+          "type": "integer",
+          "required": false,
+          "description": "予測される遅延日数(負の値は前倒し)"
+        },
+        {
+          "name": "進捗率",
+          "type": "integer",
+          "required": true,
+          "description": "現在の進捗率(0-100)"
+        },
+        {
+          "name": "計画進捗率",
+          "type": "integer",
+          "required": true,
+          "description": "本来あるべき計画進捗率(0-100)"
+        },
+        {
+          "name": "判定理由",
+          "type": "text",
+          "required": false,
+          "description": "リスク判定の根拠となった理由"
+        },
+        {
+          "name": "推奨対応",
+          "type": "text",
+          "required": false,
+          "description": "リスク軽減のための推奨対応内容"
+        },
+        {
+          "name": "対応状況",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "推奨対応の実施状況(未対応/対応中/対応完了)"
+        },
+        {
+          "name": "作成日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "レコード作成日時"
+        },
+        {
+          "name": "更新日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "レコード最終更新日時"
+        },
+        {
+          "name": "作成者",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "レコード作成者の識別子"
+        }
+      ]
+    },
+    {
+      "tableName": "作業指示受領履歴",
+      "purpose": "作業者が作業指示を受領した際の履歴を記録し、指示の配信状況、受領確認、受領時刻などを追跡管理するためのトランザクションテーブル",
+      "columns": [
+        {
+          "name": "受領履歴ID",
+          "type": "uuid",
+          "required": true,
+          "description": "作業指示受領履歴の一意識別子"
+        },
+        {
+          "name": "作業指示ID",
+          "type": "uuid",
+          "required": true,
+          "description": "関連する作業指示の識別子"
+        },
+        {
+          "name": "作業者ID",
+          "type": "uuid",
+          "required": true,
+          "description": "作業指示を受領した作業者の識別子"
+        },
+        {
+          "name": "受領日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "作業者が作業指示を受領した日時"
+        },
+        {
+          "name": "受領確認状態",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "受領確認の状態（未確認、確認済み、辞退など）"
+        },
+        {
+          "name": "確認日時",
+          "type": "timestamp",
+          "required": false,
+          "description": "作業者が受領を確認した日時"
+        },
+        {
+          "name": "配信方法",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "指示の配信方法（アプリ通知、メール、システム画面など）"
+        },
+        {
+          "name": "備考",
+          "type": "text",
+          "required": false,
+          "description": "受領に関する追加情報やコメント"
+        },
+        {
+          "name": "作成日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "レコード作成日時"
+        },
+        {
+          "name": "更新日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "レコード最終更新日時"
+        }
+      ]
+    },
+    {
+      "tableName": "ハンディターミナル連携ログ",
+      "purpose": "ハンディターミナルからの作業実績・位置情報・ステータス更新などの連携データを記録し、システム間の同期状況と作業者の活動を追跡管理する",
+      "columns": [
+        {
+          "name": "ハンディターミナル連携ログID",
+          "type": "uuid",
+          "required": true,
+          "description": "ハンディターミナル連携ログの一意識別子"
+        },
+        {
+          "name": "作業者ID",
+          "type": "uuid",
+          "required": true,
+          "description": "連携を行った作業者の識別子"
+        },
+        {
+          "name": "ハンディターミナルID",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "使用されたハンディターミナルの機器識別子"
+        },
+        {
+          "name": "拠点ID",
+          "type": "uuid",
+          "required": true,
+          "description": "作業が行われた拠点の識別子"
+        },
+        {
+          "name": "連携タイプ",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "連携データの種類(作業実績、位置情報、ステータス更新、チェックイン等)"
+        },
+        {
+          "name": "作業指示ID",
+          "type": "uuid",
+          "required": false,
+          "description": "関連する作業指示の識別子"
+        },
+        {
+          "name": "連携内容",
+          "type": "text",
+          "required": true,
+          "description": "ハンディターミナルから送信された連携データの詳細内容"
+        },
+        {
+          "name": "連携ステータス",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "連携処理の状態(成功、失敗、保留中等)"
+        },
+        {
+          "name": "エラーメッセージ",
+          "type": "text",
+          "required": false,
+          "description": "連携失敗時のエラー詳細"
+        },
+        {
+          "name": "送信日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "ハンディターミナルからデータが送信された日時"
+        },
+        {
+          "name": "受信日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "サーバーがデータを受信した日時"
+        },
+        {
+          "name": "処理完了日時",
+          "type": "timestamp",
+          "required": false,
+          "description": "連携データの処理が完了した日時"
+        },
+        {
+          "name": "作成日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "ログレコードが作成された日時"
+        },
+        {
+          "name": "更新日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "ログレコードが最後に更新された日時"
+        }
+      ]
+    },
+    {
+      "tableName": "WMS連携ログ",
+      "purpose": "WMS(倉庫管理システム)との連携履歴を記録し、データ同期状況、エラー内容、連携タイミングを追跡管理するトランザクションテーブル",
+      "columns": [
+        {
+          "name": "wms_log_id",
+          "type": "uuid",
+          "required": true,
+          "description": "WMS連携ログの一意識別子"
+        },
+        {
+          "name": "連携種別",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "連携の種類(作業指示受信、作業実績送信、在庫同期等)"
+        },
+        {
+          "name": "連携方向",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "連携の方向(受信、送信)"
+        },
+        {
+          "name": "拠点_id",
+          "type": "uuid",
+          "required": true,
+          "description": "連携対象の拠点ID"
+        },
+        {
+          "name": "連携ステータス",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "連携結果(成功、失敗、部分成功、保留中)"
+        },
+        {
+          "name": "連携開始日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "連携処理の開始日時"
+        },
+        {
+          "name": "連携完了日時",
+          "type": "timestamp",
+          "required": false,
+          "description": "連携処理の完了日時"
+        },
+        {
+          "name": "処理件数",
+          "type": "integer",
+          "required": false,
+          "description": "連携で処理されたレコード件数"
+        },
+        {
+          "name": "成功件数",
+          "type": "integer",
+          "required": false,
+          "description": "連携で成功したレコード件数"
+        },
+        {
+          "name": "失敗件数",
+          "type": "integer",
+          "required": false,
+          "description": "連携で失敗したレコード件数"
+        },
+        {
+          "name": "エラーメッセージ",
+          "type": "text",
+          "required": false,
+          "description": "連携失敗時のエラー詳細内容"
+        },
+        {
+          "name": "リトライ回数",
+          "type": "integer",
+          "required": false,
+          "description": "連携失敗時のリトライ実行回数"
+        },
+        {
+          "name": "wms_request_id",
+          "type": "varchar(100)",
+          "required": false,
+          "description": "WMS側のリクエストID(トレーサビリティ用)"
+        },
+        {
+          "name": "作成日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "ログレコード作成日時"
+        },
+        {
+          "name": "更新日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "ログレコード更新日時"
+        },
+        {
+          "name": "作成者",
+          "type": "varchar(100)",
+          "required": false,
+          "description": "ログレコード作成者またはシステム名"
+        }
+      ]
+    }
+  ],
+  "presetSeedData": {
+    "拠点": [
+      {
+        "拠点ID": "rec-001",
+        "拠点名": "首都圏東部物流センター",
+        "拠点コード": "TLC-001",
+        "住所": "千葉県船橋市栄町2丁目1番地",
+        "最大収容人員数": 150,
+        "現在配置人員数": 148,
+        "稼働状況": "稼働中",
+        "責任者名": "山田太郎",
+        "連絡先": "047-123-4567",
+        "作成日時": "2024-04-15 09:30:00",
+        "更新日時": "2025-01-22 14:15:00",
+        "作成者": "user-admin-01",
+        "更新者": "user-admin-02"
+      },
+      {
+        "拠点ID": "rec-001",
+        "拠点名": "北海道十勝農業労働拠点",
+        "拠点コード": "TOKACHI-001",
+        "住所": "北海道中川郡幕別町字緑町123番地",
+        "最大収容人員数": 85,
+        "現在配置人員数": 0,
+        "稼働状況": "休止中",
+        "責任者名": "佐藤健一",
+        "連絡先": "0155-52-3847",
+        "作成日時": "2024-03-15 09:30:00",
+        "更新日時": "2024-11-20 14:15:00",
+        "作成者": "user-admin-001",
+        "更新者": "user-admin-002"
+      },
+      {
+        "拠点ID": "rec-001",
+        "拠点名": "福岡地域営業所",
+        "拠点コード": "FKO-001",
+        "住所": "福岡県福岡市博多区博多駅前2-1-1",
+        "最大収容人員数": 45,
+        "現在配置人員数": 8,
+        "稼働状況": "計画中",
+        "責任者名": "山田太郎",
+        "連絡先": "092-123-4567",
+        "作成日時": "2024-11-15T09:30:00",
+        "更新日時": "2024-11-15T09:30:00",
+        "作成者": "user-0001",
+        "更新者": "user-0001"
+      },
+      {
+        "拠点ID": "rec-001",
+        "拠点名": "東京第一製造工場",
+        "拠点コード": "TKY-MFG-001",
+        "住所": "東京都江東区青海3丁目2番1号",
+        "最大収容人員数": 280,
+        "現在配置人員数": 145,
+        "稼働状況": "稼働中",
+        "責任者名": "山田次郎",
+        "連絡先": "03-1234-5678",
+        "作成日時": "2024-01-15 09:30:00",
+        "更新日時": "2024-12-20 14:45:00",
+        "作成者": "user-admin-001",
+        "更新者": "user-admin-002"
+      },
+      {
+        "拠点ID": "rec-001",
+        "拠点名": "東京支社・渋谷営業所",
+        "拠点コード": "TK-SBY-001",
+        "住所": "東京都渋谷区道玄坂1-2-3 渋谷ビジネスセンター5階",
+        "最大収容人員数": 45,
+        "現在配置人員数": 42,
+        "稼働状況": "稼働中",
+        "責任者名": "佐藤健一",
+        "連絡先": "03-XXXX-5678",
+        "作成日時": "2024-04-15 09:30:00",
+        "更新日時": "2025-01-20 14:15:00",
+        "作成者": "usr-admin-001",
+        "更新者": "usr-admin-001"
+      },
+      {
+        "拠点ID": "rec-001",
+        "拠点名": "令和6年能登半島地震 復旧支援センター",
+        "拠点コード": "NOTO-2024-001",
+        "住所": "石川県七尾市中島町北免田イ部24番地",
+        "最大収容人員数": 150,
+        "現在配置人員数": 87,
+        "稼働状況": "稼働中",
+        "責任者名": "山田健一",
+        "連絡先": "0767-62-1234",
+        "作成日時": "2024-01-10 09:30:00",
+        "更新日時": "2025-01-15 14:22:00",
+        "作成者": "user-admin-001",
+        "更新者": "user-supervisor-005"
+      },
+      {
+        "拠点ID": "rec-001",
+        "拠点名": "渋谷テレワークセンター",
+        "拠点コード": "TWC-SHIBUYA-01",
+        "住所": "東京都渋谷区道玄坂1-2-3 渋谷ビジネスビル5階",
+        "最大収容人員数": 150,
+        "現在配置人員数": 34,
+        "稼働状況": "休止中",
+        "責任者名": "山田花子",
+        "連絡先": "03-XXXX-5678",
+        "作成日時": "2024-04-15 09:30:00",
+        "更新日時": "2025-01-20 14:15:00",
+        "作成者": "user-admin-001",
+        "更新者": "user-manager-005"
+      },
+      {
+        "拠点ID": "rec-001",
+        "拠点名": "東京国際ビジネスセンター",
+        "拠点コード": "TIB-001",
+        "住所": "東京都千代田区丸の内1-1-1 丸の内ビルディング15階",
+        "最大収容人員数": 250,
+        "現在配置人員数": 187,
+        "稼働状況": "稼働中",
+        "責任者名": "山田健一",
+        "連絡先": "03-1234-5678",
+        "作成日時": "2024-04-15T09:30:00+09:00",
+        "更新日時": "2025-01-20T14:45:00+09:00",
+        "作成者": "user-admin-001",
+        "更新者": "user-admin-002"
+      }
+    ],
+    "チーム": [
+      {
+        "チームID": "rec-001",
+        "チーム名": "基幹システム開発チーム",
+        "拠点ID": "rec-tokyo-001",
+        "チームリーダーID": "rec-emp-0847",
+        "チーム説明": "基幹業務システムの開発・保守・運用を担当。要件定義から本番運用まで一貫して対応。",
+        "稼働状況": "稼働中",
+        "定員人数": 8,
+        "作成日時": "2024-04-01T09:30:00",
+        "更新日時": "2025-01-15T14:22:00",
+        "作成者": "山田花子"
+      },
+      {
+        "チームID": "rec-001",
+        "チーム名": "大阪カスタマーサポートチーム",
+        "拠点ID": "rec-osaka-001",
+        "チームリーダーID": "rec-emp-2847",
+        "チーム説明": "電話・メール・チャットによる顧客対応。シフト制で平日夜間・土日対応。繁忙期は人員増強対応。",
+        "稼働状況": "稼働中",
+        "定員人数": 18,
+        "作成日時": "2024-04-01T09:30:00",
+        "更新日時": "2025-01-15T14:22:00",
+        "作成者": "鈴木花子"
+      },
+      {
+        "チームID": "rec-001",
+        "チーム名": "QA・テストチーム",
+        "拠点ID": "rec-nagoya-001",
+        "チームリーダーID": "rec-emp-0847",
+        "チーム説明": "プロジェクト毎に編成される品質保証・テスト業務専門チーム。機能テスト、回帰テスト、本番環境検証を担当。",
+        "稼働状況": "稼働中",
+        "定員人数": 8,
+        "作成日時": "2024-04-01T09:30:00",
+        "更新日時": "2025-01-15T14:22:00",
+        "作成者": "佐藤花子"
+      },
+      {
+        "チームID": "rec-001",
+        "チーム名": "インフラ運用チーム",
+        "拠点ID": "rec-fukuoka-001",
+        "チームリーダーID": "rec-emp-fukuoka-leader-001",
+        "チーム説明": "福岡拠点のシステムインフラ基盤を24時間体制で監視・保守。障害対応と予防保全を担当。",
+        "稼働状況": "稼働中",
+        "定員人数": 8,
+        "作成日時": "2024-04-01T09:00:00",
+        "更新日時": "2025-01-15T14:30:00",
+        "作成者": "山田花子"
+      },
+      {
+        "チームID": "rec-001",
+        "チーム名": "営業企画チーム",
+        "拠点ID": "rec-tokyo-01",
+        "チームリーダーID": "rec-emp-0847",
+        "チーム説明": "新規営業戦略の企画立案と市場分析を担当。季節ごとのキャンペーン企画・実行が主業務。",
+        "稼働状況": "休止中",
+        "定員人数": 6,
+        "作成日時": "2024-04-15 09:30:00",
+        "更新日時": "2025-01-20 14:15:00",
+        "作成者": "山田花子"
+      },
+      {
+        "チームID": "rec-001",
+        "チーム名": "新規事業開発チーム",
+        "拠点ID": "rec-sap-001",
+        "チームリーダーID": "rec-emp-045",
+        "チーム説明": "札幌拠点における新規事業の企画立案と市場調査を担当する試験的運用チーム",
+        "稼働状況": "稼働中",
+        "定員人数": 5,
+        "作成日時": "2024-10-15T09:30:00",
+        "更新日時": "2025-01-20T14:15:00",
+        "作成者": "佐藤由美"
+      },
+      {
+        "チームID": "rec-001",
+        "チーム名": "データ分析チーム",
+        "拠点ID": "rec-tokyo-001",
+        "チームリーダーID": "rec-emp-002",
+        "チーム説明": "顧客データの分析と可視化、経営判断支援を担当。2025年Q1プロジェクト完了予定。",
+        "稼働状況": "解散",
+        "定員人数": 5,
+        "作成日時": "2024-04-15 09:30:00",
+        "更新日時": "2025-02-28 14:45:00",
+        "作成者": "佐藤花子"
+      },
+      {
+        "チームID": "rec-001",
+        "チーム名": "ドキュメント・教育チーム",
+        "拠点ID": "rec-osaka-001",
+        "チームリーダーID": "rec-emp-0847",
+        "チーム説明": "社内ドキュメント整備と新入社員・異動者向け教育研修を担当。兼務メンバーが多く柔軟な体制で運営中。",
+        "稼働状況": "稼働中",
+        "定員人数": 8,
+        "作成日時": "2024-04-01T09:30:00",
+        "更新日時": "2025-01-15T14:22:00",
+        "作成者": "山田花子"
+      },
+      {
+        "チームID": "rec-001",
+        "チーム名": "全国セキュリティ監視センター",
+        "拠点ID": "rec-hub-001",
+        "チームリーダーID": "rec-emp-042",
+        "チーム説明": "24時間365日体制で全国のセキュリティインシデント監視・対応を実施。複数拠点からのリモート勤務で対応。",
+        "稼働状況": "稼働中",
+        "定員人数": 18,
+        "作成日時": "2024-04-01T09:30:00",
+        "更新日時": "2025-01-15T14:22:00",
+        "作成者": "山田花子"
+      },
+      {
+        "チームID": "rec-001",
+        "チーム名": "プロジェクト管理オフィス",
+        "拠点ID": "rec-tokyo-001",
+        "チームリーダーID": "rec-emp-2847",
+        "チーム説明": "全社横断的なプロジェクト推進を支援し、進捗管理・リスク対応・ステークホルダー調整を担当する常設チーム",
+        "稼働状況": "稼働中",
+        "定員人数": 8,
+        "作成日時": "2024-04-01T09:00:00+09:00",
+        "更新日時": "2025-01-15T14:30:00+09:00",
+        "作成者": "佐藤由美"
+      }
+    ],
+    "作業者習熟度": [
+      {
+        "習熟度ID": "rec-001",
+        "作業者ID": "rec-0042",
+        "職務区分": "溶接作業",
+        "習熟度レベル": 2,
+        "評価日": "2024-04-15T10:30:00",
+        "評価者ID": "rec-0008",
+        "備考": "入社後の初期評価。基本的な溶接姿勢と安全操作は習得中。実務経験を積みながら段階的なスキル向上を期待。",
+        "作成日時": "2024-04-15T10:30:00",
+        "更新日時": "2024-04-15T10:30:00"
+      },
+      {
+        "習熟度ID": "rec-001",
+        "作業者ID": "rec-042",
+        "職務区分": "検査業務",
+        "習熟度レベル": 5,
+        "評価日": "2024-09-15T14:30:00+09:00",
+        "評価者ID": "rec-008",
+        "備考": "半年定期評価。不良品検出率99.2%、検査精度が部門内で最高水準を維持している。後進指導も積極的に実施。",
+        "作成日時": "2024-09-15T15:00:00+09:00",
+        "更新日時": "2024-09-15T15:00:00+09:00"
+      },
+      {
+        "習熟度ID": "rec-001",
+        "作業者ID": "rec-002",
+        "職務区分": "提案資料作成",
+        "習熟度レベル": 4,
+        "評価日": "2025-01-15T10:30:00+09:00",
+        "評価者ID": "rec-003",
+        "備考": "前回評価比で2段階昇格。顧客ニーズに基づいた提案資料の構成力が向上し、実績案件での採用率が上昇。",
+        "作成日時": "2025-01-15T10:35:00+09:00",
+        "更新日時": "2025-01-15T10:35:00+09:00"
+      },
+      {
+        "習熟度ID": "rec-001",
+        "作業者ID": "rec-042",
+        "職務区分": "安全運転",
+        "習熟度レベル": 5,
+        "評価日": "2025-01-15T10:30:00+09:00",
+        "評価者ID": "rec-008",
+        "備考": "過去12ヶ月の無事故・無違反記録に基づき優秀評価。顧客からの信頼も厚い。",
+        "作成日時": "2025-01-15T10:35:00+09:00",
+        "更新日時": "2025-01-15T10:35:00+09:00"
+      },
+      {
+        "習熟度ID": "rec-001",
+        "作業者ID": "rec-0847",
+        "職務区分": "請求書処理",
+        "習熟度レベル": 2,
+        "評価日": "2025-01-15T14:30:00+09:00",
+        "評価者ID": "rec-0102",
+        "備考": "初期配置時は3と評価したが、請求書の誤記入率が高く、顧客対応が増加したため下方修正。追加研修実施予定。",
+        "作成日時": "2024-11-20T09:00:00+09:00",
+        "更新日時": "2025-01-15T14:30:00+09:00"
+      },
+      {
+        "習熟度ID": "rec-001",
+        "作業者ID": "rec-0847",
+        "職務区分": "SYS_MAINTENANCE",
+        "習熟度レベル": 5,
+        "評価日": "2025-01-15T10:30:00+09:00",
+        "評価者ID": "rec-0312",
+        "備考": "システム保守業務において一貫して最高レベルのパフォーマンスを発揮。緊急対応時の判断力と技術力は部門内で模範的。",
+        "作成日時": "2025-01-15T10:35:00+09:00",
+        "更新日時": "2025-01-15T10:35:00+09:00"
+      },
+      {
+        "習熟度ID": "rec-001",
+        "作業者ID": "rec-042",
+        "職務区分": "機械操作",
+        "習熟度レベル": 3,
+        "評価日": "2025-01-15T14:30:00+09:00",
+        "評価者ID": "rec-008",
+        "備考": "研修プログラム完了。基本操作は習得済み。複雑な調整作業は指導継続中。",
+        "作成日時": "2025-01-15T14:45:00+09:00",
+        "更新日時": "2025-01-15T14:45:00+09:00"
+      },
+      {
+        "習熟度ID": "rec-001",
+        "作業者ID": "rec-0042",
+        "職務区分": "顧客対応",
+        "習熟度レベル": 4,
+        "評価日": "2025-01-15T10:30:00",
+        "評価者ID": "rec-0008",
+        "備考": "前評価者の異動に伴う再評価。電話対応・クレーム処理で高い評価。メール対応の工夫余地あり。",
+        "作成日時": "2024-06-20T14:15:00",
+        "更新日時": "2025-01-15T10:30:00"
+      },
+      {
+        "習熟度ID": "rec-001",
+        "作業者ID": "rec-042",
+        "職務区分": "後進指導能力",
+        "習熟度レベル": 4,
+        "評価日": "2024-11-15T14:30:00",
+        "評価者ID": "rec-108",
+        "備考": "班員5名の育成実績あり。指導方法が体系的で効果的。管理職昇進の適性あり。",
+        "作成日時": "2024-11-15T14:35:00",
+        "更新日時": "2024-11-15T14:35:00"
+      },
+      {
+        "習熟度ID": "rec-001",
+        "作業者ID": "rec-0847",
+        "職務区分": "営業事務",
+        "習熟度レベル": 4,
+        "評価日": "2025-02-28T14:30:00+09:00",
+        "評価者ID": "rec-0512",
+        "備考": "期間満了前最終評価。書類作成・顧客対応ともに高水準。システム操作習熟が課題。",
+        "作成日時": "2025-02-28T14:35:00+09:00",
+        "更新日時": "2025-02-28T14:35:00+09:00"
+      }
+    ],
+    "作業指示": [
+      {
+        "作業指示ID": "rec-001",
+        "拠点ID": "rec-site-012",
+        "チームID": "rec-team-05",
+        "作業指示番号": "WI-20250115-0847",
+        "作業名": "A-Line 組立工程（朝番）",
+        "作業説明": "製品型番XM-2400の基板実装から最終組立までの工程。検査基準は社内規格書参照。",
+        "予定開始日時": "2025-01-15 08:00:00",
+        "予定終了日時": "2025-01-15 16:30:00",
+        "実績開始日時": "2025-01-15 08:05:00",
+        "実績終了日時": null,
+        "進捗状況": "進行中",
+        "進捗率": 65,
+        "必要人数": 8,
+        "優先度": "高",
+        "作成日時": "2025-01-14 16:45:00",
+        "作成者": "鈴木健一",
+        "更新日時": "2025-01-15 12:30:00",
+        "更新者": "佐藤美咲"
+      },
+      {
+        "作業指示ID": "rec-001",
+        "拠点ID": "rec-loc-0047",
+        "チームID": "rec-team-0012",
+        "作業指示番号": "WI-20250115-0842",
+        "作業名": "朝礼時の荷物仕分け準備",
+        "作業説明": "配送センター到着荷物の初期仕分けと仕分けステーション配置",
+        "予定開始日時": "2025-01-15 06:30:00",
+        "予定終了日時": "2025-01-15 08:00:00",
+        "実績開始日時": "2025-01-15 06:28:00",
+        "実績終了日時": null,
+        "進捗状況": "進行中",
+        "進捗率": 65,
+        "必要人数": 8,
+        "優先度": "高",
+        "作成日時": "2025-01-14 17:45:00",
+        "作成者": "山田花子",
+        "更新日時": "2025-01-15 07:15:00",
+        "更新者": "佐藤次郎"
+      },
+      {
+        "作業指示ID": "rec-001",
+        "拠点ID": "rec-site-0042",
+        "チームID": "rec-team-0015",
+        "作業指示番号": "WI-2025-001847",
+        "作業名": "顧客クレーム対応：製品不良による返品処理",
+        "作業説明": "大口顧客からの製品不良報告に対応し、返品受付、原因調査、代替品手配を実施",
+        "予定開始日時": "2025-01-15 09:00:00",
+        "予定終了日時": "2025-01-15 17:00:00",
+        "実績開始日時": "2025-01-15 08:45:00",
+        "実績終了日時": null,
+        "進捗状況": "進行中",
+        "進捗率": 65,
+        "必要人数": 3,
+        "優先度": "高",
+        "作成日時": "2025-01-15 07:30:00",
+        "作成者": "山田花子",
+        "更新日時": "2025-01-15 14:20:00",
+        "更新者": "佐藤次郎"
+      },
+      {
+        "作業指示ID": "rec-001",
+        "拠点ID": "rec-loc-001",
+        "チームID": "rec-team-001",
+        "作業指示番号": "WI-2024-12-0847",
+        "作業名": "12月度月末決算 帳簿締め作業",
+        "作業説明": "12月度の全勘定科目の残高確認、仕訳帳・総勘定元帳の照合、決算整理仕訳の実施",
+        "予定開始日時": "2024-12-26 09:00:00",
+        "予定終了日時": "2024-12-31 17:00:00",
+        "実績開始日時": "2024-12-26 08:45:00",
+        "実績終了日時": null,
+        "進捗状況": "進行中",
+        "進捗率": 68,
+        "必要人数": 3,
+        "優先度": "高",
+        "作成日時": "2024-12-20 14:30:00",
+        "作成者": "山田花子",
+        "更新日時": "2024-12-29 16:15:00",
+        "更新者": "佐藤次郎"
+      },
+      {
+        "作業指示ID": "rec-001",
+        "拠点ID": "rec-loc-002",
+        "チームID": "rec-team-005",
+        "作業指示番号": "WI-2025-0001",
+        "作業名": "新規プロジェクトキックオフミーティング準備",
+        "作業説明": "営業システム刷新プロジェクトのキックオフミーティング開催に向けた準備業務。会議室手配、資料作成、参加者調整を実施。",
+        "予定開始日時": "2025-01-20 09:00:00",
+        "予定終了日時": "2025-01-24 17:00:00",
+        "実績開始日時": "2025-01-20 10:30:00",
+        "実績終了日時": null,
+        "進捗状況": "進行中",
+        "進捗率": 65,
+        "必要人数": 3,
+        "優先度": "高",
+        "作成日時": "2025-01-17 14:20:00",
+        "作成者": "山田花子",
+        "更新日時": "2025-01-21 16:45:00",
+        "更新者": "佐藤次郎"
+      },
+      {
+        "作業指示ID": "rec-001",
+        "拠点ID": "rec-site-012",
+        "チームID": "rec-team-05",
+        "作業指示番号": "MI-2024-1847",
+        "作業名": "生産ライン A 系統定期メンテナンス点検",
+        "作業説明": "生産ライン A の月次定期メンテナンス。油圧システム、ベルトコンベア、制御盤の点検と消耗部品交換を実施。",
+        "予定開始日時": "2024-12-16 08:00:00",
+        "予定終了日時": "2024-12-16 17:00:00",
+        "実績開始日時": "2024-12-16 08:15:00",
+        "実績終了日時": null,
+        "進捗状況": "進行中",
+        "進捗率": 65,
+        "必要人数": 3,
+        "優先度": "中",
+        "作成日時": "2024-12-13 14:30:00",
+        "作成者": "山田花子",
+        "更新日時": "2024-12-16 12:45:00",
+        "更新者": "佐藤次郎"
+      },
+      {
+        "作業指示ID": "rec-001",
+        "拠点ID": "rec-loc-0012",
+        "チームID": "rec-team-0005",
+        "作業指示番号": "WI-2024-11-0847",
+        "作業名": "東京支社営業ルート訪問（11月第3週）",
+        "作業説明": "丸の内・大手町エリアの既存顧客12社への定期訪問と新規営業候補5社への初回提案",
+        "予定開始日時": "2024-11-18 09:00:00",
+        "予定終了日時": "2024-11-22 17:30:00",
+        "実績開始日時": "2024-11-18 08:45:00",
+        "実績終了日時": null,
+        "進捗状況": "進行中",
+        "進捗率": 62,
+        "必要人数": 3,
+        "優先度": "高",
+        "作成日時": "2024-11-15 14:20:00",
+        "作成者": "山田花子",
+        "更新日時": "2024-11-20 16:45:00",
+        "更新者": "佐藤次郎"
+      },
+      {
+        "作業指示ID": "rec-001",
+        "拠点ID": "rec-site-012",
+        "チームID": "rec-team-005",
+        "作業指示番号": "QC-2025-001847",
+        "作業名": "製品ロット検査・不良品分類",
+        "作業説明": "2025年1月納入予定の電子部品ロット5000個につき、外観検査および機能検査を実施し、不良品を分類・記録する",
+        "予定開始日時": "2025-01-15 08:00:00",
+        "予定終了日時": "2025-01-17 17:00:00",
+        "実績開始日時": "2025-01-15 08:15:00",
+        "実績終了日時": null,
+        "進捗状況": "進行中",
+        "進捗率": 62,
+        "必要人数": 3,
+        "優先度": "高",
+        "作成日時": "2025-01-14 16:30:00",
+        "作成者": "佐藤花子",
+        "更新日時": "2025-01-16 14:45:00",
+        "更新者": "鈴木健一"
+      },
+      {
+        "作業指示ID": "rec-001",
+        "拠点ID": "rec-site-0042",
+        "チームID": "rec-team-0015",
+        "作業指示番号": "WI-2025-001847",
+        "作業名": "データベースサーバー障害復旧",
+        "作業説明": "本番環境DBサーバーのディスク容量枯渇による障害。ログファイル削除とストレージ拡張を実施",
+        "予定開始日時": "2025-01-15 09:00:00",
+        "予定終了日時": "2025-01-15 12:00:00",
+        "実績開始日時": "2025-01-15 08:45:00",
+        "実績終了日時": "2025-01-15 11:30:00",
+        "進捗状況": "完了",
+        "進捗率": 100,
+        "必要人数": 3,
+        "優先度": "高",
+        "作成日時": "2025-01-15 08:30:00",
+        "作成者": "佐藤健一",
+        "更新日時": "2025-01-15 11:35:00",
+        "更新者": "鈴木花子"
+      },
+      {
+        "作業指示ID": "rec-001",
+        "拠点ID": "rec-loc-015",
+        "チームID": "rec-team-08",
+        "作業指示番号": "WI-2024-12-0847",
+        "作業名": "倉庫A棟3階棚卸し在庫確認",
+        "作業説明": "倉庫A棟3階の全商品について、実物数量と帳簿数量の照合を実施。不一致品目の原因調査含む。",
+        "予定開始日時": "2024-12-16T09:00:00",
+        "予定終了日時": "2024-12-16T17:00:00",
+        "実績開始日時": "2024-12-16T09:15:00",
+        "実績終了日時": null,
+        "進捗状況": "進行中",
+        "進捗率": 65,
+        "必要人数": 4,
+        "優先度": "高",
+        "作成日時": "2024-12-13T14:30:00",
+        "作成者": "山田花子",
+        "更新日時": "2024-12-16T13:45:00",
+        "更新者": "鈴木健一"
+      }
+    ],
+    "作業実績": [
+      {
+        "作業実績ID": "rec-001",
+        "作業指示ID": "rec-inst-042",
+        "作業者ID": "rec-worker-015",
+        "拠点ID": "rec-site-03",
+        "チームID": "rec-team-08",
+        "作業開始日時": "2024-11-15T08:00:00+09:00",
+        "作業終了日時": "2024-11-15T16:30:00+09:00",
+        "実績数量": 480,
+        "作業ステータス": "完了",
+        "不良数": 0,
+        "備考": "目標数量達成、品質基準クリア、安全事項なし",
+        "作成日時": "2024-11-15T16:45:00+09:00",
+        "更新日時": "2024-11-15T16:45:00+09:00",
+        "作成者ID": "rec-supervisor-007"
+      },
+      {
+        "作業実績ID": "rec-001",
+        "作業指示ID": "rec-002",
+        "作業者ID": "rec-003",
+        "拠点ID": "rec-004",
+        "チームID": "rec-005",
+        "作業開始日時": "2024-11-15T09:00:00+09:00",
+        "作業終了日時": "2024-11-15T16:30:00+09:00",
+        "実績数量": 145,
+        "作業ステータス": "完了",
+        "不良数": 3,
+        "備考": "午前9時開始、11時30分に機械トラブルで中断。13時に再開し16時30分に完了。",
+        "作成日時": "2024-11-15T16:45:00+09:00",
+        "更新日時": "2024-11-15T16:45:00+09:00",
+        "作成者ID": "rec-006"
+      },
+      {
+        "作業実績ID": "rec-001",
+        "作業指示ID": "rec-inst-042",
+        "作業者ID": "rec-worker-157",
+        "拠点ID": "rec-base-03",
+        "チームID": "rec-team-08",
+        "作業開始日時": "2025-01-15 08:30:00",
+        "作業終了日時": "2025-01-15 17:00:00",
+        "実績数量": 145,
+        "作業ステータス": "完了",
+        "不良数": 18,
+        "備考": "新人研修中。手順確認不足により寸法不良が多発。指導者による再確認が必要。",
+        "作成日時": "2025-01-15 17:15:00",
+        "更新日時": "2025-01-15 17:15:00",
+        "作成者ID": "rec-supervisor-009"
+      },
+      {
+        "作業実績ID": "rec-001",
+        "作業指示ID": "rec-002",
+        "作業者ID": "rec-003",
+        "拠点ID": "rec-004",
+        "チームID": "rec-005",
+        "作業開始日時": "2024-11-15 08:00:00",
+        "作業終了日時": "2024-11-15 16:30:00",
+        "実績数量": 125,
+        "作業ステータス": "完了",
+        "不良数": 2,
+        "備考": "目標数量100に対して125個完成。熟練作業による効率的な進捗。",
+        "作成日時": "2024-11-15 17:00:00",
+        "更新日時": "2024-11-15 17:00:00",
+        "作成者ID": "rec-006"
+      },
+      {
+        "作業実績ID": "rec-001",
+        "作業指示ID": "rec-002",
+        "作業者ID": "rec-003",
+        "拠点ID": "rec-004",
+        "チームID": "rec-005",
+        "作業開始日時": "2024-11-15T08:30:00+09:00",
+        "作業終了日時": "2024-11-15T16:45:00+09:00",
+        "実績数量": 480,
+        "作業ステータス": "完了",
+        "不良数": 12,
+        "備考": "溶接部の気泡により12個が検査で不良判定。原因は溶接ガス圧の低下と判明。",
+        "作成日時": "2024-11-15T17:00:00+09:00",
+        "更新日時": "2024-11-15T17:00:00+09:00",
+        "作成者ID": "rec-006"
+      },
+      {
+        "作業実績ID": "rec-001",
+        "作業指示ID": "rec-102",
+        "作業者ID": "rec-501",
+        "拠点ID": "rec-301",
+        "チームID": "rec-401",
+        "作業開始日時": "2024-12-19T08:00:00",
+        "作業終了日時": "2024-12-19T17:00:00",
+        "実績数量": 320,
+        "作業ステータス": "中断",
+        "不良数": 8,
+        "備考": "計画数量400に対し320で終了。部品供給遅延により残り80は翌日繰越。",
+        "作成日時": "2024-12-19T17:15:00",
+        "更新日時": "2024-12-19T17:15:00",
+        "作成者ID": "rec-601"
+      },
+      {
+        "作業実績ID": "rec-001",
+        "作業指示ID": "rec-002",
+        "作業者ID": "rec-003",
+        "拠点ID": "rec-004",
+        "チームID": "rec-005",
+        "作業開始日時": "2024-11-15T08:30:00",
+        "作業終了日時": "2024-11-15T17:00:00",
+        "実績数量": 240,
+        "作業ステータス": "完了",
+        "不良数": 8,
+        "備考": "東京拠点から大阪拠点への作業移行。前日の継続分を含む。",
+        "作成日時": "2024-11-15T17:15:00",
+        "更新日時": "2024-11-15T17:15:00",
+        "作成者ID": "rec-006"
+      },
+      {
+        "作業実績ID": "rec-001",
+        "作業指示ID": "rec-002",
+        "作業者ID": "rec-003",
+        "拠点ID": "rec-004",
+        "チームID": "rec-005",
+        "作業開始日時": "2024-11-18T08:00:00+09:00",
+        "作業終了日時": "2024-11-20T17:30:00+09:00",
+        "実績数量": 450,
+        "作業ステータス": "完了",
+        "不良数": 12,
+        "備考": "チーム5名で大型製造装置の組立完了。田中太郎がリード、品質確認は佐藤花子が担当。",
+        "作成日時": "2024-11-20T18:15:00+09:00",
+        "更新日時": "2024-11-20T18:15:00+09:00",
+        "作成者ID": "rec-006"
+      },
+      {
+        "作業実績ID": "rec-001",
+        "作業指示ID": "rec-002",
+        "作業者ID": "rec-003",
+        "拠点ID": "rec-004",
+        "チームID": "rec-005",
+        "作業開始日時": "2024-11-15T08:30:00",
+        "作業終了日時": "2024-11-15T11:45:00",
+        "実績数量": 45,
+        "作業ステータス": "中断",
+        "不良数": 3,
+        "備考": "10:20頃、プレス機の油圧ポンプから異音が発生。保全部門に連絡し機械停止。復旧は翌日予定。",
+        "作成日時": "2024-11-15T12:00:00",
+        "更新日時": "2024-11-15T12:00:00",
+        "作成者ID": "rec-006"
+      },
+      {
+        "作業実績ID": "rec-001",
+        "作業指示ID": "rec-002",
+        "作業者ID": "rec-003",
+        "拠点ID": "rec-004",
+        "チームID": "rec-005",
+        "作業開始日時": "2025-01-31 14:30:00",
+        "作業終了日時": "2025-01-31 22:15:00",
+        "実績数量": 850,
+        "作業ステータス": "完了",
+        "不良数": 12,
+        "備考": "月末納期調整で通常の1.5倍ペースで実施。品質維持のため検査強化実施。",
+        "作成日時": "2025-02-01 08:45:00",
+        "更新日時": "2025-02-01 08:45:00",
+        "作成者ID": "rec-006"
+      }
+    ],
+    "人員配置案": [
+      {
+        "人員配置案ID": "rec-001",
+        "配置案名": "緊急対応_納期短縮案A",
+        "拠点ID": "rec-002",
+        "チームID": "rec-003",
+        "作業指示ID": "rec-004",
+        "配置開始日": "2025-01-15T09:00:00",
+        "配置終了日": "2025-02-28T18:00:00",
+        "予想工数": 480,
+        "予想完了日": "2025-02-20T17:00:00",
+        "ステータス": "承認待ち",
+        "説明": "顧客からの納期前倒し要望に対応。既配置の3名に加え、営業支援チームから2名の追加配置で工期を15日短縮。",
+        "作成日時": "2025-01-10T14:30:00",
+        "作成者": "鈴木花子",
+        "更新日時": "2025-01-13T10:15:00",
+        "更新者": "佐藤次郎"
+      },
+      {
+        "人員配置案ID": "rec-001",
+        "配置案名": "営業部夏季休暇対応案",
+        "拠点ID": "rec-002",
+        "チームID": "rec-003",
+        "作業指示ID": "rec-004",
+        "配置開始日": "2024-08-01T09:00:00+09:00",
+        "配置終了日": "2024-08-23T17:30:00+09:00",
+        "予想工数": 240,
+        "予想完了日": "2024-08-22T17:30:00+09:00",
+        "ステータス": "承認待ち",
+        "説明": "山田花子の8月1日～23日休暇に伴い、佐藤次郎を営業サポート業務に配置。既存案件フォローアップ継続のため。",
+        "作成日時": "2024-07-15T10:30:00+09:00",
+        "作成者": "鈴木一郎",
+        "更新日時": "2024-07-15T10:30:00+09:00",
+        "更新者": "鈴木一郎"
+      },
+      {
+        "人員配置案ID": "rec-001",
+        "配置案名": "効率化案1_複数拠点集約",
+        "拠点ID": "rec-base-001",
+        "チームID": "rec-team-005",
+        "作業指示ID": "rec-work-042",
+        "配置開始日": "2025-02-01T09:00:00",
+        "配置終了日": "2025-03-15T18:00:00",
+        "予想工数": 480,
+        "予想完了日": "2025-03-14T17:30:00",
+        "ステータス": "承認待ち",
+        "説明": "東京・横浜・川崎の3拠点の営業支援業務をさいたま本社に集約し、チーム編成を効率化。移動時間削減で月40時間の工数削減を見込む。",
+        "作成日時": "2025-01-20T14:30:00",
+        "作成者": "山田花子",
+        "更新日時": "2025-01-22T10:15:00",
+        "更新者": "鈴木次郎"
+      },
+      {
+        "人員配置案ID": "rec-001",
+        "配置案名": "スキルレベル別段階進行案",
+        "拠点ID": "rec-site-012",
+        "チームID": "rec-team-005",
+        "作業指示ID": "rec-task-089",
+        "配置開始日": "2024-02-01T09:00:00+09:00",
+        "配置終了日": "2024-06-30T17:00:00+09:00",
+        "予想工数": 1840,
+        "予想完了日": "2024-06-28T17:00:00+09:00",
+        "ステータス": "承認待ち",
+        "説明": "初級3名→中級2名→上級1名の段階的配置で、スキル習得と作業効率のバランスを最適化。前半は教育重視、後半は効率重視に切り替え。",
+        "作成日時": "2024-01-15T14:30:00+09:00",
+        "作成者": "山田花子",
+        "更新日時": "2024-01-18T10:15:00+09:00",
+        "更新者": "佐藤次郎"
+      },
+      {
+        "人員配置案ID": "rec-001",
+        "配置案名": "大型システム構築案件_混合チーム編成案",
+        "拠点ID": "rec-site-012",
+        "チームID": "rec-team-045",
+        "作業指示ID": "rec-work-089",
+        "配置開始日": "2025-02-03T09:00:00+09:00",
+        "配置終了日": "2025-08-31T18:00:00+09:00",
+        "予想工数": 3840,
+        "予想完了日": "2025-08-29T17:00:00+09:00",
+        "ステータス": "承認待ち",
+        "説明": "自社SE5名と協力会社エンジニア4名による混合チーム。基盤構築フェーズは協力会社主導、実装フェーズは自社主導の予定。",
+        "作成日時": "2025-01-22T14:30:00+09:00",
+        "作成者": "山田花子",
+        "更新日時": "2025-01-27T10:15:00+09:00",
+        "更新者": "佐藤次郎"
+      },
+      {
+        "人員配置案ID": "rec-001",
+        "配置案名": "育成案A-ベテラン新人ペアリング",
+        "拠点ID": "rec-site-0015",
+        "チームID": "rec-team-0008",
+        "作業指示ID": "rec-task-0042",
+        "配置開始日": "2025-01-20T09:00:00",
+        "配置終了日": "2025-03-31T17:30:00",
+        "予想工数": 480,
+        "予想完了日": "2025-03-28T17:00:00",
+        "ステータス": "承認待ち",
+        "説明": "山田花子（ベテラン）と新入社員佐藤健太のペアリング配置。OJTを通じた実務育成とスキル習得を目的とした3ヶ月間の集中育成プログラム。",
+        "作成日時": "2025-01-10T14:23:00",
+        "作成者": "鈴木由美",
+        "更新日時": "2025-01-10T14:23:00",
+        "更新者": "鈴木由美"
+      },
+      {
+        "人員配置案ID": "rec-001",
+        "配置案名": "24時間体制対応案（夜間シフト導入）",
+        "拠点ID": "rec-loc-012",
+        "チームID": "rec-team-005",
+        "作業指示ID": "rec-inst-089",
+        "配置開始日": "2024-04-01T00:00:00+09:00",
+        "配置終了日": "2024-06-30T23:59:59+09:00",
+        "予想工数": 2880,
+        "予想完了日": "2024-06-28T18:00:00+09:00",
+        "ステータス": "承認待ち",
+        "説明": "顧客対応強化のため日勤・夜勤の2シフト体制を導入。既存チーム人員を振り分け、24時間カバーを実現。",
+        "作成日時": "2024-03-15T10:30:00+09:00",
+        "作成者": "山田花子",
+        "更新日時": "2024-03-22T14:15:00+09:00",
+        "更新者": "佐藤次郎"
+      },
+      {
+        "人員配置案ID": "rec-001",
+        "配置案名": "2025年Q1繁忙期向け営業チーム増強案",
+        "拠点ID": "rec-site-tokyo-01",
+        "チームID": "rec-team-sales-01",
+        "作業指示ID": "rec-task-2025-0145",
+        "配置開始日": "2025-01-06T09:00:00+09:00",
+        "配置終了日": "2025-03-31T17:00:00+09:00",
+        "予想工数": 2880,
+        "予想完了日": "2025-03-28T17:00:00+09:00",
+        "ステータス": "承認待ち",
+        "説明": "新規案件増加に対応するため、営業チームに契約社員3名を追加配置。既存メンバーの負担軽減と案件対応力強化を実現。",
+        "作成日時": "2024-12-10T14:30:00+09:00",
+        "作成者": "鈴木美咲",
+        "更新日時": "2024-12-15T10:15:00+09:00",
+        "更新者": "佐藤健一"
+      },
+      {
+        "人員配置案ID": "rec-001",
+        "配置案名": "Q1終盤人員最適化案",
+        "拠点ID": "rec-site-003",
+        "チームID": "rec-team-012",
+        "作業指示ID": "rec-task-089",
+        "配置開始日": "2025-02-15T09:00:00",
+        "配置終了日": "2025-03-31T18:00:00",
+        "予想工数": 480,
+        "予想完了日": "2025-03-28T17:00:00",
+        "ステータス": "承認待ち",
+        "説明": "プロジェクト終盤のため人員を段階削減し、工程を3週間短縮する案。品質維持のため経験者を優先配置。",
+        "作成日時": "2025-02-03T14:30:00",
+        "作成者": "山田花子",
+        "更新日時": "2025-02-10T11:15:00",
+        "更新者": "佐藤次郎"
+      },
+      {
+        "人員配置案ID": "rec-001",
+        "配置案名": "新規システム開発_並行作業案",
+        "拠点ID": "rec-loc-002",
+        "チームID": "rec-team-005",
+        "作業指示ID": "rec-task-0892",
+        "配置開始日": "2024-11-15T09:00:00+09:00",
+        "配置終了日": "2025-01-20T18:00:00+09:00",
+        "予想工数": 1280,
+        "予想完了日": "2025-01-18T17:00:00+09:00",
+        "ステータス": "承認待ち",
+        "説明": "フロントエンド、バックエンド、QAチームの3チームで並行開発。バックエンド開発と並行してフロントエンド実装を進め、全体工期を短縮。",
+        "作成日時": "2024-11-08T14:30:00+09:00",
+        "作成者": "山田花子",
+        "更新日時": "2024-11-12T10:15:00+09:00",
+        "更新者": "佐藤次郎"
+      }
+    ],
+    "人員配置実行状況": [
+      {
+        "人員配置実行状況ID": "rec-001",
+        "人員配置案ID": "rec-002",
+        "作業指示ID": "rec-003",
+        "作業者ID": "rec-004",
+        "拠点ID": "rec-005",
+        "チームID": "rec-006",
+        "配置状態": "完了",
+        "計画開始日時": "2025-01-15 08:00:00",
+        "計画終了日時": "2025-01-15 17:00:00",
+        "実績開始日時": "2025-01-15 08:05:00",
+        "実績終了日時": "2025-01-15 16:55:00",
+        "計画工数": 480,
+        "実績工数": 470,
+        "進捗率": 100,
+        "遅延フラグ": false,
+        "備考": "月次定期メンテナンス完了。機械点検・給油・部品交換すべて計画通り実施。異常なし。",
+        "作成日時": "2025-01-10 14:30:00",
+        "更新日時": "2025-01-15 17:15:00",
+        "作成者": "鈴木花子",
+        "更新者": "佐藤次郎"
+      },
+      {
+        "人員配置実行状況ID": "rec-001",
+        "人員配置案ID": "rec-002",
+        "作業指示ID": "rec-003",
+        "作業者ID": "rec-004",
+        "拠点ID": "rec-005",
+        "チームID": "rec-006",
+        "配置状態": "完了",
+        "計画開始日時": "2025-01-15 09:00:00",
+        "計画終了日時": "2025-01-15 17:00:00",
+        "実績開始日時": "2025-01-14 14:30:00",
+        "実績終了日時": "2025-01-15 12:15:00",
+        "計画工数": 480,
+        "実績工数": 342,
+        "進捗率": 100,
+        "遅延フラグ": false,
+        "備考": "システム障害の緊急対応により前倒し実施、予定より約5時間早期に完了",
+        "作成日時": "2025-01-14 13:45:00",
+        "更新日時": "2025-01-15 12:30:00",
+        "作成者": "山田花子",
+        "更新者": "佐藤次郎"
+      },
+      {
+        "人員配置実行状況ID": "rec-001",
+        "人員配置案ID": "rec-002",
+        "作業指示ID": "rec-003",
+        "作業者ID": "rec-004",
+        "拠点ID": "rec-005",
+        "チームID": "rec-006",
+        "配置状態": "完了",
+        "計画開始日時": "2024-11-15 09:00:00",
+        "計画終了日時": "2024-11-15 17:00:00",
+        "実績開始日時": "2024-11-15 09:15:00",
+        "実績終了日時": "2024-11-15 18:45:00",
+        "計画工数": 480,
+        "実績工数": 570,
+        "進捗率": 100,
+        "遅延フラグ": true,
+        "備考": "配置予定者の急病により佐藤花子に変更。経験不足で予定より90分超過",
+        "作成日時": "2024-11-14 14:30:00",
+        "更新日時": "2024-11-15 19:20:00",
+        "作成者": "山田太郎",
+        "更新者": "鈴木由美"
+      },
+      {
+        "人員配置実行状況ID": "rec-001",
+        "人員配置案ID": "rec-002",
+        "作業指示ID": "rec-003",
+        "作業者ID": "rec-004",
+        "拠点ID": "rec-005",
+        "チームID": "rec-006",
+        "配置状態": "実行中",
+        "計画開始日時": "2024-12-15 08:00:00",
+        "計画終了日時": "2024-12-15 17:00:00",
+        "実績開始日時": "2024-12-15 14:30:00",
+        "実績終了日時": null,
+        "計画工数": 540,
+        "実績工数": 120,
+        "進捗率": 35,
+        "遅延フラグ": true,
+        "備考": "天候不良により午前中の作業を中止。午後14時30分から再開。",
+        "作成日時": "2024-12-15 07:45:00",
+        "更新日時": "2024-12-15 15:20:00",
+        "作成者": "鈴木花子",
+        "更新者": "佐藤次郎"
+      },
+      {
+        "人員配置実行状況ID": "rec-001",
+        "人員配置案ID": "rec-002",
+        "作業指示ID": "rec-003",
+        "作業者ID": "rec-004",
+        "拠点ID": "rec-005",
+        "チームID": "rec-006",
+        "配置状態": "キャンセル",
+        "計画開始日時": "2025-02-15 09:00:00",
+        "計画終了日時": "2025-02-15 17:00:00",
+        "実績開始日時": null,
+        "実績終了日時": null,
+        "計画工数": 480,
+        "実績工数": null,
+        "進捗率": 0,
+        "遅延フラグ": false,
+        "備考": "顧客要望変更により配置案キャンセル。2025年2月10日に顧客より仕様変更要望あり",
+        "作成日時": "2025-02-08 14:30:00",
+        "更新日時": "2025-02-10 16:45:00",
+        "作成者": "山田花子",
+        "更新者": "佐藤次郎"
+      },
+      {
+        "人員配置実行状況ID": "rec-001",
+        "人員配置案ID": "rec-002",
+        "作業指示ID": "rec-003",
+        "作業者ID": "rec-004",
+        "拠点ID": "rec-005",
+        "チームID": "rec-006",
+        "配置状態": "実行中",
+        "計画開始日時": "2025-01-15 08:00:00",
+        "計画終了日時": "2025-01-15 17:00:00",
+        "実績開始日時": "2025-01-15 08:15:00",
+        "実績終了日時": null,
+        "計画工数": 540,
+        "実績工数": 320,
+        "進捗率": 65,
+        "遅延フラグ": true,
+        "備考": "大阪拠点での機器トラブルにより作業が遅延。他拠点は予定通り進捗。",
+        "作成日時": "2025-01-14 16:30:00",
+        "更新日時": "2025-01-15 14:45:00",
+        "作成者": "山田花子",
+        "更新者": "佐藤次郎"
+      },
+      {
+        "人員配置実行状況ID": "rec-001",
+        "人員配置案ID": "rec-002",
+        "作業指示ID": "rec-003",
+        "作業者ID": "rec-004",
+        "拠点ID": "rec-005",
+        "チームID": "rec-006",
+        "配置状態": "完了",
+        "計画開始日時": "2024-11-15 09:00:00",
+        "計画終了日時": "2024-11-15 17:00:00",
+        "実績開始日時": "2024-11-15 09:15:00",
+        "実績終了日時": "2024-11-15 18:30:00",
+        "計画工数": 480,
+        "実績工数": 615,
+        "進捗率": 100,
+        "遅延フラグ": true,
+        "備考": "新人作業者のため確認作業が増加し、計画比で135分超過。OJT対応により品質は確保。",
+        "作成日時": "2024-11-14 14:30:00",
+        "更新日時": "2024-11-15 19:00:00",
+        "作成者": "山田花子",
+        "更新者": "佐藤次郎"
+      },
+      {
+        "人員配置実行状況ID": "rec-001",
+        "人員配置案ID": "rec-002",
+        "作業指示ID": "rec-003",
+        "作業者ID": "rec-004",
+        "拠点ID": "rec-005",
+        "チームID": "rec-006",
+        "配置状態": "実行中",
+        "計画開始日時": "2025-01-15 09:00:00",
+        "計画終了日時": "2025-01-15 17:00:00",
+        "実績開始日時": "2025-01-15 09:30:00",
+        "実績終了日時": null,
+        "計画工数": 480,
+        "実績工数": 210,
+        "進捗率": 45,
+        "遅延フラグ": true,
+        "備考": "原配置者・山田太郎が急病のため、代替要員・佐藤花子で対応。30分遅れで開始。",
+        "作成日時": "2025-01-14 16:45:00",
+        "更新日時": "2025-01-15 13:20:00",
+        "作成者": "user-admin-001",
+        "更新者": "user-manager-002"
+      },
+      {
+        "人員配置実行状況ID": "rec-001",
+        "人員配置案ID": "rec-002",
+        "作業指示ID": "rec-003",
+        "作業者ID": "rec-004",
+        "拠点ID": "rec-005",
+        "チームID": "rec-006",
+        "配置状態": "完了",
+        "計画開始日時": "2024-11-18 09:00:00",
+        "計画終了日時": "2024-11-20 17:00:00",
+        "実績開始日時": "2024-11-18 09:00:00",
+        "実績終了日時": "2024-11-19 16:30:00",
+        "計画工数": 1440,
+        "実績工数": 960,
+        "進捗率": 100,
+        "遅延フラグ": false,
+        "備考": "業務プロセス改善により予定より1日早期に完了。品質基準は満たされている。",
+        "作成日時": "2024-11-15 14:20:00",
+        "更新日時": "2024-11-19 17:45:00",
+        "作成者": "山田花子",
+        "更新者": "佐藤次郎"
+      },
+      {
+        "人員配置実行状況ID": "rec-001",
+        "人員配置案ID": "rec-002",
+        "作業指示ID": "rec-003",
+        "作業者ID": "rec-004",
+        "拠点ID": "rec-005",
+        "チームID": "rec-006",
+        "配置状態": "実行中",
+        "計画開始日時": "2025-01-15 09:00:00",
+        "計画終了日時": "2025-01-17 17:00:00",
+        "実績開始日時": "2025-01-15 09:15:00",
+        "実績終了日時": null,
+        "計画工数": 1440,
+        "実績工数": 480,
+        "進捗率": 35,
+        "遅延フラグ": true,
+        "備考": "1月21日時点で進捗が停滞。作業者との連絡が取れず状況把握困難",
+        "作成日時": "2025-01-15 08:30:00",
+        "更新日時": "2025-01-18 16:45:00",
+        "作成者": "山田花子",
+        "更新者": "鈴木太郎"
+      }
+    ],
+    "進捗データ": [
+      {
+        "進捗データID": "rec-001",
+        "作業指示ID": "rec-002",
+        "拠点ID": "rec-003",
+        "チームID": "rec-004",
+        "進捗日": "2024-12-20T00:00:00Z",
+        "計画数量": 50,
+        "実績数量": 50,
+        "完了率": 68,
+        "遅延フラグ": false,
+        "遅延日数": 0,
+        "備考": "予定通り進捗。品質問題なし。",
+        "作成日時": "2024-12-20T16:30:00Z",
+        "更新日時": "2024-12-20T16:30:00Z",
+        "作成者": "鈴木花子"
+      },
+      {
+        "進捗データID": "rec-001",
+        "作業指示ID": "rec-002",
+        "拠点ID": "rec-003",
+        "チームID": "rec-004",
+        "進捗日": "2024-12-15T09:00:00",
+        "計画数量": 120,
+        "実績数量": 45,
+        "完了率": 38,
+        "遅延フラグ": true,
+        "遅延日数": 3,
+        "備考": "大雨のため現場作業を中止。予定の40%程度の進捗にとどまる",
+        "作成日時": "2024-12-15T17:30:00",
+        "更新日時": "2024-12-15T17:30:00",
+        "作成者": "山田花子"
+      },
+      {
+        "進捗データID": "rec-001",
+        "作業指示ID": "rec-002",
+        "拠点ID": "rec-003",
+        "チームID": "rec-004",
+        "進捗日": "2025-01-15T09:00:00Z",
+        "計画数量": 120,
+        "実績数量": 85,
+        "完了率": 58,
+        "遅延フラグ": true,
+        "遅延日数": 4,
+        "備考": "急遽2名が休職。予定していた外注手配が遅延し対応困難",
+        "作成日時": "2025-01-15T14:30:00Z",
+        "更新日時": "2025-01-15T14:30:00Z",
+        "作成者": "鈴木花子"
+      },
+      {
+        "進捗データID": "rec-001",
+        "作業指示ID": "rec-002",
+        "拠点ID": "rec-003",
+        "チームID": "rec-004",
+        "進捗日": "2025-01-15T09:30:00Z",
+        "計画数量": 80,
+        "実績数量": 95,
+        "完了率": 105,
+        "遅延フラグ": false,
+        "遅延日数": -3,
+        "備考": "機械設定の効率化により予定より3日早く完了予定。品質基準も全てクリア。",
+        "作成日時": "2025-01-15T10:15:00Z",
+        "更新日時": "2025-01-15T10:15:00Z",
+        "作成者": "鈴木花子"
+      },
+      {
+        "進捗データID": "rec-001",
+        "作業指示ID": "rec-002",
+        "拠点ID": "rec-003",
+        "チームID": "rec-004",
+        "進捗日": "2024-11-15T00:00:00Z",
+        "計画数量": 120,
+        "実績数量": 0,
+        "完了率": 65,
+        "遅延フラグ": true,
+        "遅延日数": 3,
+        "備考": "プレス機の油圧系統故障により終日停止。メーカー対応待ち中。",
+        "作成日時": "2024-11-15T17:30:00Z",
+        "更新日時": "2024-11-15T17:30:00Z",
+        "作成者": "佐藤花子"
+      },
+      {
+        "進捗データID": "rec-001",
+        "作業指示ID": "rec-002",
+        "拠点ID": "rec-003",
+        "チームID": "rec-004",
+        "進捗日": "2024-11-15T00:00:00Z",
+        "計画数量": 80,
+        "実績数量": 110,
+        "完了率": 68,
+        "遅延フラグ": false,
+        "遅延日数": -2,
+        "備考": "追加要員3名投入により計画超過達成。品質基準も維持。",
+        "作成日時": "2024-11-15T18:30:00Z",
+        "更新日時": "2024-11-15T18:30:00Z",
+        "作成者": "山田花子"
+      },
+      {
+        "進捗データID": "rec-001",
+        "作業指示ID": "rec-002",
+        "拠点ID": "rec-003",
+        "チームID": "rec-004",
+        "進捗日": "2024-12-27",
+        "計画数量": 150,
+        "実績数量": 185,
+        "完了率": 92,
+        "遅延フラグ": false,
+        "遅延日数": -2,
+        "備考": "月末締切に向けた集中作業で計画を上回る進捗。チーム全員で対応中。",
+        "作成日時": "2024-12-27T18:30:00",
+        "更新日時": "2024-12-27T18:30:00",
+        "作成者": "山田花子"
+      },
+      {
+        "進捗データID": "rec-001",
+        "作業指示ID": "rec-002",
+        "拠点ID": "rec-003",
+        "チームID": "rec-004",
+        "進捗日": "2024-11-15T00:00:00Z",
+        "計画数量": 120,
+        "実績数量": 85,
+        "完了率": 62,
+        "遅延フラグ": true,
+        "遅延日数": 3,
+        "備考": "品質検査で不良品15個が判明。手戻り作業により前日比で進捗が5ポイント低下",
+        "作成日時": "2024-11-15T14:30:00Z",
+        "更新日時": "2024-11-15T14:30:00Z",
+        "作成者": "山田太郎"
+      },
+      {
+        "進捗データID": "rec-001",
+        "作業指示ID": "rec-002",
+        "拠点ID": "rec-003",
+        "チームID": "rec-004",
+        "進捗日": "2024-11-15T09:00:00Z",
+        "計画数量": 100,
+        "実績数量": 75,
+        "完了率": 38,
+        "遅延フラグ": true,
+        "遅延日数": 3,
+        "備考": "新人配置初週のため習熟期間中。安全確認に時間を要している",
+        "作成日時": "2024-11-15T16:30:00Z",
+        "更新日時": "2024-11-15T16:30:00Z",
+        "作成者": "山田花子"
+      },
+      {
+        "進捗データID": "rec-001",
+        "作業指示ID": "rec-002",
+        "拠点ID": "rec-003",
+        "チームID": "rec-004",
+        "進捗日": "2025-01-28T00:00:00Z",
+        "計画数量": 120,
+        "実績数量": 118,
+        "完了率": 95,
+        "遅延フラグ": false,
+        "遅延日数": 0,
+        "備考": "最終段階。残工数わずか。検査準備開始予定。",
+        "作成日時": "2025-01-28T14:30:00Z",
+        "更新日時": "2025-01-28T14:30:00Z",
+        "作成者": "佐藤花子"
+      }
+    ],
+    "進捗遅延リスク判定結果": [
+      {
+        "リスク判定結果ID": "rec-001",
+        "作業指示ID": "rec-002",
+        "拠点ID": "rec-003",
+        "チームID": "rec-004",
+        "判定日時": "2024-11-15 14:30:00",
+        "リスクレベル": "高",
+        "遅延予測日数": 5,
+        "進捗率": 42,
+        "計画進捗率": 65,
+        "判定理由": "工作機械の故障により加工工程が停止。現在の進捗率が計画比23%遅延。",
+        "推奨対応": "予備機械の導入と夜間シフト追加で遅延巻き返し。外注加工の検討も必要。",
+        "対応状況": "対応中",
+        "作成日時": "2024-11-15 14:35:00",
+        "更新日時": "2024-11-16 09:20:00",
+        "作成者": "山田太郎"
+      },
+      {
+        "リスク判定結果ID": "rec-001",
+        "作業指示ID": "rec-002",
+        "拠点ID": "rec-003",
+        "チームID": "rec-004",
+        "判定日時": "2024-12-15 14:30:00",
+        "リスクレベル": "低",
+        "遅延予測日数": 0,
+        "進捗率": 85,
+        "計画進捗率": 83,
+        "判定理由": "配達件数が計画比102%で推移。配達員の稼働率が安定。天候による遅延なし。",
+        "推奨対応": "現在の体制を維持し、品質管理を継続することを推奨。",
+        "対応状況": "対応中",
+        "作成日時": "2024-12-15 14:35:00",
+        "更新日時": "2024-12-15 14:35:00",
+        "作成者": "山田花子"
+      },
+      {
+        "リスク判定結果ID": "rec-001",
+        "作業指示ID": "rec-0042",
+        "拠点ID": "rec-0015",
+        "チームID": "rec-0028",
+        "判定日時": "2024-11-15T14:30:00",
+        "リスクレベル": "中",
+        "遅延予測日数": 8,
+        "進捗率": 35,
+        "計画進捗率": 50,
+        "判定理由": "要件定義フェーズで計画比15%の進捗遅延。割当人員が予定の3名から2名に減少し、複雑要件の分析が停滞中。",
+        "推奨対応": "要件定義専門家の追加配置またはスケジュール調整。外部ベンダーの活用も検討。",
+        "対応状況": "対応中",
+        "作成日時": "2024-11-15T14:30:00",
+        "更新日時": "2024-11-15T14:30:00",
+        "作成者": "山田太郎"
+      },
+      {
+        "リスク判定結果ID": "rec-001",
+        "作業指示ID": "rec-002",
+        "拠点ID": "rec-003",
+        "チームID": "rec-004",
+        "判定日時": "2024-11-15T14:30:00+09:00",
+        "リスクレベル": "極高",
+        "遅延予測日数": 12,
+        "進捗率": 28,
+        "計画進捗率": 45,
+        "判定理由": "過去3日間の降雨により基礎掘削作業が中断。現在の進捗が計画比-17%で、予報では向こう5日間も悪天候が続く見込み。",
+        "推奨対応": "人員を現在の15名から25名に増員し、天候回復後の集中工事体制を構築。夜間照明設備の増設も検討。",
+        "対応状況": "対応中",
+        "作成日時": "2024-11-15T14:35:00+09:00",
+        "更新日時": "2024-11-16T09:20:00+09:00",
+        "作成者": "佐藤健一"
+      },
+      {
+        "リスク判定結果ID": "rec-001",
+        "作業指示ID": "rec-002",
+        "拠点ID": "rec-003",
+        "チームID": "rec-004",
+        "判定日時": "2024-11-15T10:30:00+09:00",
+        "リスクレベル": "低",
+        "遅延予測日数": -3,
+        "進捗率": 78,
+        "計画進捗率": 65,
+        "判定理由": "営業チームの訪問活動が計画比13%上回っており、クライアント対応も予定より早期に進捗している状況",
+        "推奨対応": "現在のペースを維持しながら品質低下に注意。納期前倒しの可能性を検討。",
+        "対応状況": "対応中",
+        "作成日時": "2024-11-15T10:30:00+09:00",
+        "更新日時": "2024-11-15T10:30:00+09:00",
+        "作成者": "山田花子"
+      },
+      {
+        "リスク判定結果ID": "rec-001",
+        "作業指示ID": "rec-002",
+        "拠点ID": "rec-003",
+        "チームID": "rec-004",
+        "判定日時": "2024-11-15T14:30:00+09:00",
+        "リスクレベル": "中",
+        "遅延予測日数": 3,
+        "進捗率": 42,
+        "計画進捗率": 55,
+        "判定理由": "検査項目が5項目追加され、1項目あたり平均2時間の追加工数が発生。現在の進捗率が計画比で13ポイント下回っている。",
+        "推奨対応": "検査員の増員または外注検査の活用。追加項目の優先順位付けと並列処理の検討。",
+        "対応状況": "対応中",
+        "作成日時": "2024-11-15T14:35:00+09:00",
+        "更新日時": "2024-11-16T09:45:00+09:00",
+        "作成者": "佐藤花子"
+      },
+      {
+        "リスク判定結果ID": "rec-001",
+        "作業指示ID": "rec-002",
+        "拠点ID": "rec-003",
+        "チームID": "rec-004",
+        "判定日時": "2024-11-15T10:30:00",
+        "リスクレベル": "高",
+        "遅延予測日数": 3,
+        "進捗率": 45,
+        "計画進捗率": 60,
+        "判定理由": "フォークリフト故障により作業ペース低下。現在の進捗率が計画比15%遅延。",
+        "推奨対応": "代替フォークリフト手配、または臨時人員2名配置による手作業補強",
+        "対応状況": "対応中",
+        "作成日時": "2024-11-15T10:30:00",
+        "更新日時": "2024-11-15T14:45:00",
+        "作成者": "山田花子"
+      },
+      {
+        "リスク判定結果ID": "rec-001",
+        "作業指示ID": "rec-002",
+        "拠点ID": "rec-003",
+        "チームID": "rec-004",
+        "判定日時": "2024-12-15T14:30:00+09:00",
+        "リスクレベル": "高",
+        "遅延予測日数": 5,
+        "進捗率": 62,
+        "計画進捗率": 75,
+        "判定理由": "年末繁忙期による問い合わせ件数増加で対応スピード低下。現在の進捗が計画比13ポイント遅延",
+        "推奨対応": "臨時スタッフの配置、チャットボット導入による一次対応自動化、優先度別の対応順序見直し",
+        "対応状況": "対応中",
+        "作成日時": "2024-12-15T14:30:00+09:00",
+        "更新日時": "2024-12-18T09:15:00+09:00",
+        "作成者": "鈴木花子"
+      },
+      {
+        "リスク判定結果ID": "rec-001",
+        "作業指示ID": "rec-002",
+        "拠点ID": "rec-003",
+        "チームID": "rec-004",
+        "判定日時": "2024-11-15T10:30:00+09:00",
+        "リスクレベル": "極高",
+        "遅延予測日数": 12,
+        "進捗率": 35,
+        "計画進捗率": 60,
+        "判定理由": "モーター部品の海外発注品が通関遅延により納期が2週間超過。現在の進捗率が計画比25ポイント下回っている。",
+        "推奨対応": "代替部品の国内調達検討。サプライヤーへの納期短縮交渉。並行作業の前倒し実施。",
+        "対応状況": "対応完了",
+        "作成日時": "2024-11-15T10:30:00+09:00",
+        "更新日時": "2024-12-02T16:45:00+09:00",
+        "作成者": "山田太郎"
+      },
+      {
+        "リスク判定結果ID": "rec-001",
+        "作業指示ID": "rec-002",
+        "拠点ID": "rec-003",
+        "チームID": "rec-004",
+        "判定日時": "2024-11-15T14:30:00+09:00",
+        "リスクレベル": "高",
+        "遅延予測日数": 3,
+        "進捗率": 42,
+        "計画進捗率": 60,
+        "判定理由": "受注数が当初予想の150%に達し、現在の人員配置では納期までに完了困難な状況",
+        "推奨対応": "臨時人員3名の即時配置と夜間シフト導入による処理能力の強化",
+        "対応状況": "対応中",
+        "作成日時": "2024-11-15T14:30:00+09:00",
+        "更新日時": "2024-11-15T14:30:00+09:00",
+        "作成者": "山田花子"
+      }
+    ],
+    "作業指示受領履歴": [
+      {
+        "受領履歴ID": "rec-001",
+        "作業指示ID": "instr-0847",
+        "作業者ID": "worker-2341",
+        "受領日時": "2024-11-15T09:23:45+09:00",
+        "受領確認状態": "確認済み",
+        "確認日時": "2024-11-15T09:24:12+09:00",
+        "配信方法": "アプリ通知",
+        "備考": "モバイルアプリで即座に確認、作業開始予定時刻は10:00",
+        "作成日時": "2024-11-15T09:23:45+09:00",
+        "更新日時": "2024-11-15T09:24:12+09:00"
+      },
+      {
+        "受領履歴ID": "rec-001",
+        "作業指示ID": "inst-0847",
+        "作業者ID": "wkr-0324",
+        "受領日時": "2025-01-15 14:32:00",
+        "受領確認状態": "未確認",
+        "確認日時": null,
+        "配信方法": "メール",
+        "備考": "緊急作業指示だが作業者から返信なし。24時間以上経過。再配信検討要",
+        "作成日時": "2025-01-15 14:32:00",
+        "更新日時": "2025-01-16 15:45:00"
+      },
+      {
+        "受領履歴ID": "rec-001",
+        "作業指示ID": "instr-0847",
+        "作業者ID": "worker-2156",
+        "受領日時": "2024-11-15 09:32:00",
+        "受領確認状態": "辞退",
+        "確認日時": "2024-11-15 10:05:00",
+        "配信方法": "アプリ通知",
+        "備考": "個人的事情により本日の作業指示を辞退いたします。申し訳ございません。",
+        "作成日時": "2024-11-15 09:32:00",
+        "更新日時": "2024-11-15 10:05:00"
+      },
+      {
+        "受領履歴ID": "rec-001",
+        "作業指示ID": "inst-2024-0847",
+        "作業者ID": "wkr-0156",
+        "受領日時": "2024-11-15T09:32:18+09:00",
+        "受領確認状態": "確認済み",
+        "確認日時": "2024-11-15T09:45:22+09:00",
+        "配信方法": "システム画面",
+        "備考": "一括配信3件中1件。配信直後に確認完了。",
+        "作成日時": "2024-11-15T09:32:18+09:00",
+        "更新日時": "2024-11-15T09:45:22+09:00"
+      },
+      {
+        "受領履歴ID": "rec-001",
+        "作業指示ID": "inst-0847",
+        "作業者ID": "wkr-2156",
+        "受領日時": "2024-11-15 09:30:00",
+        "受領確認状態": "確認済み",
+        "確認日時": "2024-11-15 10:05:00",
+        "配信方法": "アプリ通知",
+        "備考": "11/15 11:00に作業内容変更あり。対象エリアをA-1からA-1,A-2に拡大。納期は変わらず15:00まで。",
+        "作成日時": "2024-11-15 09:30:00",
+        "更新日時": "2024-11-15 11:02:00"
+      },
+      {
+        "受領履歴ID": "rec-001",
+        "作業指示ID": "inst-2024-0847",
+        "作業者ID": "wkr-0512",
+        "受領日時": "2024-11-15 14:32:18",
+        "受領確認状態": "確認済み",
+        "確認日時": "2024-11-15 14:35:42",
+        "配信方法": "アプリ通知（再配信）",
+        "備考": "初回配信失敗後、11月15日14時30分に再配信。作業者・山田花子が受領確認完了。",
+        "作成日時": "2024-11-15 14:32:18",
+        "更新日時": "2024-11-15 14:35:42"
+      },
+      {
+        "受領履歴ID": "rec-001",
+        "作業指示ID": "inst-042",
+        "作業者ID": "wkr-089",
+        "受領日時": "2024-11-15 22:30:45",
+        "受領確認状態": "確認済み",
+        "確認日時": "2024-11-16 06:15:20",
+        "配信方法": "アプリ通知",
+        "備考": "深夜シフト終了後の朝礼で他2件と一括確認。作業者：鈴木健一",
+        "作成日時": "2024-11-15 22:30:45",
+        "更新日時": "2024-11-16 06:15:20"
+      },
+      {
+        "受領履歴ID": "rec-001",
+        "作業指示ID": "instr-0847",
+        "作業者ID": "worker-0234",
+        "受領日時": "2024-11-15 09:30:00",
+        "受領確認状態": "確認済み",
+        "確認日時": "2024-11-18 14:22:00",
+        "配信方法": "アプリ通知",
+        "備考": "現場での緊急対応により確認が遅れた。11月18日に事後確認完了。",
+        "作成日時": "2024-11-15 09:30:00",
+        "更新日時": "2024-11-18 14:22:00"
+      },
+      {
+        "受領履歴ID": "rec-001",
+        "作業指示ID": "rec-002",
+        "作業者ID": "rec-003",
+        "受領日時": "2024-04-15 09:30:00",
+        "受領確認状態": "確認済み",
+        "確認日時": "2024-04-15 10:15:00",
+        "配信方法": "システム画面",
+        "備考": "指導者・佐藤花子より直接指導を受けながら受領、OJT第1日目の基本操作研修",
+        "作成日時": "2024-04-15 09:30:00",
+        "更新日時": "2024-04-15 10:15:00"
+      },
+      {
+        "受領履歴ID": "rec-001",
+        "作業指示ID": "inst-2024-0847",
+        "作業者ID": "wkr-0523",
+        "受領日時": "2024-12-15 09:30:00",
+        "受領確認状態": "確認済み",
+        "確認日時": "2024-12-15 09:45:00",
+        "配信方法": "システム画面",
+        "備考": "システム障害復旧に伴う再配信。12月14日の障害時に未配信だった指示を一括再配信。",
+        "作成日時": "2024-12-15 09:30:00",
+        "更新日時": "2024-12-15 09:45:00"
+      }
+    ],
+    "ハンディターミナル連携ログ": [
+      {
+        "ハンディターミナル連携ログID": "rec-001",
+        "作業者ID": "rec-002",
+        "ハンディターミナルID": "HT-2024-0847",
+        "拠点ID": "rec-003",
+        "連携タイプ": "作業実績",
+        "作業指示ID": "rec-004",
+        "連携内容": "配達完了報告：受取人 山田花子、配達時間 14:32、署名取得、商品確認完了",
+        "連携ステータス": "成功",
+        "エラーメッセージ": null,
+        "送信日時": "2024-12-15 14:33:22",
+        "受信日時": "2024-12-15 14:33:28",
+        "処理完了日時": "2024-12-15 14:33:35",
+        "作成日時": "2024-12-15 14:33:35",
+        "更新日時": "2024-12-15 14:33:35"
+      },
+      {
+        "ハンディターミナル連携ログID": "rec-001",
+        "作業者ID": "rec-002",
+        "ハンディターミナルID": "HT-2024-0847",
+        "拠点ID": "rec-003",
+        "連携タイプ": "作業実績",
+        "作業指示ID": "rec-004",
+        "連携内容": "ピッキング作業進捗: 指示数量500個中、スキャン完了410個、未処理90個",
+        "連携ステータス": "成功",
+        "エラーメッセージ": null,
+        "送信日時": "2024-11-15 14:32:18",
+        "受信日時": "2024-11-15 14:32:19",
+        "処理完了日時": "2024-11-15 14:32:21",
+        "作成日時": "2024-11-15 14:32:21",
+        "更新日時": "2024-11-15 14:32:21"
+      },
+      {
+        "ハンディターミナル連携ログID": "rec-001",
+        "作業者ID": "rec-002",
+        "ハンディターミナルID": "HT-2024-0847",
+        "拠点ID": "rec-003",
+        "連携タイプ": "チェックイン",
+        "作業指示ID": "rec-004",
+        "連携内容": "顧客訪問チェックイン。訪問先：株式会社ABC商事、東京都渋谷区。緯度35.6595、経度139.7004。",
+        "連携ステータス": "成功",
+        "エラーメッセージ": null,
+        "送信日時": "2024-11-15 14:23:45",
+        "受信日時": "2024-11-15 14:23:52",
+        "処理完了日時": "2024-11-15 14:24:08",
+        "作成日時": "2024-11-15 14:24:08",
+        "更新日時": "2024-11-15 14:24:08"
+      },
+      {
+        "ハンディターミナル連携ログID": "rec-001",
+        "作業者ID": "rec-002",
+        "ハンディターミナルID": "HT-2024-0847",
+        "拠点ID": "rec-003",
+        "連携タイプ": "作業実績",
+        "作業指示ID": "rec-004",
+        "連携内容": "ピッキング作業完了。対象商品SKU:ABC-12345、数量:50個、ロケーション:A-3-15",
+        "連携ステータス": "失敗",
+        "エラーメッセージ": "ネットワーク接続タイムアウト。サーバーへの接続が確立できませんでした。リトライ待機中。",
+        "送信日時": "2024-11-15 14:32:18",
+        "受信日時": null,
+        "処理完了日時": null,
+        "作成日時": "2024-11-15 14:32:25",
+        "更新日時": "2024-11-15 14:35:42"
+      },
+      {
+        "ハンディターミナル連携ログID": "rec-001",
+        "作業者ID": "rec-002",
+        "ハンディターミナルID": "HT-2024-0847",
+        "拠点ID": "rec-003",
+        "連携タイプ": "作業実績",
+        "作業指示ID": "rec-004",
+        "連携内容": "ピッキング作業完了。商品コード5件、数量計48個、所要時間23分",
+        "連携ステータス": "成功",
+        "エラーメッセージ": null,
+        "送信日時": "2025-01-15 14:32:18",
+        "受信日時": "2025-01-15 14:32:22",
+        "処理完了日時": "2025-01-15 14:35:47",
+        "作成日時": "2025-01-15 14:32:22",
+        "更新日時": "2025-01-15 14:35:47"
+      },
+      {
+        "ハンディターミナル連携ログID": "rec-001",
+        "作業者ID": "rec-002",
+        "ハンディターミナルID": "HT-2024-0847",
+        "拠点ID": "rec-003",
+        "連携タイプ": "作業実績",
+        "作業指示ID": "rec-004",
+        "連携内容": "配送完了。配達証明写真1枚、顧客サイン画像1枚を送信。受取人：山田花子",
+        "連携ステータス": "成功",
+        "エラーメッセージ": null,
+        "送信日時": "2024-11-15 14:32:18",
+        "受信日時": "2024-11-15 14:32:22",
+        "処理完了日時": "2024-11-15 14:32:45",
+        "作成日時": "2024-11-15 14:32:45",
+        "更新日時": "2024-11-15 14:32:45"
+      },
+      {
+        "ハンディターミナル連携ログID": "rec-001",
+        "作業者ID": "rec-002",
+        "ハンディターミナルID": "HT-2019-00847",
+        "拠点ID": "rec-003",
+        "連携タイプ": "ステータス更新",
+        "作業指示ID": "rec-004",
+        "連携内容": "配送完了ステータスを「到着」から「配達完了」に更新",
+        "連携ステータス": "失敗",
+        "エラーメッセージ": "タイムスタンプ不整合エラー: 送信日時(2024-01-15 09:32:18)がサーバー受信日時(2024-01-15 09:28:45)より後になっています。ハンディターミナルの時刻設定を確認してください。",
+        "送信日時": "2024-01-15T09:32:18+09:00",
+        "受信日時": "2024-01-15T09:28:45+09:00",
+        "処理完了日時": "2024-01-15T09:28:52+09:00",
+        "作成日時": "2024-01-15T09:28:45+09:00",
+        "更新日時": "2024-01-15T09:28:52+09:00"
+      },
+      {
+        "ハンディターミナル連携ログID": "rec-001",
+        "作業者ID": "rec-002",
+        "ハンディターミナルID": "HT-2024-0847",
+        "拠点ID": "rec-003",
+        "連携タイプ": "作業実績",
+        "作業指示ID": "rec-004",
+        "連携内容": "バッチ処理で12件の作業実績を一括送信。ピッキング作業8件、検品作業4件を完了報告。",
+        "連携ステータス": "成功",
+        "エラーメッセージ": null,
+        "送信日時": "2024-11-15 14:32:18",
+        "受信日時": "2024-11-15 14:32:25",
+        "処理完了日時": "2024-11-15 14:32:47",
+        "作成日時": "2024-11-15 14:32:47",
+        "更新日時": "2024-11-15 14:32:47"
+      },
+      {
+        "ハンディターミナル連携ログID": "rec-001",
+        "作業者ID": "rec-002",
+        "ハンディターミナルID": "HT-2024-0847",
+        "拠点ID": "rec-003",
+        "連携タイプ": "作業実績",
+        "作業指示ID": "rec-004",
+        "連携内容": "倉庫A棟の商品ピッキング作業完了、ピッキング数量: 450個、検品完了",
+        "連携ステータス": "成功",
+        "エラーメッセージ": null,
+        "送信日時": "2024-11-15 14:32:18",
+        "受信日時": "2024-11-15 14:38:45",
+        "処理完了日時": "2024-11-15 14:51:22",
+        "作成日時": "2024-11-15 14:38:45",
+        "更新日時": "2024-11-15 14:51:22"
+      },
+      {
+        "ハンディターミナル連携ログID": "rec-0047293",
+        "作業者ID": "rec-0001847",
+        "ハンディターミナルID": "HT-2024-0856",
+        "拠点ID": "rec-0000312",
+        "連携タイプ": "作業実績",
+        "作業指示ID": "rec-0089456",
+        "連携内容": "配送完了報告。配送先：東京都渋谷区。受け取り確認済み。",
+        "連携ステータス": "失敗",
+        "エラーメッセージ": "拠点ID不一致エラー：ハンディターミナルに設定された拠点ID(rec-0000315)と作業指示の拠点ID(rec-0000312)が一致しません。別の端末で送信された可能性があります。",
+        "送信日時": "2025-01-23T14:32:18+09:00",
+        "受信日時": "2025-01-23T14:32:21+09:00",
+        "処理完了日時": "2025-01-23T14:32:25+09:00",
+        "作成日時": "2025-01-23T14:32:25+09:00",
+        "更新日時": "2025-01-23T14:32:25+09:00"
+      }
+    ],
+    "WMS連携ログ": [
+      {
+        "wms_log_id": "rec-001",
+        "連携種別": "作業指示受信",
+        "連携方向": "受信",
+        "拠点_id": "rec-002",
+        "連携ステータス": "成功",
+        "連携開始日時": "2025-01-15T06:30:00+09:00",
+        "連携完了日時": "2025-01-15T06:32:15+09:00",
+        "処理件数": 247,
+        "成功件数": 247,
+        "失敗件数": 0,
+        "エラーメッセージ": null,
+        "リトライ回数": 0,
+        "wms_request_id": "WMS-20250115-063001-A1B2C3",
+        "作成日時": "2025-01-15T06:32:15+09:00",
+        "更新日時": "2025-01-15T06:32:15+09:00",
+        "作成者": "自動連携システム"
+      },
+      {
+        "wms_log_id": "rec-001",
+        "連携種別": "在庫同期",
+        "連携方向": "受信",
+        "拠点_id": "rec-002",
+        "連携ステータス": "部分成功",
+        "連携開始日時": "2024-11-15 12:30:00",
+        "連携完了日時": "2024-11-15 12:35:42",
+        "処理件数": 1250,
+        "成功件数": 1198,
+        "失敗件数": 52,
+        "エラーメッセージ": "SKU:SKU-2024-08947の在庫数量不一致（WMS側:450、システム側:380）。他51件も数量乖離を検出。",
+        "リトライ回数": 1,
+        "wms_request_id": "WMS-REQ-20241115-0847",
+        "作成日時": "2024-11-15 12:35:43",
+        "更新日時": "2024-11-15 12:35:43",
+        "作成者": "WMS連携システム"
+      },
+      {
+        "wms_log_id": "rec-001",
+        "連携種別": "作業実績送信",
+        "連携方向": "送信",
+        "拠点_id": "rec-002",
+        "連携ステータス": "成功",
+        "連携開始日時": "2024-12-15 22:30:00",
+        "連携完了日時": "2024-12-15 22:47:30",
+        "処理件数": 1250,
+        "成功件数": 1250,
+        "失敗件数": 0,
+        "エラーメッセージ": null,
+        "リトライ回数": 3,
+        "wms_request_id": "WMS-20241215-112358",
+        "作成日時": "2024-12-15 22:30:15",
+        "更新日時": "2024-12-15 22:47:30",
+        "作成者": "夜間バッチ自動実行"
+      },
+      {
+        "wms_log_id": "rec-20250115-wms-001",
+        "連携種別": "作業指示受信",
+        "連携方向": "受信",
+        "拠点_id": "rec-site-0042",
+        "連携ステータス": "保留中",
+        "連携開始日時": "2025-01-15T09:32:15+09:00",
+        "連携完了日時": null,
+        "処理件数": 0,
+        "成功件数": 0,
+        "失敗件数": 0,
+        "エラーメッセージ": "WMS接続タイムアウト: 読み取りタイムアウト(60秒)に達しました。ネットワーク遅延またはWMSサーバー応答不可の可能性があります。",
+        "リトライ回数": 3,
+        "wms_request_id": "WMS-2025-01-15-000847",
+        "作成日時": "2025-01-15T09:32:15+09:00",
+        "更新日時": "2025-01-15T09:35:42+09:00",
+        "作成者": "自動連携エンジン"
+      },
+      {
+        "wms_log_id": "rec-20250115-001",
+        "連携種別": "作業実績送信",
+        "連携方向": "送信",
+        "拠点_id": "rec-site-0042",
+        "連携ステータス": "失敗",
+        "連携開始日時": "2025-01-15 14:30:00",
+        "連携完了日時": "2025-01-15 14:32:15",
+        "処理件数": 245,
+        "成功件数": 0,
+        "失敗件数": 245,
+        "エラーメッセージ": "WMS認証トークンの有効期限切れ。拠点コード: FUKUOKA-DC-02。再認証が必要です。",
+        "リトライ回数": 3,
+        "wms_request_id": "WMS-REQ-20250115-087654",
+        "作成日時": "2025-01-15 14:32:20",
+        "更新日時": "2025-01-15 14:35:45",
+        "作成者": "WMS連携システム"
+      },
+      {
+        "wms_log_id": "rec-20250115-002847",
+        "連携種別": "在庫逆仕訳同期",
+        "連携方向": "送信",
+        "拠点_id": "rec-hub-tokyo-01",
+        "連携ステータス": "部分成功",
+        "連携開始日時": "2025-01-15 14:30:00",
+        "連携完了日時": "2025-01-15 14:32:15",
+        "処理件数": 25,
+        "成功件数": 22,
+        "失敗件数": 3,
+        "エラーメッセージ": "返品ロット番号の形式不正により3件失敗。該当ロット: LOT-2024-999X、LOT-2024-888Y、LOT-2024-777Z",
+        "リトライ回数": 1,
+        "wms_request_id": "WMS-RET-20250115-5847",
+        "作成日時": "2025-01-15 14:32:16",
+        "更新日時": "2025-01-15 14:33:45",
+        "作成者": "システム_WMS連携エンジン"
+      },
+      {
+        "wms_log_id": "rec-001",
+        "連携種別": "初期マスタデータ同期",
+        "連携方向": "受信",
+        "拠点_id": "rec-002",
+        "連携ステータス": "部分成功",
+        "連携開始日時": "2024-11-15 09:30:00",
+        "連携完了日時": "2024-11-15 09:47:23",
+        "処理件数": 1250,
+        "成功件数": 1235,
+        "失敗件数": 15,
+        "エラーメッセージ": "商品マスタ15件で既存SKUコード重複エラーが発生。在庫初期値設定で不正な数値形式を検出。",
+        "リトライ回数": 2,
+        "wms_request_id": "WMS-20241115-093001-7842",
+        "作成日時": "2024-11-15 09:47:24",
+        "更新日時": "2024-11-15 10:15:32",
+        "作成者": "システム管理者_鈴木花子"
+      },
+      {
+        "wms_log_id": "rec-001",
+        "連携種別": "配送完了通知受信",
+        "連携方向": "受信",
+        "拠点_id": "rec-002",
+        "連携ステータス": "保留中",
+        "連携開始日時": "2025-01-15T14:32:00+09:00",
+        "連携完了日時": null,
+        "処理件数": 127,
+        "成功件数": 0,
+        "失敗件数": 127,
+        "エラーメッセージ": "WMS接続タイムアウト: 読み取り制限時間60秒を超過",
+        "リトライ回数": 2,
+        "wms_request_id": "WMS-20250115-0847",
+        "作成日時": "2025-01-15T14:32:15+09:00",
+        "更新日時": "2025-01-15T14:38:45+09:00",
+        "作成者": "自動連携システム"
+      },
+      {
+        "wms_log_id": "rec-001-2025-01-31-inv-reset",
+        "連携種別": "在庫同期",
+        "連携方向": "送信",
+        "拠点_id": "rec-site-all-branches",
+        "連携ステータス": "部分成功",
+        "連携開始日時": "2025-01-31T23:00:00+09:00",
+        "連携完了日時": "2025-02-01T00:45:30+09:00",
+        "処理件数": 1250,
+        "成功件数": 1198,
+        "失敗件数": 52,
+        "エラーメッセージ": "東京拠点の52件で在庫マスタ不整合により失敗。該当SKUの確認後リトライ予定。",
+        "リトライ回数": 1,
+        "wms_request_id": "WMS-20250131-MONTHLY-INV-RESET-001",
+        "作成日時": "2025-01-31T22:55:00+09:00",
+        "更新日時": "2025-02-01T00:45:30+09:00",
+        "作成者": "システム_在庫調整バッチ"
+      },
+      {
+        "wms_log_id": "rec-001",
+        "連携種別": "作業指示受信",
+        "連携方向": "受信",
+        "拠点_id": "rec-002",
+        "連携ステータス": "成功",
+        "連携開始日時": "2024-12-15T09:30:00+09:00",
+        "連携完了日時": "2024-12-15T09:31:45+09:00",
+        "処理件数": 47,
+        "成功件数": 47,
+        "失敗件数": 0,
+        "エラーメッセージ": null,
+        "リトライ回数": 0,
+        "wms_request_id": "WMS-20241215-093045-8F2K",
+        "作成日時": "2024-12-15T09:31:46+09:00",
+        "更新日時": "2024-12-15T09:31:46+09:00",
+        "作成者": "WMS自動連携"
+      }
+    ]
+  },
+  "shellHtml": "<!doctype html>\n<html lang=\"ja\">\n<head>\n  <meta charset=\"UTF-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n  <title>作業管理システム - 作業進捗・人員配置最適化エンジン</title>\n  <style>\n:root {\n  --primary: #f59e0b;\n  --primary-hover: #d97706;\n  --bg-main: #fefdf8;\n  --bg-card: #faf8f3;\n  --bg-sidebar: #f5f1e8;\n  --top-bar-bg: #fffbf0;\n  --top-bar-border: #f3e8d8;\n  --top-bar-text: #1f2937;\n  --text: #1f2937;\n  --text-muted: #6b7280;\n  --border: #e5ddd0;\n  --border-width: 1px;\n  --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;\n  --space-unit: 8px;\n  --control-height: 40px;\n  --radius-card: 12px;\n  --radius-control: 8px;\n  --shadow-card: 0 2px 8px rgba(31, 41, 55, 0.08), 0 1px 3px rgba(31, 41, 55, 0.04);\n  --motion-duration: 200ms;\n  --surface-texture: linear-gradient(90deg, transparent 0%, rgba(245, 158, 11, 0.02) 50%, transparent 100%), repeating-linear-gradient(0deg, transparent 0px, rgba(245, 158, 11, 0.01) 1px, transparent 2px, transparent 4px);\n  --surface-texture-size: 100% 100%;\n  --surface-texture-position: 0 0;\n}\n\n* {\n  margin: 0;\n  padding: 0;\n  box-sizing: border-box;\n}\n\nhtml, body {\n  height: 100%;\n  font-family: var(--font-family);\n  color: var(--text);\n  background-color: var(--bg-main);\n}\n\nbody {\n  display: flex;\n  flex-direction: column;\n}\n\n[data-aivic-shell-pattern] {\n  display: flex;\n  flex-direction: column;\n  height: 100vh;\n  overflow: hidden;\n}\n\n.shell-header {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  height: 56px;\n  background-color: var(--top-bar-bg);\n  border-bottom: var(--border-width) solid var(--top-bar-border);\n  padding: 0 calc(var(--space-unit) * 3);\n  flex-shrink: 0;\n  gap: calc(var(--space-unit) * 2);\n}\n\n.shell-header-left {\n  display: flex;\n  align-items: center;\n  gap: calc(var(--space-unit) * 3);\n  flex: 1;\n}\n\n.shell-logo {\n  font-size: 16px;\n  font-weight: 600;\n  color: var(--text);\n  letter-spacing: -0.3px;\n}\n\n.shell-logo-system {\n  font-size: 12px;\n  color: var(--text-muted);\n  font-weight: 400;\n  margin-top: 2px;\n}\n\n.shell-nav-top {\n  display: flex;\n  gap: calc(var(--space-unit) * 0.5);\n  align-items: center;\n}\n\n.shell-nav-item {\n  display: inline-flex;\n  align-items: center;\n  height: 32px;\n  padding: 0 calc(var(--space-unit) * 2);\n  font-size: 13px;\n  font-weight: 500;\n  color: var(--top-bar-text);\n  background: transparent;\n  border: none;\n  cursor: pointer;\n  border-radius: var(--radius-control);\n  transition: background-color var(--motion-duration), color var(--motion-duration);\n  white-space: nowrap;\n}\n\n.shell-nav-item:hover {\n  background-color: rgba(245, 158, 11, 0.1);\n}\n\n.shell-nav-item.aivic-active {\n  background-color: var(--primary);\n  color: #fff;\n}\n\n.shell-header-right {\n  display: flex;\n  align-items: center;\n  gap: calc(var(--space-unit) * 2);\n}\n\n.shell-user-area {\n  display: flex;\n  align-items: center;\n  gap: calc(var(--space-unit) * 1.5);\n}\n\n.shell-user-avatar {\n  width: 32px;\n  height: 32px;\n  border-radius: 50%;\n  background-color: var(--primary);\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  color: #fff;\n  font-size: 13px;\n  font-weight: 600;\n  flex-shrink: 0;\n}\n\n.shell-user-name {\n  font-size: 13px;\n  color: var(--top-bar-text);\n  font-weight: 500;\n}\n\n.shell-user-logout {\n  font-size: 12px;\n  color: var(--text-muted);\n  text-decoration: none;\n  transition: color var(--motion-duration);\n  cursor: pointer;\n}\n\n.shell-user-logout:hover {\n  color: var(--primary);\n  text-decoration: underline;\n}\n\n.shell-body {\n  display: flex;\n  flex: 1;\n  overflow: hidden;\n}\n\n.content-area {\n  flex: 1;\n  overflow-y: auto;\n  overflow-x: hidden;\n  background-color: var(--bg-main);\n  background-image: var(--surface-texture);\n  background-size: var(--surface-texture-size);\n  background-position: var(--surface-texture-position);\n}\n\n[data-aivic-panel] {\n  display: block;\n  min-height: 100%;\n}\n\n.shell-footer {\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  height: 40px;\n  background-color: var(--bg-card);\n  border-top: var(--border-width) solid var(--border);\n  font-size: 12px;\n  color: var(--text-muted);\n  flex-shrink: 0;\n}\n\n@media (max-width: 1024px) {\n  .shell-header {\n    padding: 0 calc(var(--space-unit) * 2);\n  }\n\n  .shell-nav-item {\n    padding: 0 calc(var(--space-unit) * 1.5);\n    font-size: 12px;\n  }\n}\n\n@media (max-width: 640px) {\n  .shell-header {\n    padding: 0 calc(var(--space-unit) * 1.5);\n  }\n\n  .shell-header-left {\n    gap: calc(var(--space-unit) * 1.5);\n  }\n\n  .shell-logo {\n    font-size: 14px;\n  }\n\n  .shell-nav-top {\n    display: none;\n  }\n\n  .shell-user-name {\n    display: none;\n  }\n}\n  </style>\n  <!--AIVIC_GLOBALS-->\n</head>\n<body>\n  <div data-aivic-shell-pattern=\"command_center\" data-aivic-nav-position=\"top\" data-aivic-density=\"balanced\">\n    <header class=\"shell-header\">\n      <div class=\"shell-header-left\">\n        <div>\n          <div class=\"shell-logo\">作業管理システム</div>\n          <div class=\"shell-logo-system\">作業進捗・人員配置最適化エンジン</div>\n        </div>\n        <nav class=\"shell-nav-top\">\n          <button class=\"shell-nav-item aivic-active\" data-aivic-nav=\"scr-1789461783315\" onclick=\"window.showScreen('scr-1789461783315')\">進捗・人員配置ダッシュボード</button>\n          <button class=\"shell-nav-item\" data-aivic-nav=\"scr-1789461798629\" onclick=\"window.showScreen('scr-1789461798629')\">人員配置最適化提案</button>\n          <button class=\"shell-nav-item\" data-aivic-nav=\"scr-1789461813941\" onclick=\"window.showScreen('scr-1789461813941')\">作業指示・実績管理</button>\n        </nav>\n      </div>\n      <div class=\"shell-header-right\">\n        <div class=\"shell-user-area\">\n          <div class=\"shell-user-avatar\">U</div>\n          <div class=\"shell-user-name\">ユーザー</div>\n          <a class=\"shell-user-logout\" href=\"./login.html\">ログアウト</a>\n        </div>\n      </div>\n    </header>\n    <div class=\"shell-body\">\n      <main class=\"content-area\">\n        <div data-aivic-panel=\"scr-1789461783315\"></div>\n        <div data-aivic-panel=\"scr-1789461798629\"></div>\n        <div data-aivic-panel=\"scr-1789461813941\"></div>\n      </main>\n    </div>\n    <footer class=\"shell-footer\">\n      © 2025 作業管理システム. All rights reserved.\n    </footer>\n  </div>\n  <!--AIVIC_RUNTIME-->\n</body>\n</html>",
+  "screenTaste": "明るい色使い"
+}

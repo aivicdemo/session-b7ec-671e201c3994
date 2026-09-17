@@ -1,0 +1,2454 @@
+{
+  "systemId": "itg-2",
+  "systemName": "作業者生産性データ分析・配置最適化支援システム",
+  "cssTheme": "```css\n:root {\n  /* Primary & Accent */\n  --primary: #f59e0b;\n  --primary-hover: #d97706;\n\n  /* Background Palette - 明るく爽やかなベース */\n  --bg-main: #fefdf8;\n  --bg-card: #faf8f3;\n  --bg-sidebar: #f5f1e8;\n\n  /* Top Bar - 明るさを保ちながら視覚的な分離 */\n  --top-bar-bg: #fffbf0;\n  --top-bar-border: #f3e8d8;\n  --top-bar-text: #1f2937;\n\n  /* Text Colors */\n  --text: #1f2937;\n  --text-muted: #6b7280;\n\n  /* Borders & Dividers */\n  --border: #e5ddd0;\n  --border-width: 1px;\n\n  /* Typography */\n  --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;\n\n  /* Spacing & Sizing */\n  --space-unit: 8px;\n  --control-height: 40px;\n  --radius-card: 12px;\n  --radius-control: 8px;\n\n  /* Shadows - 柔らかく明るい環境に合わせた浮遊感 */\n  --shadow-card: 0 2px 8px rgba(31, 41, 55, 0.08), 0 1px 3px rgba(31, 41, 55, 0.04);\n\n  /* Motion */\n  --motion-duration: 200ms;\n\n  /* Surface Texture - 明るく温かみのある紙のような質感 */\n  --surface-texture: \n    linear-gradient(90deg, transparent 0%, rgba(245, 158, 11, 0.02) 50%, transparent 100%),\n    repeating-linear-gradient(\n      0deg,\n      transparent 0px,\n      rgba(245, 158, 11, 0.01) 1px,\n      transparent 2px,\n      transparent 4px\n    );\n  --surface-texture-size: 100% 100%;\n  --surface-texture-position: 0 0;\n}\n```",
+  "screens": [
+    {
+      "id": "scr-1789461964046",
+      "name": "生産性ダッシュボード・分析画面",
+      "purpose": "作業者個人の生産性データを自動収集・分析し、初期割当結果と実績の追跡比較を行うことで、習熟度評価と品質ばらつきを可視化し、配置最適化の意思決定を支援する",
+      "items": [
+        "作業者別生産性サマリーカード",
+        "生産性データ時系列グラフ",
+        "習熟度レベル表示",
+        "初期割当計画表示パネル",
+        "実績記録表示パネル",
+        "割当結果と実績の比較テーブル",
+        "偏差分析チャート",
+        "品質ばらつき検知アラート",
+        "パターン認識結果表示",
+        "生産性データ蓄積状態インジケーター",
+        "データ収集期間フィルター",
+        "作業タイプ別フィルター"
+      ]
+    },
+    {
+      "id": "scr-1789461978707",
+      "name": "最適人員配置案提案・実行画面",
+      "purpose": "作業者の生産性データに基づいて自動生成された最適人員配置案を確認・承認・実行し、割当変更を記録・追跡するための統合管理画面",
+      "items": [
+        "配置案サマリーパネル",
+        "現在の配置状況表示",
+        "提案配置案一覧表",
+        "配置案詳細ビュー",
+        "作業者別割当内容表示",
+        "部門別割当内容表示",
+        "生産性向上予測値表示",
+        "配置案の確認ボタン",
+        "配置案の承認ボタン",
+        "配置案の却下ボタン",
+        "配置案の実行ボタン",
+        "割当変更内容確認ダイアログ"
+      ]
+    },
+    {
+      "id": "scr-1789461993203",
+      "name": "作業実績データ記録・入力画面",
+      "purpose": "作業者の実績データを収集・記録し、作業タイプ・部門別に入力・管理するとともに、データの自動保存と検証を行う",
+      "items": [
+        "作業者選択ドロップダウン",
+        "部門選択ドロップダウン",
+        "作業タイプ選択ドロップダウン",
+        "作業日付入力フィールド",
+        "作業開始時刻入力フィールド",
+        "作業終了時刻入力フィールド",
+        "実績数量入力フィールド",
+        "単位選択ドロップダウン",
+        "作業内容説明テキストエリア",
+        "品質評価選択ボタングループ",
+        "備考入力フィールド",
+        "実績データ保存ボタン"
+      ]
+    }
+  ],
+  "screenPanels": [
+    {
+      "screenId": "scr-1789461964046",
+      "panelHtml": "<div style=\"display: flex; flex-direction: column; height: 100%; background: var(--bg-main); color: var(--text); font-family: var(--font-family);\">\n  \n  <!-- Breadcrumb / Sub-header -->\n  <div style=\"padding: 12px 20px; border-bottom: 1px solid var(--border); background: var(--bg-card); font-size: 13px; color: var(--text-muted);\">\n    作業管理システム / 作業者生産性データ分析・配置最適化支援システム / 生産性ダッシュボード・分析画面\n  </div>\n\n  <!-- Filter Bar -->\n  <div style=\"padding: 16px 20px; border-bottom: 1px solid var(--border); background: var(--bg-card); display: flex; gap: 16px; align-items: flex-end; flex-wrap: wrap;\">\n    <div style=\"display: flex; flex-direction: column; gap: 4px;\">\n      <label style=\"font-size: 12px; color: var(--text-muted); font-weight: 500;\">データ収集期間</label>\n      <select data-testid=\"period-filter\" style=\"padding: 8px 12px; border: 1px solid var(--border); border-radius: var(--radius-control); background: var(--bg-main); color: var(--text); font-size: 13px; cursor: pointer;\">\n        <option value=\"\">選択してください</option>\n        <option value=\"today\">本日</option>\n        <option value=\"week\">本週</option>\n        <option value=\"month\">本月</option>\n        <option value=\"custom\">カスタム</option>\n      </select>\n    </div>\n\n    <div style=\"display: flex; gap: 8px; align-items: flex-end;\">\n      <div style=\"display: flex; flex-direction: column; gap: 4px;\">\n        <label style=\"font-size: 12px; color: var(--text-muted); font-weight: 500;\">開始日</label>\n        <input type=\"date\" data-testid=\"start-date-input\" style=\"padding: 8px 12px; border: 1px solid var(--border); border-radius: var(--radius-control); background: var(--bg-main); color: var(--text); font-size: 13px;\" />\n      </div>\n      <div style=\"display: flex; flex-direction: column; gap: 4px;\">\n        <label style=\"font-size: 12px; color: var(--text-muted); font-weight: 500;\">終了日</label>\n        <input type=\"date\" data-testid=\"end-date-input\" style=\"padding: 8px 12px; border: 1px solid var(--border); border-radius: var(--radius-control); background: var(--bg-main); color: var(--text); font-size: 13px;\" />\n      </div>\n    </div>\n\n    <div style=\"display: flex; flex-direction: column; gap: 4px;\">\n      <label style=\"font-size: 12px; color: var(--text-muted); font-weight: 500;\">作業タイプ</label>\n      <select data-testid=\"work-type-filter\" style=\"padding: 8px 12px; border: 1px solid var(--border); border-radius: var(--radius-control); background: var(--bg-main); color: var(--text); font-size: 13px; cursor: pointer;\">\n        <option value=\"\">すべて</option>\n        <option value=\"assembly\">組立</option>\n        <option value=\"inspection\">検査</option>\n        <option value=\"packing\">梱包</option>\n        <option value=\"other\">その他</option>\n      </select>\n    </div>\n\n    <button data-testid=\"filter-apply-button\" style=\"padding: 8px 16px; background: var(--primary); color: #fff; border: none; border-radius: var(--radius-control); font-size: 13px; font-weight: 500; cursor: pointer; transition: background var(--motion-duration);\">\n      適用\n    </button>\n  </div>\n\n  <!-- Main Content Grid -->\n  <div style=\"flex: 1; overflow: auto; padding: 16px 20px; display: grid; grid-template-columns: 280px 1fr 320px; gap: 16px;\">\n\n    <!-- Left Column: Worker Summary Cards -->\n    <div style=\"display: flex; flex-direction: column; gap: 12px; overflow-y: auto; padding-right: 8px;\">\n      <div style=\"font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 4px;\">作業者別生産性</div>\n      <div id=\"worker-cards-container\" data-testid=\"worker-cards-container\" style=\"display: flex; flex-direction: column; gap: 12px;\">\n        <!-- Worker cards will be inserted here -->\n      </div>\n    </div>\n\n    <!-- Center Column: Charts & Comparison Table -->\n    <div style=\"display: flex; flex-direction: column; gap: 16px; overflow-y: auto;\">\n      \n      <!-- Time Series Chart -->\n      <div class=\"card\" style=\"padding: 16px; background: var(--bg-card); border-radius: var(--radius-card); box-shadow: var(--shadow-card); border: 1px solid var(--border);\">\n        <div style=\"font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 12px;\">生産性推移（直近30日）</div>\n        <div class=\"chart-wrap\" style=\"position: relative; height: 280px; max-height: 300px;\">\n          <canvas id=\"productivity-chart\"></canvas>\n        </div>\n      </div>\n\n      <!-- Deviation Analysis Chart -->\n      <div class=\"card\" style=\"padding: 16px; background: var(--bg-card); border-radius: var(--radius-card); box-shadow: var(--shadow-card); border: 1px solid var(--border);\">\n        <div style=\"font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 12px;\">期待値 vs 実績値（偏差分析）</div>\n        <div class=\"chart-wrap\" style=\"position: relative; height: 240px; max-height: 260px;\">\n          <canvas id=\"deviation-chart\"></canvas>\n        </div>\n      </div>\n\n      <!-- Comparison Table -->\n      <div class=\"card\" style=\"padding: 16px; background: var(--bg-card); border-radius: var(--radius-card); box-shadow: var(--shadow-card); border: 1px solid var(--border);\">\n        <div style=\"font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 12px;\">割当結果と実績の比較</div>\n        <div class=\"table-wrap\" style=\"overflow-x: auto; max-height: 240px; overflow-y: auto;\">\n          <table data-testid=\"comparison-table\" style=\"width: 100%; border-collapse: collapse; font-size: 12px;\">\n            <thead>\n              <tr style=\"background: var(--bg-main); border-bottom: 1px solid var(--border);\">\n                <th style=\"padding: 8px 12px; text-align: left; color: var(--text); font-weight: 600; border-right: 1px solid var(--border);\">作業者</th>\n                <th style=\"padding: 8px 12px; text-align: center; color: var(--text); font-weight: 600; border-right: 1px solid var(--border);\">期待生産性</th>\n                <th style=\"padding: 8px 12px; text-align: center; color: var(--text); font-weight: 600; border-right: 1px solid var(--border);\">実績生産性</th>\n                <th style=\"padding: 8px 12px; text-align: center; color: var(--text); font-weight: 600;\">差分</th>\n              </tr>\n            </thead>\n            <tbody id=\"comparison-tbody\" data-testid=\"comparison-tbody\">\n              <!-- Rows will be inserted here -->\n            </tbody>\n          </table>\n        </div>\n      </div>\n\n    </div>\n\n    <!-- Right Column: Initial Assignment & Performance Panels -->\n    <div style=\"display: flex; flex-direction: column; gap: 12px; overflow-y: auto; padding-left: 8px;\">\n      \n      <!-- Initial Assignment Panel -->\n      <div class=\"card\" style=\"padding: 14px; background: var(--bg-card); border-radius: var(--radius-card); box-shadow: var(--shadow-card); border: 1px solid var(--border);\">\n        <div style=\"font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 10px;\">初期割当計画</div>\n        <div style=\"display: flex; flex-direction: column; gap: 8px; font-size: 12px;\">\n          <div>\n            <div style=\"color: var(--text-muted); font-size: 11px;\">配置部門</div>\n            <div id=\"initial-dept\" data-testid=\"initial-dept\" style=\"color: var(--text); font-weight: 500;\">—</div>\n          </div>\n          <div>\n            <div style=\"color: var(--text-muted); font-size: 11px;\">配置工程</div>\n            <div id=\"initial-process\" data-testid=\"initial-process\" style=\"color: var(--text); font-weight: 500;\">—</div>\n          </div>\n          <div>\n            <div style=\"color: var(--text-muted); font-size: 11px;\">割当開始日</div>\n            <div id=\"initial-start-date\" data-testid=\"initial-start-date\" style=\"color: var(--text); font-weight: 500;\">—</div>\n          </div>\n          <div>\n            <div style=\"color: var(--text-muted); font-size: 11px;\">期待生産性目標</div>\n            <div id=\"initial-target\" data-testid=\"initial-target\" style=\"color: var(--text); font-weight: 500;\">—</div>\n          </div>\n        </div>\n      </div>\n\n      <!-- Performance Panel -->\n      <div class=\"card\" style=\"padding: 14px; background: var(--bg-card); border-radius: var(--radius-card); box-shadow: var(--shadow-card); border: 1px solid var(--border);\">\n        <div style=\"font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 10px;\">実績記録（直近）</div>\n        <div style=\"display: flex; flex-direction: column; gap: 8px; font-size: 12px;\">\n          <div>\n            <div style=\"color: var(--text-muted); font-size: 11px;\">実績作業時間</div>\n            <div id=\"actual-work-time\" data-testid=\"actual-work-time\" style=\"color: var(--text); font-weight: 500;\">—</div>\n          </div>\n          <div>\n            <div style=\"color: var(--text-muted); font-size: 11px;\">完了件数</div>\n            <div id=\"actual-completed\" data-testid=\"actual-completed\" style=\"color: var(--text); font-weight: 500;\">—</div>\n          </div>\n          <div>\n            <div style=\"color: var(--text-muted); font-size: 11px;\">実績生産性率</div>\n            <div id=\"actual-productivity\" data-testid=\"actual-productivity\" style=\"color: var(--text); font-weight: 500;\">—</div>\n          </div>\n          <div>\n            <div style=\"color: var(--text-muted); font-size: 11px;\">品質スコア</div>\n            <div id=\"actual-quality\" data-testid=\"actual-quality\" style=\"color: var(--text); font-weight: 500;\">—</div>\n          </div>\n        </div>\n      </div>\n\n      <!-- Proficiency Level Panel -->\n      <div class=\"card\" style=\"padding: 14px; background: var(--bg-card); border-radius: var(--radius-card); box-shadow: var(--shadow-card); border: 1px solid var(--border);\">\n        <div style=\"font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 10px;\">習熟度レベル</div>\n        <div id=\"proficiency-badge\" data-testid=\"proficiency-badge\" style=\"display: inline-block; padding: 6px 12px; border-radius: 6px; background: var(--primary); color: #fff; font-size: 12px; font-weight: 600;\">\n          —\n        </div>\n      </div>\n\n      <!-- Quality Alert Panel -->\n      <div id=\"quality-alert\" data-testid=\"quality-alert\" style=\"padding: 12px; background: #fef3c7; border: 1px solid #fcd34d; border-radius: var(--radius-card); display: none;\">\n        <div style=\"font-size: 12px; font-weight: 600; color: #92400e; margin-bottom: 6px;\">⚠ 品質ばらつき検知</div>\n        <div id=\"alert-message\" style=\"font-size: 11px; color: #b45309; line-height: 1.4;\">\n          品質スコアが低下しています\n        </div>\n      </div>\n\n    </div>\n\n  </div>\n\n</div>",
+      "initJs": "function(container, apiUrl, tables) {\n  // ============================================================\n  // Data Initialization & State Management\n  // ============================================================\n  let currentWorker = null;\n  let productivityData = [];\n  let performanceData = [];\n  let initialAssignmentData = [];\n  let comparisonData = [];\n  let chartInstances = {};\n\n  const filterState = {\n    period: 'month',\n    startDate: null,\n    endDate: null,\n    workType: ''\n  };\n\n  // ============================================================\n  // Utility Functions\n  // ============================================================\n  function getDateRange(period) {\n    const today = new Date();\n    let start, end = new Date(today);\n\n    switch(period) {\n      case 'today':\n        start = new Date(today);\n        break;\n      case 'week':\n        start = new Date(today);\n        start.setDate(today.getDate() - 7);\n        break;\n      case 'month':\n        start = new Date(today);\n        start.setDate(1);\n        break;\n      case 'custom':\n        start = filterState.startDate ? new Date(filterState.startDate) : new Date(today.getFullYear(), today.getMonth(), 1);\n        end = filterState.endDate ? new Date(filterState.endDate) : today;\n        break;\n      default:\n        start = new Date(today);\n        start.setDate(today.getDate() - 30);\n    }\n\n    return { start, end };\n  }\n\n  function formatDate(date) {\n    if (!date) return '—';\n    const d = new Date(date);\n    return d.toLocaleDateString('ja-JP', { year: 'numeric', month: '2-digit', day: '2-digit' });\n  }\n\n  function getProficiencyLevel(productivity) {\n    if (productivity >= 95) return 'エキスパート';\n    if (productivity >= 85) return '上級';\n    if (productivity >= 70) return '中級';\n    return '初級';\n  }\n\n  function getProficiencyColor(level) {\n    switch(level) {\n      case 'エキスパート': return '#10b981';\n      case '上級': return '#3b82f6';\n      case '中級': return '#f59e0b';\n      case '初級': return '#ef4444';\n      default: return '#6b7280';\n    }\n  }\n\n  // ============================================================\n  // Data Fetching & Aggregation\n  // ============================================================\n  async function loadData() {\n    try {\n      // Fetch productivity data\n      const prodData = await window.aivicApi.list(0); // 生産性データテーブル\n      productivityData = prodData || [];\n\n      // Fetch performance records\n      const perfData = await window.aivicApi.list(1); // 実績記録テーブル\n      performanceData = perfData || [];\n\n      // Fetch initial assignments\n      const initData = await window.aivicApi.list(2); // 初期割当テーブル\n      initialAssignmentData = initData || [];\n\n      // Fetch placement plans\n      const placementData = await window.aivicApi.list(3); // 配置計画テーブル\n      comparisonData = placementData || [];\n\n      renderWorkerCards();\n      updateCharts();\n      updateComparisonTable();\n      updateDetailPanels();\n    } catch (error) {\n      console.error('Data loading error:', error);\n    }\n  }\n\n  // ============================================================\n  // Worker Cards Rendering\n  // ============================================================\n  function renderWorkerCards() {\n    const container = container.querySelector('#worker-cards-container');\n    if (!container) return;\n\n    container.innerHTML = '';\n\n    // Group productivity data by worker\n    const workerMap = {};\n    productivityData.forEach(record => {\n      if (!workerMap[record.workerId]) {\n        workerMap[record.workerId] = {\n          workerId: record.workerId,\n          workerName: record.workerName || 'Unknown',\n          location: record.location || '—',\n          records: []\n        };\n      }\n      workerMap[record.workerId].records.push(record);\n    });\n\n    // Create cards for each worker\n    Object.values(workerMap).slice(0, 8).forEach(worker => {\n      const avgProductivity = worker.records.length > 0\n        ? Math.round(worker.records.reduce((sum, r) => sum + (r.productivityRate || 0), 0) / worker.records.length)\n        : 0;\n      const avgQuality = worker.records.length > 0\n        ? Math.round(worker.records.reduce((sum, r) => sum + (r.qualityScore || 0), 0) / worker.records.length)\n        : 0;\n      const proficiency = getProficiencyLevel(avgProductivity);\n      const profColor = getProficiencyColor(proficiency);\n\n      const card = document.createElement('div');\n      card.className = 'card';\n      card.style.cssText = `\n        padding: 12px;\n        background: var(--bg-card);\n        border-radius: var(--radius-card);\n        box-shadow: var(--shadow-card);\n        border: 1px solid var(--border);\n        cursor: pointer;\n        transition: all var(--motion-duration);\n      `;\n      card.onmouseover = () => {\n        card.style.boxShadow = '0 4px 12px rgba(31, 41, 55, 0.12)';\n        card.style.transform = 'translateY(-2px)';\n      };\n      card.onmouseout = () => {\n        card.style.boxShadow = 'var(--shadow-card)';\n        card.style.transform = 'translateY(0)';\n      };\n      card.onclick = () => selectWorker(worker.workerId, worker);\n\n      card.innerHTML = `\n        <div style=\"font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 8px;\">${worker.workerName}</div>\n        <div style=\"font-size: 11px; color: var(--text-muted); margin-bottom: 8px;\">${worker.location}</div>\n        <div style=\"display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;\">\n          <div>\n            <div style=\"font-size: 10px; color: var(--text-muted);\">生産性</div>\n            <div style=\"font-size: 14px; font-weight: 700; color: var(--primary);\">${avgProductivity}%</div>\n          </div>\n          <div>\n            <div style=\"font-size: 10px; color: var(--text-muted);\">品質</div>\n            <div style=\"font-size: 14px; font-weight: 700; color: #3b82f6;\">${avgQuality}</div>\n          </div>\n        </div>\n        <div style=\"padding: 6px 8px; background: ${profColor}20; border-radius: 4px; text-align: center;\">\n          <div style=\"font-size: 11px; font-weight: 600; color: ${profColor};\">${proficiency}</div>\n        </div>\n      `;\n\n      container.appendChild(card);\n    });\n  }\n\n  function selectWorker(workerId, workerInfo) {\n    currentWorker = { id: workerId, ...workerInfo };\n    updateDetailPanels();\n    updateCharts();\n    updateComparisonTable();\n  }\n\n  // ============================================================\n  // Chart Rendering\n  // ============================================================\n  function updateCharts() {\n    if (!window.Chart) {\n      console.warn('Chart.js not loaded');\n      return;\n    }\n\n    // Filter data based on current worker and date range\n    const { start, end } = getDateRange(filterState.period);\n    let filteredData = productivityData;\n\n    if (currentWorker) {\n      filteredData = filteredData.filter(r => r.workerId === currentWorker.id);\n    }\n\n    filteredData = filteredData.filter(r => {\n      const recordDate = new Date(r.workDate);\n      return recordDate >= start && recordDate <= end;\n    });\n\n    // Sort by date\n    filteredData.sort((a, b) => new Date(a.workDate) - new Date(b.workDate));\n\n    // ========== Productivity Time Series Chart ==========\n    const prodCtx = container.querySelector('#productivity-chart');\n    if (prodCtx) {\n      if (chartInstances.productivity) {\n        chartInstances.productivity.destroy();\n      }\n\n      const labels = filteredData.map(r => formatDate(r.workDate));\n      const productivityValues = filteredData.map(r => r.productivityRate || 0);\n      const standardLine = filteredData.map(() => 80); // Standard productivity target\n\n      chartInstances.productivity = new window.Chart(prodCtx, {\n        type: 'line',\n        data: {\n          labels: labels,\n          datasets: [\n            {\n              label: '実績生産性率',\n              data: productivityValues,\n              borderColor: '#f59e0b',\n              backgroundColor: 'rgba(245, 158, 11, 0.08)',\n              borderWidth: 2,\n              fill: true,\n              tension: 0.3,\n              pointRadius: 4,\n              pointBackgroundColor: '#f59e0b',\n              pointBorderColor: '#fff',\n              pointBorderWidth: 2\n            },\n            {\n              label: '標準値（80%）',\n              data: standardLine,\n              borderColor: '#d1d5db',\n              borderWidth: 1,\n              borderDash: [5, 5],\n              fill: false,\n              pointRadius: 0,\n              tension: 0\n            }\n          ]\n        },\n        options: {\n          responsive: true,\n          maintainAspectRatio: false,\n          plugins: {\n            legend: {\n              display: true,\n              labels: {\n                font: { size: 11 },\n                color: '#6b7280',\n                usePointStyle: true,\n                padding: 12\n              }\n            }\n          },\n          scales: {\n            y: {\n              beginAtZero: true,\n              max: 100,\n              ticks: {\n                font: { size: 11 },\n                color: '#6b7280',\n                callback: function(value) { return value + '%'; }\n              },\n              grid: {\n                color: 'rgba(229, 221, 208, 0.3)',\n                drawBorder: false\n              }\n            },\n            x: {\n              ticks: {\n                font: { size: 10 },\n                color: '#6b7280',\n                maxRotation: 45,\n                minRotation: 0\n              },\n              grid: {\n                display: false,\n                drawBorder: false\n              }\n            }\n          }\n        }\n      });\n    }\n\n    // ========== Deviation Analysis Chart ==========\n    const devCtx = container.querySelector('#deviation-chart');\n    if (devCtx) {\n      if (chartInstances.deviation) {\n        chartInstances.deviation.destroy();\n      }\n\n      // Aggregate by week for deviation analysis\n      const weeklyData = {};\n      filteredData.forEach(r => {\n        const date = new Date(r.workDate);\n        const weekStart = new Date(date);\n        weekStart.setDate(date.getDate() - date.getDay());\n        const weekKey = weekStart.toISOString().split('T')[0];\n\n        if (!weeklyData[weekKey]) {\n          weeklyData[weekKey] = { expected: 0, actual: 0, count: 0 };\n        }\n        weeklyData[weekKey].expected += 80; // Standard expectation\n        weeklyData[weekKey].actual += r.productivityRate || 0;\n        weeklyData[weekKey].count += 1;\n      });\n\n      const weekLabels = Object.keys(weeklyData).sort();\n      const expectedValues = weekLabels.map(k => Math.round(weeklyData[k].expected / weeklyData[k].count));\n      const actualValues = weekLabels.map(k => Math.round(weeklyData[k].actual / weeklyData[k].count));\n\n      chartInstances.deviation = new window.Chart(devCtx, {\n        type: 'bar',\n        data: {\n          labels: weekLabels.map(d => formatDate(d)),\n          datasets: [\n            {\n              label: '期待値',\n              data: expectedValues,\n              backgroundColor: 'rgba(219, 234, 254, 0.8)',\n              borderColor: '#3b82f6',\n              borderWidth: 1\n            },\n            {\n              label: '実績値',\n              data: actualValues,\n              backgroundColor: 'rgba(254, 215, 170, 0.8)',\n              borderColor: '#f59e0b',\n              borderWidth: 1\n            }\n          ]\n        },\n        options: {\n          responsive: true,\n          maintainAspectRatio: false,\n          plugins: {\n            legend: {\n              display: true,\n              labels: {\n                font: { size: 11 },\n                color: '#6b7280',\n                padding: 12\n              }\n            }\n          },\n          scales: {\n            y: {\n              beginAtZero: true,\n              max: 100,\n              ticks: {\n                font: { size: 11 },\n                color: '#6b7280',\n                callback: function(value) { return value + '%'; }\n              },\n              grid: {\n                color: 'rgba(229, 221, 208, 0.3)',\n                drawBorder: false\n              }\n            },\n            x: {\n              ticks: {\n                font: { size: 10 },\n                color: '#6b7280'\n              },\n              grid: {\n                display: false,\n                drawBorder: false\n              }\n            }\n          }\n        }\n      });\n    }\n  }\n\n  // ============================================================\n  // Comparison Table Update\n  // ============================================================\n  function updateComparisonTable() {\n    const tbody = container.querySelector('#comparison-tbody');\n    if (!tbody) return;\n\n    tbody.innerHTML = '';\n\n    // Filter comparison data\n    let filtered = comparisonData;\n    if (currentWorker) {\n      filtered = filtered.filter(r => r.workerId === currentWorker.id);\n    }\n\n    filtered.slice(0, 10).forEach(record => {\n      const expected = record.expectedProductivity || 80;\n      const actual = record.actualProductivity || 0;\n      const diff = actual - expected;\n      const diffPercent = Math.round((diff / expected) * 100);\n      const diffColor = diff >= 0 ? '#10b981' : '#ef4444';\n\n      const row = document.createElement('tr');\n      row.style.borderBottom = '1px solid var(--border)';\n      row.innerHTML = `\n        <td style=\"padding: 8px 12px; color: var(--text); border-right: 1px solid var(--border);\">${record.workerName || '—'}</td>\n        <td style=\"padding: 8px 12px; text-align: center; color: var(--text); border-right: 1px solid var(--border);\">${expected}%</td>\n        <td style=\"padding: 8px 12px; text-align: center; color: var(--text); border-right: 1px solid var(--border);\">${actual}%</td>\n        <td style=\"padding: 8px 12px; text-align: center; color: ${diffColor}; font-weight: 600; background: ${diffColor}15;\">\n          ${diff >= 0 ? '+' : ''}${diffPercent}%\n        </td>\n      `;\n      tbody.appendChild(row);\n    });\n\n    if (filtered.length === 0) {\n      const row = document.createElement('tr');\n      row.innerHTML = `<td colspan=\"4\" style=\"padding: 16px; text-align: center; color: var(--text-muted);\">データなし</td>`;\n      tbody.appendChild(row);\n    }\n  }\n\n  // ============================================================\n  // Detail Panels Update\n  // ============================================================\n  function updateDetailPanels() {\n    if (!currentWorker) {\n      // Reset panels\n      container.querySelector('#initial-dept').textContent = '—';\n      container.querySelector('#initial-process').textContent = '—';\n      container.querySelector('#initial-start-date').textContent = '—';\n      container.querySelector('#initial-target').textContent = '—';\n      container.querySelector('#actual-work-time').textContent = '—';\n      container.querySelector('#actual-completed').textContent = '—';\n      container.querySelector('#actual-productivity').textContent = '—';\n      container.querySelector('#actual-quality').textContent = '—';\n      container.querySelector('#proficiency-badge').textContent = '—';\n      container.querySelector('#quality-alert').style.display = 'none';\n      return;\n    }\n\n    // Initial Assignment Panel\n    const assignment = initialAssignmentData.find(a => a.workerId === currentWorker.id);\n    if (assignment) {\n      container.querySelector('#initial-dept').textContent = assignment.department || '—';\n      container.querySelector('#initial-process').textContent = assignment.process || '—';\n      container.querySelector('#initial-start-date').textContent = formatDate(assignment.startDate);\n      container.querySelector('#initial-target').textContent = (assignment.expectedProductivity || 80) + '%';\n    }\n\n    // Performance Panel (Latest Record)\n    const latestPerf = performanceData\n      .filter(p => p.workerId === currentWorker.id)\n      .sort((a, b) => new Date(b.workDate) - new Date(a.workDate))[0];\n\n    if (latestPerf) {\n      container.querySelector('#actual-work-time').textContent = (latestPerf.workTimeMinutes || 0) + ' 分';\n      container.querySelector('#actual-completed').textContent = (latestPerf.completedCount || 0) + ' 件';\n      container.querySelector('#actual-productivity').textContent = (latestPerf.productivityRate || 0) + '%';\n      container.querySelector('#actual-quality').textContent = (latestPerf.qualityScore || 0);\n    }\n\n    // Proficiency Level\n    const avgProd = currentWorker.records && currentWorker.records.length > 0\n      ? Math.round(currentWorker.records.reduce((sum, r) => sum + (r.productivityRate || 0), 0) / currentWorker.records.length)\n      : 0;\n    const profLevel = getProficiencyLevel(avgProd);\n    const profColor = getProficiencyColor(profLevel);\n    const badge = container.querySelector('#proficiency-badge');\n    badge.textContent = profLevel;\n    badge.style.background = profColor;\n\n    // Quality Alert\n    const recentQuality = performanceData\n      .filter(p => p.workerId === currentWorker.id)\n      .slice(-7)\n      .map(p => p.qualityScore || 0);\n\n    if (recentQuality.length > 0) {\n      const avgQuality = Math.round(recentQuality.reduce((a, b) => a + b) / recentQuality.length);\n      const alertEl = container.querySelector('#quality-alert');\n      const msgEl = container.querySelector('#alert-message');\n\n      if (avgQuality < 70) {\n        alertEl.style.display = 'block';\n        msgEl.textContent = `品質スコアが低下しています（直近7日平均: ${avgQuality}）`;\n      } else {\n        alertEl.style.display = 'none';\n      }\n    }\n  }\n\n  // ============================================================\n  // Event Listeners\n  // ============================================================\n  const filterApplyBtn = container.querySelector('[data-testid=\"filter-apply-button\"]');\n  if (filterApplyBtn) {\n    filterApplyBtn.addEventListener('click', () => {\n      const periodSelect = container.querySelector('[data-testid=\"period-filter\"]');\n      const startInput = container.querySelector('[data-testid=\"start-date-input\"]');\n      const endInput = container.querySelector('[data-testid=\"end-date-input\"]');\n      const workTypeSelect = container.querySelector('[data-testid=\"work-type-filter\"]');\n\n      filterState.period = periodSelect.value || 'month';\n      filterState.startDate = startInput.value;\n      filterState.endDate = endInput.value;\n      filterState.workType = workTypeSelect.value;\n\n      updateCharts();\n      updateComparisonTable();\n    });\n  }\n\n  const periodSelect = container.querySelector('[data-testid=\"period-filter\"]');\n  if (periodSelect) {\n    periodSelect.addEventListener('change', (e) => {\n      filterState.period = e.target.value || 'month';\n      if (e.target.value !== 'custom') {\n        container.querySelector('[data-testid=\"start-date-input\"]').value = '';\n        container.querySelector('[data-testid=\"end-date-input\"]').value = '';\n      }\n    });\n  }\n\n  // ============================================================\n  // Initial Load\n  // ============================================================\n  loadData();\n}",
+      "method": "ai"
+    },
+    {
+      "screenId": "scr-1789461978707",
+      "panelHtml": "<div style=\"display: flex; flex-direction: column; height: 100%; background: var(--bg-main); color: var(--text); font-family: var(--font-family);\">\n  \n  <!-- Breadcrumb / Sub-header -->\n  <div style=\"padding: 12px 20px; border-bottom: 1px solid var(--border); background: var(--bg-card); font-size: 13px; color: var(--text-muted);\">\n    作業管理システム&nbsp;›&nbsp;作業者生産性データ分析・配置最適化支援システム&nbsp;›&nbsp;最適人員配置案提案・実行画面\n  </div>\n\n  <!-- Main Content Area -->\n  <div style=\"flex: 1; overflow: auto; display: flex; flex-direction: column;\">\n    \n    <!-- Summary Panel -->\n    <div style=\"background: var(--bg-card); padding: 16px 20px; border-bottom: 1px solid var(--border); display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;\">\n      <div style=\"display: flex; flex-direction: column; gap: 4px;\">\n        <div style=\"font-size: 12px; color: var(--text-muted); font-weight: 500;\">提案日時</div>\n        <div style=\"font-size: 16px; font-weight: 600; color: var(--text);\" data-testid=\"proposal-date\">2025-01-15 14:32</div>\n      </div>\n      <div style=\"display: flex; flex-direction: column; gap: 4px;\">\n        <div style=\"font-size: 12px; color: var(--text-muted); font-weight: 500;\">対象作業者数</div>\n        <div style=\"font-size: 16px; font-weight: 600; color: var(--text);\" data-testid=\"target-workers\">12 名</div>\n      </div>\n      <div style=\"display: flex; flex-direction: column; gap: 4px;\">\n        <div style=\"font-size: 12px; color: var(--text-muted); font-weight: 500;\">期待生産性向上率</div>\n        <div style=\"font-size: 16px; font-weight: 600; color: var(--primary);\" data-testid=\"expected-improvement\">+8.5%</div>\n      </div>\n      <div style=\"display: flex; flex-direction: column; gap: 4px;\">\n        <div style=\"font-size: 12px; color: var(--text-muted); font-weight: 500;\">推奨実行日</div>\n        <div style=\"font-size: 16px; font-weight: 600; color: var(--text);\" data-testid=\"recommended-date\">2025-01-20</div>\n      </div>\n    </div>\n\n    <!-- Two-Row Layout -->\n    <div style=\"flex: 1; display: flex; flex-direction: column; overflow: auto; padding: 16px 20px; gap: 16px;\">\n      \n      <!-- Row 1: Current Status & Department Allocation -->\n      <div style=\"display: grid; grid-template-columns: 1fr 1fr; gap: 16px; height: 200px;\">\n        \n        <!-- Current Allocation Status -->\n        <div class=\"card\" style=\"display: flex; flex-direction: column; gap: 12px; overflow: auto;\">\n          <div style=\"font-size: 14px; font-weight: 600; color: var(--text);\">現在の配置状況</div>\n          <div style=\"flex: 1; overflow: auto;\">\n            <table style=\"width: 100%; border-collapse: collapse; font-size: 13px;\" data-testid=\"current-allocation-table\">\n              <thead>\n                <tr style=\"border-bottom: 1px solid var(--border);\">\n                  <th style=\"text-align: left; padding: 8px 0; color: var(--text); font-weight: 600;\">部門</th>\n                  <th style=\"text-align: right; padding: 8px 0; color: var(--text); font-weight: 600;\">配置人数</th>\n                  <th style=\"text-align: right; padding: 8px 0; color: var(--text); font-weight: 600;\">平均生産性</th>\n                </tr>\n              </thead>\n              <tbody id=\"current-allocation-tbody\">\n                <tr style=\"border-bottom: 1px solid var(--border);\">\n                  <td style=\"padding: 8px 0; color: var(--text);\">製造部</td>\n                  <td style=\"text-align: right; color: var(--text);\">8 名</td>\n                  <td style=\"text-align: right; color: var(--text);\">78%</td>\n                </tr>\n                <tr style=\"border-bottom: 1px solid var(--border);\">\n                  <td style=\"padding: 8px 0; color: var(--text);\">品質管理部</td>\n                  <td style=\"text-align: right; color: var(--text);\">4 名</td>\n                  <td style=\"text-align: right; color: var(--text);\">72%</td>\n                </tr>\n                <tr>\n                  <td style=\"padding: 8px 0; color: var(--text);\">物流部</td>\n                  <td style=\"text-align: right; color: var(--text);\">6 名</td>\n                  <td style=\"text-align: right; color: var(--text);\">65%</td>\n                </tr>\n              </tbody>\n            </table>\n          </div>\n        </div>\n\n        <!-- Department Allocation Changes -->\n        <div class=\"card\" style=\"display: flex; flex-direction: column; gap: 12px; overflow: auto;\">\n          <div style=\"font-size: 14px; font-weight: 600; color: var(--text);\">部門別割当内容</div>\n          <div style=\"flex: 1; overflow: auto;\">\n            <table style=\"width: 100%; border-collapse: collapse; font-size: 13px;\" data-testid=\"department-allocation-table\">\n              <thead>\n                <tr style=\"border-bottom: 1px solid var(--border);\">\n                  <th style=\"text-align: left; padding: 8px 0; color: var(--text); font-weight: 600;\">部門</th>\n                  <th style=\"text-align: right; padding: 8px 0; color: var(--text); font-weight: 600;\">変更数</th>\n                  <th style=\"text-align: right; padding: 8px 0; color: var(--text); font-weight: 600;\">期待向上率</th>\n                </tr>\n              </thead>\n              <tbody id=\"department-allocation-tbody\">\n                <tr style=\"border-bottom: 1px solid var(--border);\">\n                  <td style=\"padding: 8px 0; color: var(--text);\">製造部</td>\n                  <td style=\"text-align: right; color: var(--text);\">+2 名</td>\n                  <td style=\"text-align: right; color: var(--primary); font-weight: 600;\">+5.2%</td>\n                </tr>\n                <tr style=\"border-bottom: 1px solid var(--border);\">\n                  <td style=\"padding: 8px 0; color: var(--text);\">品質管理部</td>\n                  <td style=\"text-align: right; color: var(--text);\">-1 名</td>\n                  <td style=\"text-align: right; color: var(--primary); font-weight: 600;\">+3.1%</td>\n                </tr>\n                <tr>\n                  <td style=\"padding: 8px 0; color: var(--text);\">物流部</td>\n                  <td style=\"text-align: right; color: var(--text);\">-1 名</td>\n                  <td style=\"text-align: right; color: var(--primary); font-weight: 600;\">+2.8%</td>\n                </tr>\n              </tbody>\n            </table>\n          </div>\n        </div>\n      </div>\n\n      <!-- Row 2: Proposal List & Detail View -->\n      <div style=\"display: grid; grid-template-columns: 1.4fr 1fr; gap: 16px; flex: 1; min-height: 300px; overflow: hidden;\">\n        \n        <!-- Proposal List -->\n        <div class=\"card\" style=\"display: flex; flex-direction: column; gap: 12px; overflow: hidden;\">\n          <div style=\"display: flex; justify-content: space-between; align-items: center; gap: 12px;\">\n            <div style=\"font-size: 14px; font-weight: 600; color: var(--text);\">提案配置案一覧</div>\n            <input type=\"text\" placeholder=\"作業者名で検索...\" data-testid=\"worker-search\" style=\"padding: 6px 12px; border: 1px solid var(--border); border-radius: var(--radius-control); background: var(--bg-main); color: var(--text); font-size: 12px; width: 150px;\" />\n          </div>\n          <div style=\"flex: 1; overflow: auto;\">\n            <table style=\"width: 100%; border-collapse: collapse; font-size: 12px;\" data-testid=\"proposal-list-table\">\n              <thead style=\"position: sticky; top: 0; background: var(--bg-main); z-index: 10;\">\n                <tr style=\"border-bottom: 1px solid var(--border);\">\n                  <th style=\"text-align: left; padding: 8px 0; color: var(--text); font-weight: 600;\">作業者名</th>\n                  <th style=\"text-align: left; padding: 8px 0; color: var(--text); font-weight: 600;\">現在の部門</th>\n                  <th style=\"text-align: left; padding: 8px 0; color: var(--text); font-weight: 600;\">提案部門</th>\n                  <th style=\"text-align: right; padding: 8px 0; color: var(--text); font-weight: 600;\">改善率</th>\n                </tr>\n              </thead>\n              <tbody id=\"proposal-list-tbody\">\n                <tr style=\"border-bottom: 1px solid var(--border); cursor: pointer; background: var(--bg-card);\" class=\"proposal-row\" data-id=\"w001\" data-testid=\"proposal-row-w001\">\n                  <td style=\"padding: 10px 0; color: var(--text);\">田中太郎</td>\n                  <td style=\"padding: 10px 0; color: var(--text);\">品質管理部</td>\n                  <td style=\"padding: 10px 0; color: var(--text);\">製造部</td>\n                  <td style=\"text-align: right; padding: 10px 0; color: var(--primary); font-weight: 600;\">+6.2%</td>\n                </tr>\n                <tr style=\"border-bottom: 1px solid var(--border); cursor: pointer; background: var(--bg-card);\" class=\"proposal-row\" data-id=\"w002\" data-testid=\"proposal-row-w002\">\n                  <td style=\"padding: 10px 0; color: var(--text);\">鈴木花子</td>\n                  <td style=\"padding: 10px 0; color: var(--text);\">物流部</td>\n                  <td style=\"padding: 10px 0; color: var(--text);\">製造部</td>\n                  <td style=\"text-align: right; padding: 10px 0; color: var(--primary); font-weight: 600;\">+8.1%</td>\n                </tr>\n                <tr style=\"border-bottom: 1px solid var(--border); cursor: pointer; background: var(--bg-card);\" class=\"proposal-row\" data-id=\"w003\" data-testid=\"proposal-row-w003\">\n                  <td style=\"padding: 10px 0; color: var(--text);\">佐藤次郎</td>\n                  <td style=\"padding: 10px 0; color: var(--text);\">製造部</td>\n                  <td style=\"padding: 10px 0; color: var(--text);\">品質管理部</td>\n                  <td style=\"text-align: right; padding: 10px 0; color: var(--primary); font-weight: 600;\">+5.8%</td>\n                </tr>\n                <tr style=\"border-bottom: 1px solid var(--border); cursor: pointer; background: var(--bg-card);\" class=\"proposal-row\" data-id=\"w004\" data-testid=\"proposal-row-w004\">\n                  <td style=\"padding: 10px 0; color: var(--text);\">高橋美咲</td>\n                  <td style=\"padding: 10px 0; color: var(--text);\">物流部</td>\n                  <td style=\"padding: 10px 0; color: var(--text);\">製造部</td>\n                  <td style=\"text-align: right; padding: 10px 0; color: var(--primary); font-weight: 600;\">+7.3%</td>\n                </tr>\n              </tbody>\n            </table>\n          </div>\n        </div>\n\n        <!-- Detail View -->\n        <div class=\"card\" style=\"display: flex; flex-direction: column; gap: 12px; overflow: hidden;\">\n          <div style=\"font-size: 14px; font-weight: 600; color: var(--text);\">配置案詳細</div>\n          <div id=\"detail-view\" style=\"flex: 1; overflow: auto; display: flex; flex-direction: column; gap: 12px;\">\n            <div style=\"padding: 12px; background: var(--bg-main); border-radius: var(--radius-control); border: 1px solid var(--border);\">\n              <div style=\"font-size: 12px; color: var(--text-muted); margin-bottom: 4px;\">作業者プロフィール</div>\n              <div id=\"detail-worker-name\" style=\"font-size: 14px; font-weight: 600; color: var(--text);\">未選択</div>\n            </div>\n            <div style=\"padding: 12px; background: var(--bg-main); border-radius: var(--radius-control); border: 1px solid var(--border);\">\n              <div style=\"font-size: 12px; color: var(--text-muted); margin-bottom: 4px;\">配置先情報</div>\n              <div style=\"font-size: 12px; color: var(--text); line-height: 1.6;\">\n                <div><strong>部門:</strong> <span id=\"detail-department\">—</span></div>\n                <div><strong>工程:</strong> <span id=\"detail-process\">—</span></div>\n                <div><strong>開始予定:</strong> <span id=\"detail-start-date\">—</span></div>\n              </div>\n            </div>\n            <div style=\"padding: 12px; background: var(--bg-main); border-radius: var(--radius-control); border: 1px solid var(--border);\">\n              <div style=\"font-size: 12px; color: var(--text-muted); margin-bottom: 4px;\">期待効果</div>\n              <div style=\"font-size: 12px; color: var(--text); line-height: 1.6;\">\n                <div><strong>生産性目標:</strong> <span id=\"detail-productivity-target\">—</span></div>\n                <div><strong>改善率:</strong> <span id=\"detail-improvement-rate\" style=\"color: var(--primary); font-weight: 600;\">—</span></div>\n              </div>\n            </div>\n            <div style=\"padding: 12px; background: var(--bg-main); border-radius: var(--radius-control); border: 1px solid var(--border);\">\n              <div style=\"font-size: 12px; color: var(--text-muted); margin-bottom: 4px;\">推奨理由</div>\n              <div id=\"detail-reason\" style=\"font-size: 12px; color: var(--text); line-height: 1.6;\">—</div>\n            </div>\n          </div>\n        </div>\n      </div>\n\n      <!-- Productivity Comparison Chart -->\n      <div class=\"card\" style=\"display: flex; flex-direction: column; gap: 12px; height: 220px;\">\n        <div style=\"font-size: 14px; font-weight: 600; color: var(--text);\">生産性向上予測値</div>\n        <canvas id=\"productivity-chart\" style=\"flex: 1;\" data-testid=\"productivity-chart\"></canvas>\n      </div>\n\n    </div>\n  </div>\n\n  <!-- Action Buttons (Fixed at Bottom) -->\n  <div style=\"background: var(--bg-card); border-top: 1px solid var(--border); padding: 16px 20px; display: flex; gap: 12px; justify-content: flex-end;\">\n    <button class=\"action-btn secondary\" data-testid=\"reject-button\" style=\"padding: 10px 20px; border-radius: var(--radius-control); font-size: 13px;\">却下</button>\n    <button class=\"action-btn secondary\" data-testid=\"confirm-button\" style=\"padding: 10px 20px; border-radius: var(--radius-control); font-size: 13px;\">確認</button>\n    <button class=\"action-btn secondary\" data-testid=\"approve-button\" style=\"padding: 10px 20px; border-radius: var(--radius-control); font-size: 13px;\">承認</button>\n    <button class=\"action-btn\" data-testid=\"execute-button\" style=\"padding: 10px 20px; border-radius: var(--radius-control); font-size: 13px; background: var(--primary); color: #fff; border: none;\">実行</button>\n  </div>\n</div>\n\n<!-- Confirm Dialog -->\n<div id=\"confirm-dialog\" class=\"modal-overlay\" style=\"display: none; position: fixed; inset: 0; z-index: 1000; background: rgba(0, 0, 0, 0.55); display: flex; align-items: center; justify-content: center;\">\n  <div style=\"background: var(--bg-card); color: var(--text); padding: 24px; border-radius: 12px; max-width: 500px; box-shadow: 0 8px 32px rgba(0,0,0,0.4);\">\n    <div style=\"font-size: 16px; font-weight: 600; margin-bottom: 16px;\">配置案の確認</div>\n    <div style=\"margin-bottom: 16px; font-size: 13px; color: var(--text-muted); line-height: 1.6;\">\n      <p>この配置案について、ご質問やご不明な点がございましたら、以下にご記入ください。</p>\n    </div>\n    <textarea data-testid=\"confirm-notes\" placeholder=\"質問・コメント（任意）\" style=\"width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: var(--radius-control); background: var(--bg-main); color: var(--text); font-size: 12px; font-family: var(--font-family); resize: vertical; min-height: 80px; margin-bottom: 16px;\"></textarea>\n    <div style=\"display: flex; gap: 12px; justify-content: flex-end;\">\n      <button class=\"action-btn secondary\" onclick=\"document.getElementById('confirm-dialog').style.display='none'\" style=\"padding: 10px 20px; border-radius: var(--radius-control); font-size: 13px;\">キャンセル</button>\n      <button class=\"action-btn\" onclick=\"handleConfirmSubmit()\" style=\"padding: 10px 20px; border-radius: var(--radius-control); font-size: 13px; background: var(--primary); color: #fff; border: none;\">確認完了</button>\n    </div>\n  </div>\n</div>\n\n<!-- Approve Dialog -->\n<div id=\"approve-dialog\" class=\"modal-overlay\" style=\"display: none; position: fixed; inset: 0; z-index: 1000; background: rgba(0, 0, 0, 0.55); display: flex; align-items: center; justify-content: center;\">\n  <div style=\"background: var(--bg-card); color: var(--text); padding: 24px; border-radius: 12px; max-width: 500px; box-shadow: 0 8px 32px rgba(0,0,0,0.4);\">\n    <div style=\"font-size: 16px; font-weight: 600; margin-bottom: 16px;\">配置案の承認</div>\n    <div style=\"margin-bottom: 16px; font-size: 13px; color: var(--text-muted); line-height: 1.6;\">\n      <p>この配置案を承認します。承認理由をご入力ください。</p>\n    </div>\n    <label style=\"display: block; font-size: 12px; color: var(--text-muted); margin-bottom: 6px;\">承認理由</label>\n    <textarea data-testid=\"approve-reason\" placeholder=\"承認理由を入力してください\" style=\"width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: var(--radius-control); background: var(--bg-main); color: var(--text); font-size: 12px; font-family: var(--font-family); resize: vertical; min-height: 80px; margin-bottom: 16px;\"></textarea>\n    <div style=\"display: flex; gap: 12px; justify-content: flex-end;\">\n      <button class=\"action-btn secondary\" onclick=\"document.getElementById('approve-dialog').style.display='none'\" style=\"padding: 10px 20px; border-radius: var(--radius-control); font-size: 13px;\">キャンセル</button>\n      <button class=\"action-btn\" onclick=\"handleApproveSubmit()\" style=\"padding: 10px 20px; border-radius: var(--radius-control); font-size: 13px; background: var(--primary); color: #fff; border: none;\">承認</button>\n    </div>\n  </div>\n</div>\n\n<!-- Reject Dialog -->\n<div id=\"reject-dialog\" class=\"modal-overlay\" style=\"display: none; position: fixed; inset: 0; z-index: 1000; background: rgba(0, 0, 0, 0.55); display: flex; align-items: center; justify-content: center;\">\n  <div style=\"background: var(--bg-card); color: var(--text); padding: 24px; border-radius: 12px; max-width: 500px; box-shadow: 0 8px 32px rgba(0,0,0,0.4);\">\n    <div style=\"font-size: 16px; font-weight: 600; margin-bottom: 16px;\">配置案の却下</div>\n    <div style=\"margin-bottom: 16px; font-size: 13px; color: var(--text-muted); line-height: 1.6;\">\n      <p>この配置案を却下します。却下理由をご入力ください。</p>\n    </div>\n    <label style=\"display: block; font-size: 12px; color: var(--text-muted); margin-bottom: 6px;\">却下理由</label>\n    <textarea data-testid=\"reject-reason\" placeholder=\"却下理由を入力してください\" style=\"width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: var(--radius-control); background: var(--bg-main); color: var(--text); font-size: 12px; font-family: var(--font-family); resize: vertical; min-height: 80px; margin-bottom: 16px;\"></textarea>\n    <div style=\"display: flex; gap: 12px; justify-content: flex-end;\">\n      <button class=\"action-btn secondary\" onclick=\"document.getElementById('reject-dialog').style.display='none'\" style=\"padding: 10px 20px; border-radius: var(--radius-control); font-size: 13px;\">キャンセル</button>\n      <button class=\"action-btn\" onclick=\"handleRejectSubmit()\" style=\"padding: 10px 20px; border-radius: var(--radius-control); font-size: 13px; background: var(--primary); color: #fff; border: none;\">却下</button>\n    </div>\n  </div>\n</div>\n\n<!-- Execute Confirmation Dialog -->\n<div id=\"execute-dialog\" class=\"modal-overlay\" style=\"display: none; position: fixed; inset: 0; z-index: 1000; background: rgba(0, 0, 0, 0.55); display: flex; align-items: center; justify-content: center;\">\n  <div style=\"background: var(--bg-card); color: var(--text); padding: 24px; border-radius: 12px; max-width: 500px; box-shadow: 0 8px 32px rgba(0,0,0,0.4);\">\n    <div style=\"font-size: 16px; font-weight: 600; margin-bottom: 16px;\">割当変更内容確認</div>\n    <div id=\"execute-summary\" style=\"margin-bottom: 16px; padding: 12px; background: var(--bg-main); border-radius: var(--radius-control); border: 1px solid var(--border); font-size: 12px; color: var(--text); line-height: 1.8;\">\n      <!-- Populated by JS -->\n    </div>\n    <div style=\"margin-bottom: 16px; font-size: 12px; color: var(--text-muted);\">\n      <label style=\"display: block; margin-bottom: 6px;\">実行日時</label>\n      <input type=\"datetime-local\" id=\"execute-datetime\" data-testid=\"execute-datetime\" style=\"width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: var(--radius-control); background: var(--bg-main); color: var(--text); font-size: 12px;\" />\n    </div>\n    <div style=\"display: flex; gap: 12px; justify-content: flex-end;\">\n      <button class=\"action-btn secondary\" onclick=\"document.getElementById('execute-dialog').style.display='none'\" style=\"padding: 10px 20px; border-radius: var(--radius-control); font-size: 13px;\">キャンセル</button>\n      <button class=\"action-btn\" onclick=\"handleExecuteSubmit()\" style=\"padding: 10px 20px; border-radius: var(--radius-control); font-size: 13px; background: var(--primary); color: #fff; border: none;\">実行</button>\n    </div>\n  </div>\n</div>\n\n<!-- Success Message -->\n<div id=\"success-message\" style=\"display: none; position: fixed; top: 20px; right: 20px; background: var(--primary); color: #fff; padding: 16px 20px; border-radius: var(--radius-control); box-shadow: 0 4px 12px rgba(0,0,0,0.2); font-size: 13px; z-index: 2000;\">\n  配置案を実行しました\n</div>",
+      "initJs": "function(container, apiUrl, tables) {\n  let selectedProposalId = null;\n  let proposalData = [];\n\n  // Mock proposal data\n  const mockProposals = [\n    {\n      id: 'w001',\n      workerName: '田中太郎',\n      currentDept: '品質管理部',\n      proposedDept: '製造部',\n      improvementRate: 6.2,\n      reason: '過去の配置データから、製造部での生産性が15%高い傾向が確認されました。',\n      productivityTarget: 85,\n      startDate: '2025-01-20',\n      currentProductivity: 72,\n      proposedProductivity: 85\n    },\n    {\n      id: 'w002',\n      workerName: '鈴木花子',\n      currentDept: '物流部',\n      proposedDept: '製造部',\n      improvementRate: 8.1,\n      reason: '組立作業での習熟度が高く、製造部での配置で最大効率が期待できます。',\n      productivityTarget: 88,\n      startDate: '2025-01-20',\n      currentProductivity: 65,\n      proposedProductivity: 88\n    },\n    {\n      id: 'w003',\n      workerName: '佐藤次郎',\n      currentDept: '製造部',\n      proposedDept: '品質管理部',\n      improvementRate: 5.8,\n      reason: '品質チェック業務での精度が高く、品質管理部での配置で検査効率が向上します。',\n      productivityTarget: 82,\n      startDate: '2025-01-20',\n      currentProductivity: 78,\n      proposedProductivity: 82\n    },\n    {\n      id: 'w004',\n      workerName: '高橋美咲',\n      currentDept: '物流部',\n      proposedDept: '製造部',\n      improvementRate: 7.3,\n      reason: '手作業の正確性が高く、精密組立作業での配置で生産性向上が見込まれます。',\n      productivityTarget: 86,\n      startDate: '2025-01-20',\n      currentProductivity: 68,\n      proposedProductivity: 86\n    }\n  ];\n\n  proposalData = mockProposals;\n\n  // Render proposal list\n  function renderProposalList(filter = '') {\n    const tbody = container.querySelector('#proposal-list-tbody');\n    tbody.innerHTML = '';\n    \n    proposalData\n      .filter(p => !filter || p.workerName.includes(filter))\n      .forEach(proposal => {\n        const row = document.createElement('tr');\n        row.className = 'proposal-row';\n        row.dataset.id = proposal.id;\n        row.dataset.testid = `proposal-row-${proposal.id}`;\n        row.style.cssText = 'border-bottom: 1px solid var(--border); cursor: pointer; background: var(--bg-card);';\n        row.innerHTML = `\n          <td style=\"padding: 10px 0; color: var(--text);\">${proposal.workerName}</td>\n          <td style=\"padding: 10px 0; color: var(--text);\">${proposal.currentDept}</td>\n          <td style=\"padding: 10px 0; color: var(--text);\">${proposal.proposedDept}</td>\n          <td style=\"text-align: right; padding: 10px 0; color: var(--primary); font-weight: 600;\">+${proposal.improvementRate}%</td>\n        `;\n        row.addEventListener('click', () => selectProposal(proposal.id));\n        tbody.appendChild(row);\n      });\n  }\n\n  // Select proposal and show detail\n  function selectProposal(proposalId) {\n    selectedProposalId = proposalId;\n    const proposal = proposalData.find(p => p.id === proposalId);\n    if (!proposal) return;\n\n    // Update detail view\n    container.querySelector('#detail-worker-name').textContent = proposal.workerName;\n    container.querySelector('#detail-department').textContent = proposal.proposedDept;\n    container.querySelector('#detail-process').textContent = '標準工程';\n    container.querySelector('#detail-start-date').textContent = proposal.startDate;\n    container.querySelector('#detail-productivity-target').textContent = `${proposal.productivityTarget}%`;\n    container.querySelector('#detail-improvement-rate').textContent = `+${proposal.improvementRate}%`;\n    container.querySelector('#detail-reason').textContent = proposal.reason;\n\n    // Update chart\n    drawProductivityChart(proposal);\n\n    // Highlight selected row\n    container.querySelectorAll('.proposal-row').forEach(row => {\n      row.style.backgroundColor = row.dataset.id === proposalId ? 'var(--primary)' : 'var(--bg-card)';\n      row.style.color = row.dataset.id === proposalId ? '#fff' : 'var(--text)';\n      if (row.dataset.id === proposalId) {\n        row.querySelectorAll('td').forEach(td => {\n          td.style.color = '#fff';\n        });\n      } else {\n        row.querySelectorAll('td').forEach(td => {\n          td.style.color = 'var(--text)';\n        });\n      }\n    });\n  }\n\n  // Draw productivity comparison chart\n  function drawProductivityChart(proposal) {\n    const canvas = container.querySelector('#productivity-chart');\n    const ctx = canvas.getContext('2d');\n    const rect = canvas.getBoundingClientRect();\n    canvas.width = rect.width;\n    canvas.height = rect.height;\n\n    const padding = 40;\n    const chartWidth = canvas.width - padding * 2;\n    const chartHeight = canvas.height - padding * 2;\n    const barWidth = chartWidth / 4;\n    const maxValue = 100;\n\n    // Background\n    ctx.fillStyle = '#faf8f3';\n    ctx.fillRect(0, 0, canvas.width, canvas.height);\n\n    // Grid lines\n    ctx.strokeStyle = '#e5ddd0';\n    ctx.lineWidth = 1;\n    for (let i = 0; i <= 5; i++) {\n      const y = padding + (chartHeight / 5) * i;\n      ctx.beginPath();\n      ctx.moveTo(padding, y);\n      ctx.lineTo(canvas.width - padding, y);\n      ctx.stroke();\n    }\n\n    // Y-axis labels\n    ctx.fillStyle = '#6b7280';\n    ctx.font = '12px -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto';\n    ctx.textAlign = 'right';\n    for (let i = 0; i <= 5; i++) {\n      const value = (maxValue / 5) * i;\n      const y = padding + chartHeight - (chartHeight / 5) * i;\n      ctx.fillText(value + '%', padding - 10, y + 4);\n    }\n\n    // X-axis\n    ctx.strokeStyle = '#1f2937';\n    ctx.lineWidth = 1;\n    ctx.beginPath();\n    ctx.moveTo(padding, canvas.height - padding);\n    ctx.lineTo(canvas.width - padding, canvas.height - padding);\n    ctx.stroke();\n\n    // Y-axis\n    ctx.beginPath();\n    ctx.moveTo(padding, padding);\n    ctx.lineTo(padding, canvas.height - padding);\n    ctx.stroke();\n\n    // Draw bars\n    const data = [\n      { label: '現在', value: proposal.currentProductivity, color: '#d97706' },\n      { label: '提案後', value: proposal.proposedProductivity, color: '#f59e0b' }\n    ];\n\n    data.forEach((item, idx) => {\n      const x = padding + barWidth * (idx + 0.5) - 20;\n      const barHeight = (item.value / maxValue) * chartHeight;\n      const y = canvas.height - padding - barHeight;\n\n      ctx.fillStyle = item.color;\n      ctx.fillRect(x, y, 40, barHeight);\n\n      // Value label on bar\n      ctx.fillStyle = '#1f2937';\n      ctx.font = 'bold 13px -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto';\n      ctx.textAlign = 'center';\n      ctx.fillText(item.value + '%', x + 20, y - 5);\n\n      // X-axis label\n      ctx.fillStyle = '#1f2937';\n      ctx.font = '12px -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto';\n      ctx.fillText(item.label, x + 20, canvas.height - padding + 20);\n    });\n\n    // Title\n    ctx.fillStyle = '#1f2937';\n    ctx.font = 'bold 14px -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto';\n    ctx.textAlign = 'left';\n    ctx.fillText(`${proposal.workerName} の生産性比較`, padding, 25);\n  }\n\n  // Event listeners\n  container.querySelector('#worker-search').addEventListener('input', (e) => {\n    renderProposalList(e.target.value);\n  });\n\n  container.querySelector('[data-testid=\"confirm-button\"]').addEventListener('click', () => {\n    container.querySelector('#confirm-dialog').style.display = 'flex';\n  });\n\n  container.querySelector('[data-testid=\"approve-button\"]').addEventListener('click', () => {\n    container.querySelector('#approve-dialog').style.display = 'flex';\n  });\n\n  container.querySelector('[data-testid=\"reject-button\"]').addEventListener('click', () => {\n    container.querySelector('#reject-dialog').style.display = 'flex';\n  });\n\n  container.querySelector('[data-testid=\"execute-button\"]').addEventListener('click', () => {\n    if (!selectedProposalId) {\n      alert('配置案を選択してください');\n      return;\n    }\n    const proposal = proposalData.find(p => p.id === selectedProposalId);\n    const summary = container.querySelector('#execute-summary');\n    summary.innerHTML = `\n      <strong>作業者:</strong> ${proposal.workerName}<br/>\n      <strong>現在の部門:</strong> ${proposal.currentDept}<br/>\n      <strong>配置先部門:</strong> ${proposal.proposedDept}<br/>\n      <strong>期待生産性向上率:</strong> +${proposal.improvementRate}%<br/>\n      <strong>配置開始予定日:</strong> ${proposal.startDate}\n    `;\n    const now = new Date();\n    const isoString = now.toISOString().slice(0, 16);\n    container.querySelector('#execute-datetime').value = isoString;\n    container.querySelector('#execute-dialog').style.display = 'flex';\n  });\n\n  // Close dialogs on overlay click\n  container.querySelectorAll('.modal-overlay').forEach(overlay => {\n    overlay.addEventListener('click', (e) => {\n      if (e.target === overlay) {\n        overlay.style.display = 'none';\n      }\n    });\n  });\n\n  // Handle confirm submit\n  window.handleConfirmSubmit = function() {\n    const notes = container.querySelector('[data-testid=\"confirm-notes\"]').value;\n    console.log('Confirm notes:', notes);\n    container.querySelector('#confirm-dialog').style.display = 'none';\n    showSuccessMessage('配置案の確認が完了しました');\n  };\n\n  // Handle approve submit\n  window.handleApproveSubmit = function() {\n    const reason = container.querySelector('[data-testid=\"approve-reason\"]').value;\n    if (!reason.trim()) {\n      alert('承認理由を入力してください');\n      return;\n    }\n    console.log('Approve reason:', reason);\n    container.querySelector('#approve-dialog').style.display = 'none';\n    showSuccessMessage('配置案を承認しました');\n  };\n\n  // Handle reject submit\n  window.handleRejectSubmit = function() {\n    const reason = container.querySelector('[data-testid=\"reject-reason\"]').value;\n    if (!reason.trim()) {\n      alert('却下理由を入力してください');\n      return;\n    }\n    console.log('Reject reason:', reason);\n    container.querySelector('#reject-dialog').style.display = 'none';\n    showSuccessMessage('配置案を却下しました');\n  };\n\n  // Handle execute submit\n  window.handleExecuteSubmit = function() {\n    const datetime = container.querySelector('#execute-datetime').value;\n    if (!datetime) {\n      alert('実行日時を選択してください');\n      return;\n    }\n    console.log('Execute datetime:', datetime);\n    container.querySelector('#execute-dialog').style.display = 'none';\n    showSuccessMessage('配置案を実行しました');\n  };\n\n  // Show success message\n  function showSuccessMessage(message) {\n    const msg = container.querySelector('#success-message');\n    msg.textContent = message;\n    msg.style.display = 'block';\n    setTimeout(() => {\n      msg.style.display = 'none';\n    }, 3000);\n  }\n\n  // Initial render\n  renderProposalList();\n  if (proposalData.length > 0) {\n    selectProposal(proposalData[0].id);\n  }\n}",
+      "method": "ai"
+    },
+    {
+      "screenId": "scr-1789461993203",
+      "panelHtml": "<div style=\"display: flex; flex-direction: column; height: 100%; background: var(--bg-main);\">\n  <!-- Breadcrumb / Sub-header -->\n  <div style=\"padding: 12px 20px; border-bottom: 1px solid var(--border); background: var(--bg-card); font-size: 13px; color: var(--text-muted);\">\n    作業管理システム / 作業者生産性データ分析・配置最適化支援システム / 作業実績データ記録・入力画面\n  </div>\n\n  <!-- Main Content -->\n  <div style=\"flex: 1; overflow-y: auto; padding: 24px 20px; display: flex; justify-content: center;\">\n    <div style=\"width: 100%; max-width: 620px;\">\n      \n      <!-- Page Title -->\n      <h1 style=\"font-size: 20px; font-weight: 600; color: var(--text); margin: 0 0 24px 0;\">作業実績データ記録</h1>\n\n      <!-- Form Container -->\n      <div class=\"card\" style=\"padding: 24px; background: var(--bg-card); border-radius: 12px; box-shadow: var(--shadow-card);\">\n        <form id=\"work-record-form\" style=\"display: flex; flex-direction: column; gap: 20px;\">\n\n          <!-- 作業者選択 -->\n          <div style=\"display: flex; flex-direction: column; gap: 6px;\">\n            <label style=\"font-size: 12px; font-weight: 500; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;\">作業者</label>\n            <select \n              data-testid=\"worker-select\" \n              name=\"workerId\" \n              required\n              style=\"padding: 10px 12px; border: 1px solid rgba(229, 221, 208, 0.6); border-radius: 8px; background: var(--bg-main); color: var(--text); font-size: 14px; font-family: var(--font-family); height: 40px; cursor: pointer; transition: border-color 200ms;\"\n            >\n              <option value=\"\">選択してください</option>\n              <option value=\"worker-001\">田中太郎 (製造部)</option>\n              <option value=\"worker-002\">鈴木花子 (品質管理部)</option>\n              <option value=\"worker-003\">佐藤次郎 (製造部)</option>\n              <option value=\"worker-004\">伊藤美咲 (物流部)</option>\n              <option value=\"worker-005\">山田健一 (製造部)</option>\n            </select>\n          </div>\n\n          <!-- 部門選択 -->\n          <div style=\"display: flex; flex-direction: column; gap: 6px;\">\n            <label style=\"font-size: 12px; font-weight: 500; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;\">部門</label>\n            <select \n              data-testid=\"department-select\" \n              name=\"departmentId\" \n              required\n              style=\"padding: 10px 12px; border: 1px solid rgba(229, 221, 208, 0.6); border-radius: 8px; background: var(--bg-main); color: var(--text); font-size: 14px; font-family: var(--font-family); height: 40px; cursor: pointer; transition: border-color 200ms;\"\n            >\n              <option value=\"\">選択してください</option>\n              <option value=\"dept-001\">製造部</option>\n              <option value=\"dept-002\">品質管理部</option>\n              <option value=\"dept-003\">物流部</option>\n              <option value=\"dept-004\">企画部</option>\n            </select>\n          </div>\n\n          <!-- 作業タイプ選択 -->\n          <div style=\"display: flex; flex-direction: column; gap: 6px;\">\n            <label style=\"font-size: 12px; font-weight: 500; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;\">作業タイプ</label>\n            <select \n              data-testid=\"task-type-select\" \n              name=\"taskTypeId\" \n              required\n              style=\"padding: 10px 12px; border: 1px solid rgba(229, 221, 208, 0.6); border-radius: 8px; background: var(--bg-main); color: var(--text); font-size: 14px; font-family: var(--font-family); height: 40px; cursor: pointer; transition: border-color 200ms;\"\n            >\n              <option value=\"\">選択してください</option>\n              <option value=\"type-001\">組立作業</option>\n              <option value=\"type-002\">検査作業</option>\n              <option value=\"type-003\">梱包作業</option>\n              <option value=\"type-004\">配線工事</option>\n              <option value=\"type-005\">配管作業</option>\n              <option value=\"type-006\">点検作業</option>\n            </select>\n          </div>\n\n          <!-- 作業日付・開始時刻・終了時刻 (3列) -->\n          <div style=\"display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px;\">\n            <div style=\"display: flex; flex-direction: column; gap: 6px;\">\n              <label style=\"font-size: 12px; font-weight: 500; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;\">作業日付</label>\n              <input \n                data-testid=\"work-date-input\" \n                type=\"date\" \n                name=\"workDate\" \n                required\n                style=\"padding: 10px 12px; border: 1px solid rgba(229, 221, 208, 0.6); border-radius: 8px; background: var(--bg-main); color: var(--text); font-size: 14px; font-family: var(--font-family); height: 40px;\"\n              />\n            </div>\n            <div style=\"display: flex; flex-direction: column; gap: 6px;\">\n              <label style=\"font-size: 12px; font-weight: 500; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;\">開始時刻</label>\n              <input \n                data-testid=\"start-time-input\" \n                type=\"time\" \n                name=\"startTime\" \n                required\n                style=\"padding: 10px 12px; border: 1px solid rgba(229, 221, 208, 0.6); border-radius: 8px; background: var(--bg-main); color: var(--text); font-size: 14px; font-family: var(--font-family); height: 40px;\"\n              />\n            </div>\n            <div style=\"display: flex; flex-direction: column; gap: 6px;\">\n              <label style=\"font-size: 12px; font-weight: 500; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;\">終了時刻</label>\n              <input \n                data-testid=\"end-time-input\" \n                type=\"time\" \n                name=\"endTime\" \n                required\n                style=\"padding: 10px 12px; border: 1px solid rgba(229, 221, 208, 0.6); border-radius: 8px; background: var(--bg-main); color: var(--text); font-size: 14px; font-family: var(--font-family); height: 40px;\"\n              />\n            </div>\n          </div>\n\n          <!-- 実績数量・単位 (2列) -->\n          <div style=\"display: grid; grid-template-columns: 1fr 1fr; gap: 12px;\">\n            <div style=\"display: flex; flex-direction: column; gap: 6px;\">\n              <label style=\"font-size: 12px; font-weight: 500; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;\">実績数量</label>\n              <input \n                data-testid=\"quantity-input\" \n                type=\"number\" \n                name=\"quantity\" \n                min=\"0\" \n                required\n                style=\"padding: 10px 12px; border: 1px solid rgba(229, 221, 208, 0.6); border-radius: 8px; background: var(--bg-main); color: var(--text); font-size: 14px; font-family: var(--font-family); height: 40px;\"\n              />\n            </div>\n            <div style=\"display: flex; flex-direction: column; gap: 6px;\">\n              <label style=\"font-size: 12px; font-weight: 500; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;\">単位</label>\n              <select \n                data-testid=\"unit-select\" \n                name=\"unit\" \n                required\n                style=\"padding: 10px 12px; border: 1px solid rgba(229, 221, 208, 0.6); border-radius: 8px; background: var(--bg-main); color: var(--text); font-size: 14px; font-family: var(--font-family); height: 40px; cursor: pointer;\"\n              >\n                <option value=\"\">選択してください</option>\n                <option value=\"unit-piece\">件</option>\n                <option value=\"unit-individual\">個</option>\n                <option value=\"unit-box\">箱</option>\n                <option value=\"unit-pallet\">パレット</option>\n                <option value=\"unit-set\">セット</option>\n              </select>\n            </div>\n          </div>\n\n          <!-- 品質評価 (5段階ボタングループ) -->\n          <div style=\"display: flex; flex-direction: column; gap: 8px;\">\n            <label style=\"font-size: 12px; font-weight: 500; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;\">品質評価</label>\n            <div style=\"display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px;\">\n              <label style=\"display: flex; align-items: center; justify-content: center; padding: 10px; border: 1px solid rgba(229, 221, 208, 0.6); border-radius: 8px; background: var(--bg-main); cursor: pointer; transition: all 200ms; font-size: 12px; font-weight: 500; color: var(--text);\">\n                <input type=\"radio\" name=\"qualityScore\" value=\"5\" style=\"margin-right: 6px; accent-color: var(--primary);\" />\n                優秀\n              </label>\n              <label style=\"display: flex; align-items: center; justify-content: center; padding: 10px; border: 1px solid rgba(229, 221, 208, 0.6); border-radius: 8px; background: var(--bg-main); cursor: pointer; transition: all 200ms; font-size: 12px; font-weight: 500; color: var(--text);\">\n                <input type=\"radio\" name=\"qualityScore\" value=\"4\" style=\"margin-right: 6px; accent-color: var(--primary);\" />\n                良好\n              </label>\n              <label style=\"display: flex; align-items: center; justify-content: center; padding: 10px; border: 1px solid rgba(229, 221, 208, 0.6); border-radius: 8px; background: var(--bg-main); cursor: pointer; transition: all 200ms; font-size: 12px; font-weight: 500; color: var(--text);\">\n                <input type=\"radio\" name=\"qualityScore\" value=\"3\" style=\"margin-right: 6px; accent-color: var(--primary);\" />\n                標準\n              </label>\n              <label style=\"display: flex; align-items: center; justify-content: center; padding: 10px; border: 1px solid rgba(229, 221, 208, 0.6); border-radius: 8px; background: var(--bg-main); cursor: pointer; transition: all 200ms; font-size: 12px; font-weight: 500; color: var(--text);\">\n                <input type=\"radio\" name=\"qualityScore\" value=\"2\" style=\"margin-right: 6px; accent-color: var(--primary);\" />\n                要改善\n              </label>\n              <label style=\"display: flex; align-items: center; justify-content: center; padding: 10px; border: 1px solid rgba(229, 221, 208, 0.6); border-radius: 8px; background: var(--bg-main); cursor: pointer; transition: all 200ms; font-size: 12px; font-weight: 500; color: var(--text);\">\n                <input type=\"radio\" name=\"qualityScore\" value=\"1\" style=\"margin-right: 6px; accent-color: var(--primary);\" />\n                不良\n              </label>\n            </div>\n          </div>\n\n          <!-- 計算結果表示エリア -->\n          <div id=\"calculation-result\" style=\"padding: 12px; background: rgba(245, 158, 11, 0.06); border-radius: 8px; border-left: 3px solid var(--primary); font-size: 13px; color: var(--text); display: none;\">\n            <div style=\"margin-bottom: 4px;\"><strong>所要時間:</strong> <span id=\"work-hours\">0</span> 時間 <span id=\"work-minutes\">0</span> 分</div>\n            <div><strong>生産性率:</strong> <span id=\"productivity-rate\">-</span> 件/時間</div>\n          </div>\n\n          <!-- Error Message Container -->\n          <div id=\"error-message\" style=\"padding: 12px; background: rgba(220, 38, 38, 0.08); border-radius: 8px; border-left: 3px solid #dc2626; font-size: 13px; color: #991b1b; display: none;\"></div>\n\n          <!-- Submit Button -->\n          <button \n            data-testid=\"save-button\" \n            type=\"submit\" \n            style=\"padding: 12px 20px; background: var(--primary); color: #fff; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; height: 44px; transition: background-color 200ms; margin-top: 8px;\"\n          >\n            実績データを保存\n          </button>\n        </form>\n      </div>\n\n      <!-- Success Message -->\n      <div id=\"success-message\" style=\"margin-top: 16px; padding: 12px 16px; background: rgba(34, 197, 94, 0.08); border-radius: 8px; border-left: 3px solid #22c55e; font-size: 13px; color: #166534; display: none;\">\n        ✓ 実績データを保存しました\n      </div>\n\n    </div>\n  </div>\n</div>",
+      "initJs": "function(container, apiUrl, tables) {\n  const form = container.querySelector('#work-record-form');\n  const errorMsg = container.querySelector('#error-message');\n  const successMsg = container.querySelector('#success-message');\n  const calcResult = container.querySelector('#calculation-result');\n  const saveBtn = container.querySelector('[data-testid=\"save-button\"]');\n\n  // 本日の日付をデフォルト値に設定\n  const dateInput = container.querySelector('[data-testid=\"work-date-input\"]');\n  const today = new Date().toISOString().split('T')[0];\n  dateInput.value = today;\n\n  // 時刻入力時に計算結果を更新\n  const startTimeInput = container.querySelector('[data-testid=\"start-time-input\"]');\n  const endTimeInput = container.querySelector('[data-testid=\"end-time-input\"]');\n  const quantityInput = container.querySelector('[data-testid=\"quantity-input\"]');\n\n  function updateCalculations() {\n    const startTime = startTimeInput.value;\n    const endTime = endTimeInput.value;\n    const quantity = parseInt(quantityInput.value) || 0;\n\n    if (!startTime || !endTime) return;\n\n    // 時刻をパース\n    const [startHour, startMin] = startTime.split(':').map(Number);\n    const [endHour, endMin] = endTime.split(':').map(Number);\n    const startMinutes = startHour * 60 + startMin;\n    const endMinutes = endHour * 60 + endMin;\n\n    // 終了時刻が開始時刻より前の場合はエラーハイライト\n    if (endMinutes <= startMinutes) {\n      endTimeInput.style.borderColor = '#dc2626';\n      calcResult.style.display = 'none';\n      return;\n    } else {\n      endTimeInput.style.borderColor = 'rgba(229, 221, 208, 0.6)';\n    }\n\n    // 所要時間を計算\n    const totalMinutes = endMinutes - startMinutes;\n    const hours = Math.floor(totalMinutes / 60);\n    const minutes = totalMinutes % 60;\n\n    container.querySelector('#work-hours').textContent = hours;\n    container.querySelector('#work-minutes').textContent = minutes;\n\n    // 生産性率を計算（件/時間）\n    if (totalMinutes > 0 && quantity > 0) {\n      const productivityRate = Math.round((quantity / totalMinutes) * 60);\n      container.querySelector('#productivity-rate').textContent = productivityRate;\n      calcResult.style.display = 'block';\n    } else {\n      calcResult.style.display = 'none';\n    }\n  }\n\n  startTimeInput.addEventListener('change', updateCalculations);\n  endTimeInput.addEventListener('change', updateCalculations);\n  quantityInput.addEventListener('input', updateCalculations);\n\n  // フォーム送信処理\n  form.addEventListener('submit', async (e) => {\n    e.preventDefault();\n    errorMsg.style.display = 'none';\n    successMsg.style.display = 'none';\n\n    // フォームデータを取得\n    const formData = new FormData(form);\n    const workerId = formData.get('workerId');\n    const departmentId = formData.get('departmentId');\n    const taskTypeId = formData.get('taskTypeId');\n    const workDate = formData.get('workDate');\n    const startTime = formData.get('startTime');\n    const endTime = formData.get('endTime');\n    const quantity = parseInt(formData.get('quantity')) || 0;\n    const unit = formData.get('unit');\n    const qualityScore = parseInt(formData.get('qualityScore')) || 0;\n\n    // バリデーション\n    const errors = [];\n\n    if (!workerId) errors.push('作業者を選択してください');\n    if (!departmentId) errors.push('部門を選択してください');\n    if (!taskTypeId) errors.push('作業タイプを選択してください');\n    if (!workDate) errors.push('作業日付を入力してください');\n    if (!startTime) errors.push('開始時刻を入力してください');\n    if (!endTime) errors.push('終了時刻を入力してください');\n    if (quantity <= 0) errors.push('実績数量は0より大きい値を入力してください');\n    if (!unit) errors.push('単位を選択してください');\n    if (qualityScore === 0) errors.push('品質評価を選択してください');\n\n    // 時刻の妥当性チェック\n    if (startTime && endTime) {\n      const [startHour, startMin] = startTime.split(':').map(Number);\n      const [endHour, endMin] = endTime.split(':').map(Number);\n      const startMinutes = startHour * 60 + startMin;\n      const endMinutes = endHour * 60 + endMin;\n      if (endMinutes <= startMinutes) {\n        errors.push('終了時刻は開始時刻より後の時刻を入力してください');\n      }\n    }\n\n    if (errors.length > 0) {\n      errorMsg.textContent = errors.join(' / ');\n      errorMsg.style.display = 'block';\n      return;\n    }\n\n    // 所要時間を計算\n    const [startHour, startMin] = startTime.split(':').map(Number);\n    const [endHour, endMin] = endTime.split(':').map(Number);\n    const totalMinutes = (endHour * 60 + endMin) - (startHour * 60 + startMin);\n\n    // 生産性率を計算\n    const productivityRate = Math.round((quantity / totalMinutes) * 60);\n\n    // 品質スコアを数値に変換（1-5を0-100に正規化）\n    const qualityScoreNormalized = qualityScore * 20;\n\n    // 保存データを構築\n    const recordData = {\n      workerId,\n      departmentId,\n      taskTypeId,\n      workDate,\n      startTime,\n      endTime,\n      quantity,\n      unit,\n      qualityScore: qualityScoreNormalized,\n      workTimeMinutes: totalMinutes,\n      productivityRate,\n      createdAt: new Date().toISOString(),\n    };\n\n    // API経由で保存\n    try {\n      saveBtn.disabled = true;\n      saveBtn.style.opacity = '0.6';\n\n      // 実績記録テーブルに保存（tableIndex: 6 = 実績記録）\n      const saved = await window.aivicApi.save(6, recordData);\n\n      if (saved) {\n        successMsg.style.display = 'block';\n        form.reset();\n        dateInput.value = today;\n        calcResult.style.display = 'none';\n        errorMsg.style.display = 'none';\n\n        // 3秒後にメッセージを非表示\n        setTimeout(() => {\n          successMsg.style.display = 'none';\n        }, 3000);\n      } else {\n        errorMsg.textContent = 'データの保存に失敗しました。もう一度お試しください。';\n        errorMsg.style.display = 'block';\n      }\n    } catch (err) {\n      errorMsg.textContent = 'エラーが発生しました: ' + (err.message || '不明なエラー');\n      errorMsg.style.display = 'block';\n    } finally {\n      saveBtn.disabled = false;\n      saveBtn.style.opacity = '1';\n    }\n  });\n\n  // ボタンのホバー効果\n  saveBtn.addEventListener('mouseover', () => {\n    if (!saveBtn.disabled) {\n      saveBtn.style.background = 'var(--primary-hover)';\n    }\n  });\n  saveBtn.addEventListener('mouseout', () => {\n    saveBtn.style.background = 'var(--primary)';\n  });\n\n  // ラジオボタンのビジュアルフィードバック\n  const qualityLabels = container.querySelectorAll('label:has(input[name=\"qualityScore\"])');\n  qualityLabels.forEach(label => {\n    const radio = label.querySelector('input[type=\"radio\"]');\n    radio.addEventListener('change', () => {\n      qualityLabels.forEach(l => {\n        const r = l.querySelector('input[type=\"radio\"]');\n        if (r.checked) {\n          l.style.background = 'rgba(245, 158, 11, 0.12)';\n          l.style.borderColor = 'var(--primary)';\n        } else {\n          l.style.background = 'var(--bg-main)';\n          l.style.borderColor = 'rgba(229, 221, 208, 0.6)';\n        }\n      });\n    });\n  });\n}",
+      "method": "ai"
+    }
+  ],
+  "tableDefinitions": [
+    {
+      "tableName": "ユーザー",
+      "purpose": "システムユーザーの認証・認可・プロフィール管理を行い、作業者・管理者・システム管理者などの役割に基づいたアクセス制御を実現する",
+      "columns": [
+        {
+          "name": "ユーザーID",
+          "type": "uuid",
+          "required": true,
+          "description": "ユーザーの一意識別子"
+        },
+        {
+          "name": "ユーザー名",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "ログイン時に使用するユーザー名"
+        },
+        {
+          "name": "メールアドレス",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "ユーザーの連絡先メールアドレス"
+        },
+        {
+          "name": "パスワードハッシュ",
+          "type": "varchar(255)",
+          "required": true,
+          "description": "暗号化されたパスワード"
+        },
+        {
+          "name": "氏名",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "ユーザーの実名"
+        },
+        {
+          "name": "役割",
+          "type": "varchar(50)",
+          "required": true,
+          "description": "ユーザーの役割（作業者・チームリーダー・管理者・システム管理者など）"
+        },
+        {
+          "name": "拠点ID",
+          "type": "uuid",
+          "required": false,
+          "description": "ユーザーが属する拠点の識別子"
+        },
+        {
+          "name": "チームID",
+          "type": "uuid",
+          "required": false,
+          "description": "ユーザーが属するチームの識別子"
+        },
+        {
+          "name": "ステータス",
+          "type": "varchar(20)",
+          "required": true,
+          "description": "ユーザーのステータス（有効・無効・休止中など）"
+        },
+        {
+          "name": "最終ログイン日時",
+          "type": "timestamp",
+          "required": false,
+          "description": "ユーザーが最後にログインした日時"
+        },
+        {
+          "name": "作成日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "ユーザーレコードの作成日時"
+        },
+        {
+          "name": "更新日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "ユーザーレコードの最終更新日時"
+        },
+        {
+          "name": "作成者",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "ユーザーレコードを作成したユーザー"
+        },
+        {
+          "name": "更新者",
+          "type": "varchar(100)",
+          "required": false,
+          "description": "ユーザーレコードを最後に更新したユーザー"
+        }
+      ]
+    },
+    {
+      "tableName": "作業者",
+      "purpose": "作業進捗・人員配置最適化エンジンにおいて、作業者の基本情報、所属、スキル、稼働状況を管理するマスタテーブル",
+      "columns": [
+        {
+          "name": "作業者ID",
+          "type": "uuid",
+          "required": true,
+          "description": "作業者を一意に識別するプライマリキー"
+        },
+        {
+          "name": "作業者名",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "作業者の氏名"
+        },
+        {
+          "name": "拠点ID",
+          "type": "uuid",
+          "required": true,
+          "description": "所属拠点を示す外部キー"
+        },
+        {
+          "name": "チームID",
+          "type": "uuid",
+          "required": true,
+          "description": "所属チームを示す外部キー"
+        },
+        {
+          "name": "職種",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "作業者の職種分類"
+        },
+        {
+          "name": "稼働状況",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "稼働中/休止中/退職等の状態"
+        },
+        {
+          "name": "時給",
+          "type": "integer",
+          "required": false,
+          "description": "作業者の時給単価"
+        },
+        {
+          "name": "最大稼働時間",
+          "type": "integer",
+          "required": false,
+          "description": "1日あたりの最大稼働時間"
+        },
+        {
+          "name": "作成日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "レコード作成日時"
+        },
+        {
+          "name": "更新日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "レコード最終更新日時"
+        },
+        {
+          "name": "作成者",
+          "type": "varchar(100)",
+          "required": false,
+          "description": "レコード作成者"
+        }
+      ]
+    },
+    {
+      "tableName": "生産性データ",
+      "purpose": "作業者の生産性指標を記録・分析し、人員配置最適化の判断基準となるデータを管理するトランザクションテーブル",
+      "columns": [
+        {
+          "name": "生産性データID",
+          "type": "uuid",
+          "required": true,
+          "description": "生産性データの一意識別子"
+        },
+        {
+          "name": "作業実績ID",
+          "type": "uuid",
+          "required": true,
+          "description": "関連する作業実績への外部キー"
+        },
+        {
+          "name": "作業者ID",
+          "type": "uuid",
+          "required": true,
+          "description": "生産性を記録する作業者への外部キー"
+        },
+        {
+          "name": "拠点ID",
+          "type": "uuid",
+          "required": true,
+          "description": "作業が実施された拠点への外部キー"
+        },
+        {
+          "name": "チームID",
+          "type": "uuid",
+          "required": true,
+          "description": "作業者が属するチームへの外部キー"
+        },
+        {
+          "name": "作業日",
+          "type": "timestamp",
+          "required": true,
+          "description": "生産性データが記録された作業日"
+        },
+        {
+          "name": "計画作業時間",
+          "type": "integer",
+          "required": true,
+          "description": "計画された作業時間（分単位）"
+        },
+        {
+          "name": "実績作業時間",
+          "type": "integer",
+          "required": true,
+          "description": "実際の作業時間（分単位）"
+        },
+        {
+          "name": "完了件数",
+          "type": "integer",
+          "required": true,
+          "description": "当日に完了した作業件数"
+        },
+        {
+          "name": "生産性率",
+          "type": "integer",
+          "required": true,
+          "description": "生産性率（パーセンテージ、0-100）"
+        },
+        {
+          "name": "品質スコア",
+          "type": "integer",
+          "required": false,
+          "description": "品質評価スコア（0-100）"
+        },
+        {
+          "name": "エラー件数",
+          "type": "integer",
+          "required": false,
+          "description": "当日に発生したエラー・不良件数"
+        },
+        {
+          "name": "習熟度レベル",
+          "type": "varchar(100)",
+          "required": false,
+          "description": "当日時点での作業者の習熟度レベル"
+        },
+        {
+          "name": "備考",
+          "type": "text",
+          "required": false,
+          "description": "生産性に影響した特記事項や環境要因"
+        },
+        {
+          "name": "作成日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "生産性データの作成日時"
+        },
+        {
+          "name": "更新日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "生産性データの最終更新日時"
+        },
+        {
+          "name": "作成者",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "生産性データを作成したユーザー"
+        }
+      ]
+    },
+    {
+      "tableName": "配置計画",
+      "purpose": "作業者の配置計画を管理し、生産性データに基づいて最適な配置を記録・追跡するマスタテーブル",
+      "columns": [
+        {
+          "name": "配置計画ID",
+          "type": "uuid",
+          "required": true,
+          "description": "配置計画の一意識別子"
+        },
+        {
+          "name": "作業者ID",
+          "type": "uuid",
+          "required": true,
+          "description": "配置対象の作業者を特定するための外部キー"
+        },
+        {
+          "name": "配置部門",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "作業者を配置する部門またはチーム名"
+        },
+        {
+          "name": "配置職務",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "配置先での職務内容またはロール"
+        },
+        {
+          "name": "開始日",
+          "type": "timestamp",
+          "required": true,
+          "description": "配置計画の開始日時"
+        },
+        {
+          "name": "終了日",
+          "type": "timestamp",
+          "required": false,
+          "description": "配置計画の終了日時、未定の場合はNULL"
+        },
+        {
+          "name": "配置ステータス",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "配置計画のステータス（計画中、実行中、完了、中止等）"
+        },
+        {
+          "name": "期待生産性目標",
+          "type": "integer",
+          "required": false,
+          "description": "この配置での期待生産性目標値"
+        },
+        {
+          "name": "最適化根拠",
+          "type": "text",
+          "required": false,
+          "description": "この配置が最適と判断された理由や分析結果"
+        },
+        {
+          "name": "作成日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "配置計画レコードの作成日時"
+        },
+        {
+          "name": "更新日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "配置計画レコードの最終更新日時"
+        },
+        {
+          "name": "作成者ID",
+          "type": "uuid",
+          "required": true,
+          "description": "配置計画を作成したユーザーの外部キー"
+        }
+      ]
+    },
+    {
+      "tableName": "初期割当",
+      "purpose": "作業者の初期配置情報を管理し、生産性データとの紐付けや配置計画の基準となるマスタデータを保持する",
+      "columns": [
+        {
+          "name": "割当ID",
+          "type": "uuid",
+          "required": true,
+          "description": "初期割当の一意識別子"
+        },
+        {
+          "name": "作業者ID",
+          "type": "uuid",
+          "required": true,
+          "description": "作業者テーブルへの外部キー"
+        },
+        {
+          "name": "配置部門",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "作業者が初期配置される部門名"
+        },
+        {
+          "name": "配置工程",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "作業者が初期配置される工程名"
+        },
+        {
+          "name": "割当開始日",
+          "type": "timestamp",
+          "required": true,
+          "description": "初期割当の開始日時"
+        },
+        {
+          "name": "割当終了日",
+          "type": "timestamp",
+          "required": false,
+          "description": "初期割当の終了日時（未定の場合はNULL）"
+        },
+        {
+          "name": "割当ステータス",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "割当状態（有効/無効/一時停止等）"
+        },
+        {
+          "name": "備考",
+          "type": "text",
+          "required": false,
+          "description": "割当に関する補足情報"
+        },
+        {
+          "name": "作成日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "レコード作成日時"
+        },
+        {
+          "name": "更新日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "レコード最終更新日時"
+        },
+        {
+          "name": "作成者",
+          "type": "uuid",
+          "required": true,
+          "description": "ユーザーテーブルへの外部キー（作成ユーザー）"
+        }
+      ]
+    },
+    {
+      "tableName": "実績記録",
+      "purpose": "作業者の日々の作業実績を記録し、生産性分析と配置最適化の基礎データとなるトランザクションテーブル",
+      "columns": [
+        {
+          "name": "実績記録ID",
+          "type": "uuid",
+          "required": true,
+          "description": "実績記録の一意識別子"
+        },
+        {
+          "name": "作業者ID",
+          "type": "uuid",
+          "required": true,
+          "description": "作業者テーブルへの外部キー"
+        },
+        {
+          "name": "配置計画ID",
+          "type": "uuid",
+          "required": false,
+          "description": "配置計画テーブルへの外部キー、該当する配置がある場合"
+        },
+        {
+          "name": "作業日",
+          "type": "timestamp",
+          "required": true,
+          "description": "作業が実施された日付"
+        },
+        {
+          "name": "作業内容",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "実施した作業の種類または名称"
+        },
+        {
+          "name": "完了数量",
+          "type": "integer",
+          "required": true,
+          "description": "当該作業で完了した件数または数量"
+        },
+        {
+          "name": "所要時間分",
+          "type": "integer",
+          "required": true,
+          "description": "作業に要した時間（分単位）"
+        },
+        {
+          "name": "品質スコア",
+          "type": "integer",
+          "required": false,
+          "description": "作業品質の評価スコア（0-100など）"
+        },
+        {
+          "name": "備考",
+          "type": "text",
+          "required": false,
+          "description": "実績に関する補足情報"
+        },
+        {
+          "name": "作成日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "実績記録が作成された日時"
+        },
+        {
+          "name": "更新日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "実績記録が最後に更新された日時"
+        },
+        {
+          "name": "作成者",
+          "type": "uuid",
+          "required": true,
+          "description": "ユーザーテーブルへの外部キー、実績を記録したユーザー"
+        }
+      ]
+    },
+    {
+      "tableName": "作業タイプ",
+      "purpose": "作業の種類を定義し、生産性データや配置計画で参照される作業タイプのマスタテーブル",
+      "columns": [
+        {
+          "name": "作業タイプID",
+          "type": "uuid",
+          "required": true,
+          "description": "作業タイプの一意識別子"
+        },
+        {
+          "name": "作業タイプ名",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "作業タイプの名称（例：組立、検査、梱包）"
+        },
+        {
+          "name": "説明",
+          "type": "text",
+          "required": false,
+          "description": "作業タイプの詳細説明"
+        },
+        {
+          "name": "標準生産性",
+          "type": "integer",
+          "required": false,
+          "description": "この作業タイプの標準生産性値（単位：個/時間など）"
+        },
+        {
+          "name": "難易度レベル",
+          "type": "integer",
+          "required": false,
+          "description": "作業の難易度を示す数値（1-5など）"
+        },
+        {
+          "name": "有効フラグ",
+          "type": "boolean",
+          "required": true,
+          "description": "作業タイプが有効かどうか"
+        },
+        {
+          "name": "作成日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "レコード作成日時"
+        },
+        {
+          "name": "更新日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "レコード最終更新日時"
+        },
+        {
+          "name": "作成者",
+          "type": "uuid",
+          "required": false,
+          "description": "レコード作成者のユーザーID"
+        }
+      ]
+    },
+    {
+      "tableName": "部門",
+      "purpose": "組織の部門マスタ。作業者の所属管理、生産性データの部門別集計、配置計画の部門単位での管理に使用される。",
+      "columns": [
+        {
+          "name": "部門ID",
+          "type": "uuid",
+          "required": true,
+          "description": "部門の一意識別子。主キー。"
+        },
+        {
+          "name": "部門名",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "部門の名称。例：製造部、品質管理部。"
+        },
+        {
+          "name": "部門コード",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "部門の業務コード。一意。例：MFG001。"
+        },
+        {
+          "name": "説明",
+          "type": "text",
+          "required": false,
+          "description": "部門の説明や役割。"
+        },
+        {
+          "name": "親部門ID",
+          "type": "uuid",
+          "required": false,
+          "description": "上位部門のID。階層構造を表現する場合に使用。"
+        },
+        {
+          "name": "責任者ユーザーID",
+          "type": "uuid",
+          "required": false,
+          "description": "部門の責任者となるユーザーID。ユーザーテーブルへの外部キー。"
+        },
+        {
+          "name": "ステータス",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "部門のステータス。例：active、inactive。"
+        },
+        {
+          "name": "作成日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "部門レコードの作成日時。"
+        },
+        {
+          "name": "更新日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "部門レコードの最終更新日時。"
+        },
+        {
+          "name": "作成者",
+          "type": "uuid",
+          "required": false,
+          "description": "部門レコードを作成したユーザーID。"
+        }
+      ]
+    },
+    {
+      "tableName": "割当変更履歴",
+      "purpose": "作業者の配置変更の履歴を記録し、変更前後の状態、理由、実行者を追跡するための履歴管理テーブル",
+      "columns": [
+        {
+          "name": "割当変更履歴ID",
+          "type": "uuid",
+          "required": true,
+          "description": "割当変更履歴の一意識別子"
+        },
+        {
+          "name": "作業者ID",
+          "type": "uuid",
+          "required": true,
+          "description": "変更対象の作業者を識別するID、作業者テーブルへの外部キー"
+        },
+        {
+          "name": "変更前配置計画ID",
+          "type": "uuid",
+          "required": false,
+          "description": "変更前の配置計画ID、配置計画テーブルへの外部キー"
+        },
+        {
+          "name": "変更後配置計画ID",
+          "type": "uuid",
+          "required": true,
+          "description": "変更後の配置計画ID、配置計画テーブルへの外部キー"
+        },
+        {
+          "name": "変更前部門ID",
+          "type": "uuid",
+          "required": false,
+          "description": "変更前の配置部門ID"
+        },
+        {
+          "name": "変更後部門ID",
+          "type": "uuid",
+          "required": true,
+          "description": "変更後の配置部門ID、部門テーブルへの外部キー"
+        },
+        {
+          "name": "変更前作業タイプID",
+          "type": "uuid",
+          "required": false,
+          "description": "変更前の作業タイプID"
+        },
+        {
+          "name": "変更後作業タイプID",
+          "type": "uuid",
+          "required": true,
+          "description": "変更後の作業タイプID、作業タイプテーブルへの外部キー"
+        },
+        {
+          "name": "変更理由",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "配置変更の理由コード（生産性向上、スキル育成、負荷分散等）"
+        },
+        {
+          "name": "変更理由詳細",
+          "type": "text",
+          "required": false,
+          "description": "配置変更理由の詳細説明"
+        },
+        {
+          "name": "変更実行日",
+          "type": "timestamp",
+          "required": true,
+          "description": "配置変更が実際に実行された日時"
+        },
+        {
+          "name": "予定変更日",
+          "type": "timestamp",
+          "required": false,
+          "description": "配置変更の予定実行日時"
+        },
+        {
+          "name": "作成日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "変更履歴レコードが作成された日時"
+        },
+        {
+          "name": "作成者ID",
+          "type": "uuid",
+          "required": true,
+          "description": "変更を実行したユーザーID、ユーザーテーブルへの外部キー"
+        },
+        {
+          "name": "承認者ID",
+          "type": "uuid",
+          "required": false,
+          "description": "変更を承認したユーザーID、ユーザーテーブルへの外部キー"
+        },
+        {
+          "name": "承認日時",
+          "type": "timestamp",
+          "required": false,
+          "description": "変更が承認された日時"
+        },
+        {
+          "name": "ステータス",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "変更ステータス（計画中、実行済、キャンセル等）"
+        }
+      ]
+    },
+    {
+      "tableName": "比較分析結果",
+      "purpose": "作業者の生産性データを複数の時期・条件で比較分析し、配置最適化の判断材料となる分析結果を記録・管理するテーブル",
+      "columns": [
+        {
+          "name": "比較分析結果ID",
+          "type": "uuid",
+          "required": true,
+          "description": "比較分析結果の一意識別子"
+        },
+        {
+          "name": "分析名",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "比較分析の名称・タイトル"
+        },
+        {
+          "name": "分析タイプ",
+          "type": "varchar(50)",
+          "required": true,
+          "description": "分析の種類(時系列比較/部門間比較/作業タイプ別比較/配置前後比較等)"
+        },
+        {
+          "name": "対象期間開始日",
+          "type": "timestamp",
+          "required": true,
+          "description": "比較分析の対象期間開始日時"
+        },
+        {
+          "name": "対象期間終了日",
+          "type": "timestamp",
+          "required": true,
+          "description": "比較分析の対象期間終了日時"
+        },
+        {
+          "name": "比較対象1",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "比較対象の第1グループ(作業者ID/部門ID/配置計画ID等)"
+        },
+        {
+          "name": "比較対象2",
+          "type": "varchar(100)",
+          "required": false,
+          "description": "比較対象の第2グループ(作業者ID/部門ID/配置計画ID等)"
+        },
+        {
+          "name": "平均生産性1",
+          "type": "integer",
+          "required": true,
+          "description": "比較対象1の平均生産性(単位:件数/時間等)"
+        },
+        {
+          "name": "平均生産性2",
+          "type": "integer",
+          "required": false,
+          "description": "比較対象2の平均生産性(単位:件数/時間等)"
+        },
+        {
+          "name": "生産性改善率",
+          "type": "integer",
+          "required": false,
+          "description": "生産性の改善率(パーセンテージ)"
+        },
+        {
+          "name": "平均品質スコア1",
+          "type": "integer",
+          "required": false,
+          "description": "比較対象1の平均品質スコア"
+        },
+        {
+          "name": "平均品質スコア2",
+          "type": "integer",
+          "required": false,
+          "description": "比較対象2の平均品質スコア"
+        },
+        {
+          "name": "分析結果サマリー",
+          "type": "text",
+          "required": false,
+          "description": "比較分析の結果要約・主要な発見事項"
+        },
+        {
+          "name": "推奨アクション",
+          "type": "text",
+          "required": false,
+          "description": "分析結果に基づく推奨される配置変更・改善施策"
+        },
+        {
+          "name": "統計的有意性",
+          "type": "boolean",
+          "required": false,
+          "description": "分析結果が統計的に有意であるかどうか"
+        },
+        {
+          "name": "作成日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "比較分析結果の作成日時"
+        },
+        {
+          "name": "更新日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "比較分析結果の最終更新日時"
+        },
+        {
+          "name": "作成者",
+          "type": "uuid",
+          "required": true,
+          "description": "比較分析結果を作成したユーザーID"
+        }
+      ]
+    }
+  ],
+  "presetSeedData": {
+    "ユーザー": [
+      {
+        "ユーザーID": "rec-001",
+        "ユーザー名": "tanaka_taro",
+        "メールアドレス": "tanaka.taro@company.jp",
+        "パスワードハッシュ": "$2b$12$abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQR",
+        "氏名": "田中太郎",
+        "役割": "管理者",
+        "拠点ID": "rec-hq-001",
+        "チームID": "rec-team-sales-001",
+        "ステータス": "有効",
+        "最終ログイン日時": "2025-01-15T09:30:00Z",
+        "作成日時": "2024-04-01T10:00:00Z",
+        "更新日時": "2025-01-10T14:20:00Z",
+        "作成者": "system_admin",
+        "更新者": "tanaka_taro"
+      },
+      {
+        "ユーザーID": "rec-001",
+        "ユーザー名": "tanaka_taro",
+        "メールアドレス": "tanaka.taro@manufacturing.co.jp",
+        "パスワードハッシュ": "$2b$12$abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQR",
+        "氏名": "田中太郎",
+        "役割": "作業者",
+        "拠点ID": "rec-101",
+        "チームID": "rec-201",
+        "ステータス": "有効",
+        "最終ログイン日時": "2025-01-15 08:32:45",
+        "作成日時": "2024-04-10 14:20:00",
+        "更新日時": "2025-01-15 08:32:45",
+        "作成者": "suzuki_hanako",
+        "更新者": "tanaka_taro"
+      },
+      {
+        "ユーザーID": "rec-001",
+        "ユーザー名": "tanaka_taro",
+        "メールアドレス": "tanaka.taro@factory-a.jp",
+        "パスワードハッシュ": "$2b$12$abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
+        "氏名": "田中太郎",
+        "役割": "チームリーダー",
+        "拠点ID": "rec-site-001",
+        "チームID": "rec-team-001",
+        "ステータス": "有効",
+        "最終ログイン日時": "2025-01-15T08:45:30+09:00",
+        "作成日時": "2024-04-01T09:00:00+09:00",
+        "更新日時": "2025-01-15T08:45:30+09:00",
+        "作成者": "admin_user",
+        "更新者": "tanaka_taro"
+      },
+      {
+        "ユーザーID": "rec-001",
+        "ユーザー名": "tanaka.taro",
+        "メールアドレス": "tanaka.taro@company.jp",
+        "パスワードハッシュ": "$2b$12$abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQRST",
+        "氏名": "田中太郎",
+        "役割": "システム管理者",
+        "拠点ID": "rec-101",
+        "チームID": "rec-201",
+        "ステータス": "有効",
+        "最終ログイン日時": "2025-01-15T09:30:00+09:00",
+        "作成日時": "2024-04-01T08:00:00+09:00",
+        "更新日時": "2025-01-10T14:20:00+09:00",
+        "作成者": "system",
+        "更新者": "田中太郎"
+      },
+      {
+        "ユーザーID": "rec-001",
+        "ユーザー名": "tanaka.taro",
+        "メールアドレス": "tanaka.taro@company.jp",
+        "パスワードハッシュ": "$2b$12$abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQR",
+        "氏名": "田中太郎",
+        "役割": "作業者",
+        "拠点ID": "rec-b01",
+        "チームID": "rec-team-05",
+        "ステータス": "有効",
+        "最終ログイン日時": "2025-01-15T09:30:00+09:00",
+        "作成日時": "2023-06-10T14:20:00+09:00",
+        "更新日時": "2025-01-14T16:45:00+09:00",
+        "作成者": "suzuki.hanako",
+        "更新者": "yamamoto.jiro"
+      },
+      {
+        "ユーザーID": "rec-001",
+        "ユーザー名": "yamada.hanako",
+        "メールアドレス": "yamada.hanako@company.jp",
+        "パスワードハッシュ": "$2b$12$abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQR",
+        "氏名": "山田花子",
+        "役割": "作業者",
+        "拠点ID": "rec-010",
+        "チームID": "rec-020",
+        "ステータス": "有効",
+        "最終ログイン日時": "2025-01-15T09:30:00+09:00",
+        "作成日時": "2025-01-10T14:20:00+09:00",
+        "更新日時": "2025-01-15T09:30:00+09:00",
+        "作成者": "suzuki.taro",
+        "更新者": "yamada.hanako"
+      },
+      {
+        "ユーザーID": "rec-001",
+        "ユーザー名": "tanaka_taro",
+        "メールアドレス": "tanaka.taro@factory-c.jp",
+        "パスワードハッシュ": "$2b$12$abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQR",
+        "氏名": "田中太郎",
+        "役割": "管理者",
+        "拠点ID": "rec-factory-c",
+        "チームID": "rec-team-production-2",
+        "ステータス": "有効",
+        "最終ログイン日時": "2025-01-15T09:30:00+09:00",
+        "作成日時": "2024-04-10T14:20:00+09:00",
+        "更新日時": "2025-01-10T16:45:00+09:00",
+        "作成者": "suzuki_hanako",
+        "更新者": "yamamoto_jiro"
+      },
+      {
+        "ユーザーID": "rec-001",
+        "ユーザー名": "suzuki.hanako",
+        "メールアドレス": "suzuki.hanako@company.jp",
+        "パスワードハッシュ": "$2b$12$K8vN9pL2mQ4rS5tU6vW7xOyZ1aB2cD3eF4gH5iJ6kL7mN8oP9qR0s",
+        "氏名": "鈴木花子",
+        "役割": "作業者",
+        "拠点ID": "rec-102",
+        "チームID": "rec-203",
+        "ステータス": "無効",
+        "最終ログイン日時": "2024-03-15T14:32:00Z",
+        "作成日時": "2023-06-20T09:15:00Z",
+        "更新日時": "2024-11-08T10:45:00Z",
+        "作成者": "佐藤太郎",
+        "更新者": "山田次郎"
+      },
+      {
+        "ユーザーID": "rec-001",
+        "ユーザー名": "tanaka.taro",
+        "メールアドレス": "tanaka.taro@company.jp",
+        "パスワードハッシュ": "$2b$12$abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
+        "氏名": "田中太郎",
+        "役割": "チームリーダー",
+        "拠点ID": "rec-101",
+        "チームID": "rec-201",
+        "ステータス": "有効",
+        "最終ログイン日時": "2025-01-15T09:30:00+09:00",
+        "作成日時": "2024-04-01T10:00:00+09:00",
+        "更新日時": "2025-01-10T14:20:00+09:00",
+        "作成者": "admin.user",
+        "更新者": "admin.user"
+      },
+      {
+        "ユーザーID": "rec-001",
+        "ユーザー名": "tanaka.taro",
+        "メールアドレス": "tanaka.taro@company.jp",
+        "パスワードハッシュ": "$2b$12$abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrst",
+        "氏名": "田中太郎",
+        "役割": "管理者",
+        "拠点ID": "rec-101",
+        "チームID": "rec-201,rec-202",
+        "ステータス": "有効",
+        "最終ログイン日時": "2025-01-15 09:30:00",
+        "作成日時": "2024-04-01 10:00:00",
+        "更新日時": "2025-01-10 14:20:00",
+        "作成者": "system_admin",
+        "更新者": "tanaka.taro"
+      }
+    ],
+    "作業者": [
+      {
+        "作業者ID": "rec-001",
+        "作業者名": "佐藤健一",
+        "拠点ID": "rec-b001",
+        "チームID": "rec-t001",
+        "職種": "営業",
+        "稼働状況": "稼働中",
+        "時給": 0,
+        "最大稼働時間": 480,
+        "作成日時": "2024-04-01T09:00:00+09:00",
+        "更新日時": "2025-01-15T14:30:00+09:00",
+        "作成者": "人事部_山田"
+      },
+      {
+        "作業者ID": "rec-001",
+        "作業者名": "鈴木美咲",
+        "拠点ID": "rec-101",
+        "チームID": "rec-201",
+        "職種": "事務職",
+        "稼働状況": "稼働中",
+        "時給": 1200,
+        "最大稼働時間": 4,
+        "作成日時": "2024-10-15 09:30:00",
+        "更新日時": "2024-12-20 14:15:00",
+        "作成者": "採用担当 田中"
+      },
+      {
+        "作業者ID": "rec-001",
+        "作業者名": "鈴木由美",
+        "拠点ID": "rec-002",
+        "チームID": "rec-003",
+        "職種": "システムエンジニア",
+        "稼働状況": "休止中",
+        "時給": 2800,
+        "最大稼働時間": 8,
+        "作成日時": "2023-06-15 09:30:00",
+        "更新日時": "2024-11-20 14:15:00",
+        "作成者": "人事部 佐藤"
+      },
+      {
+        "作業者ID": "rec-001",
+        "作業者名": "佐藤花子",
+        "拠点ID": "rec-101",
+        "チームID": "rec-201",
+        "職種": "ソフトウェア開発エンジニア",
+        "稼働状況": "稼働中",
+        "時給": 1200,
+        "最大稼働時間": 4,
+        "作成日時": "2025-04-01 09:00:00",
+        "更新日時": "2025-04-01 09:00:00",
+        "作成者": "人事部 山田太郎"
+      },
+      {
+        "作業者ID": "rec-001",
+        "作業者名": "鈴木健一",
+        "拠点ID": "rec-101",
+        "チームID": "rec-201",
+        "職種": "システムエンジニア",
+        "稼働状況": "休止中",
+        "時給": 3500,
+        "最大稼働時間": 4,
+        "作成日時": "2024-08-15T09:30:00",
+        "更新日時": "2025-01-20T14:15:00",
+        "作成者": "田中花子"
+      },
+      {
+        "作業者ID": "rec-001",
+        "作業者名": "山田孝夫",
+        "拠点ID": "rec-b-001",
+        "チームID": "rec-t-003",
+        "職種": "経営コンサルタント",
+        "稼働状況": "稼働中",
+        "時給": 8500,
+        "最大稼働時間": 4,
+        "作成日時": "2024-10-15 09:30:00",
+        "更新日時": "2025-01-08 14:20:00",
+        "作成者": "人事部_佐藤"
+      },
+      {
+        "作業者ID": "rec-001",
+        "作業者名": "佐藤健一",
+        "拠点ID": "rec-site-005",
+        "チームID": "rec-team-012",
+        "職種": "チームリーダー",
+        "稼働状況": "稼働中",
+        "時給": 2200,
+        "最大稼働時間": 8,
+        "作成日時": "2024-04-01T09:00:00+09:00",
+        "更新日時": "2025-01-15T14:30:00+09:00",
+        "作成者": "人事部_山田花子"
+      },
+      {
+        "作業者ID": "rec-001",
+        "作業者名": "佐藤美咲",
+        "拠点ID": "rec-0042",
+        "チームID": "rec-0015",
+        "職種": "システムエンジニア",
+        "稼働状況": "休止中",
+        "時給": 3500,
+        "最大稼働時間": 8,
+        "作成日時": "2024-10-15 09:30:00",
+        "更新日時": "2025-01-08 14:22:00",
+        "作成者": "人事部 鈴木健一"
+      },
+      {
+        "作業者ID": "rec-001",
+        "作業者名": "佐藤健一",
+        "拠点ID": "rec-hub-001",
+        "チームID": "rec-team-sales-001",
+        "職種": "営業職",
+        "稼働状況": "稼働中",
+        "時給": 1800,
+        "最大稼働時間": 7,
+        "作成日時": "2024-04-01T09:00:00Z",
+        "更新日時": "2025-01-15T14:30:00Z",
+        "作成者": "人事部 山田花子"
+      },
+      {
+        "作業者ID": "rec-001",
+        "作業者名": "鈴木美咲",
+        "拠点ID": "rec-101",
+        "チームID": "rec-201",
+        "職種": "製造オペレーター",
+        "稼働状況": "稼働中",
+        "時給": 1250,
+        "最大稼働時間": 8,
+        "作成日時": "2024-04-15 09:30:00",
+        "更新日時": "2025-01-20 14:15:00",
+        "作成者": "人事部 佐藤"
+      }
+    ],
+    "生産性データ": [
+      {
+        "生産性データID": "rec-001",
+        "作業実績ID": "rec-102",
+        "作業者ID": "rec-201",
+        "拠点ID": "rec-301",
+        "チームID": "rec-401",
+        "作業日": "2024-11-15T09:00:00Z",
+        "計画作業時間": 480,
+        "実績作業時間": 465,
+        "完了件数": 52,
+        "生産性率": 96,
+        "品質スコア": 98,
+        "エラー件数": 1,
+        "習熟度レベル": "上級",
+        "備考": "天候良好で作業環境最適。経験を活かした効率的な作業進行。",
+        "作成日時": "2024-11-15T17:30:00Z",
+        "更新日時": "2024-11-15T17:30:00Z",
+        "作成者": "田中太郎"
+      },
+      {
+        "生産性データID": "rec-001",
+        "作業実績ID": "rec-act-0047",
+        "作業者ID": "rec-wkr-0156",
+        "拠点ID": "rec-loc-0012",
+        "チームID": "rec-team-0008",
+        "作業日": "2024-11-15T09:00:00+09:00",
+        "計画作業時間": 480,
+        "実績作業時間": 520,
+        "完了件数": 18,
+        "生産性率": 58,
+        "品質スコア": 72,
+        "エラー件数": 4,
+        "習熟度レベル": "初級",
+        "備考": "研修開始2週目。手順確認に時間を要したが理解度は向上中。先輩サポートで対応。",
+        "作成日時": "2024-11-15T17:30:00+09:00",
+        "更新日時": "2024-11-15T17:30:00+09:00",
+        "作成者": "山田花子"
+      },
+      {
+        "生産性データID": "rec-001",
+        "作業実績ID": "rec-201",
+        "作業者ID": "rec-301",
+        "拠点ID": "rec-401",
+        "チームID": "rec-501",
+        "作業日": "2024-11-15T09:00:00",
+        "計画作業時間": 480,
+        "実績作業時間": 620,
+        "完了件数": 32,
+        "生産性率": 62,
+        "品質スコア": 78,
+        "エラー件数": 4,
+        "習熟度レベル": "中級",
+        "備考": "午前中に自動梱包機が停止。復旧まで約90分の作業中断。",
+        "作成日時": "2024-11-15T17:30:00",
+        "更新日時": "2024-11-15T17:30:00",
+        "作成者": "田中太郎"
+      },
+      {
+        "生産性データID": "rec-001",
+        "作業実績ID": "rec-002",
+        "作業者ID": "rec-003",
+        "拠点ID": "rec-004",
+        "チームID": "rec-005",
+        "作業日": "2024-11-15T09:00:00Z",
+        "計画作業時間": 480,
+        "実績作業時間": 475,
+        "完了件数": 42,
+        "生産性率": 88,
+        "品質スコア": 52,
+        "エラー件数": 18,
+        "習熟度レベル": "中級",
+        "備考": "品質検査で不良18件発見。新型部品の仕様確認不足が原因。",
+        "作成日時": "2024-11-15T17:30:00Z",
+        "更新日時": "2024-11-16T10:15:00Z",
+        "作成者": "鈴木美咲"
+      },
+      {
+        "生産性データID": "rec-001",
+        "作業実績ID": "rec-002",
+        "作業者ID": "rec-003",
+        "拠点ID": "rec-004",
+        "チームID": "rec-005",
+        "作業日": "2024-12-15T09:00:00+09:00",
+        "計画作業時間": 480,
+        "実績作業時間": 580,
+        "完了件数": 68,
+        "生産性率": 78,
+        "品質スコア": 82,
+        "エラー件数": 5,
+        "習熟度レベル": "中級",
+        "備考": "年末繁忙期で受注増加、人員不足のため計画超過。残業対応で対処",
+        "作成日時": "2024-12-16T08:30:00+09:00",
+        "更新日時": "2024-12-16T08:30:00+09:00",
+        "作成者": "山田花子"
+      },
+      {
+        "生産性データID": "rec-001",
+        "作業実績ID": "rec-102",
+        "作業者ID": "rec-203",
+        "拠点ID": "rec-304",
+        "チームID": "rec-405",
+        "作業日": "2024-11-15T09:00:00",
+        "計画作業時間": 480,
+        "実績作業時間": 320,
+        "完了件数": 12,
+        "生産性率": 45,
+        "品質スコア": 78,
+        "エラー件数": 3,
+        "習熟度レベル": "中級",
+        "備考": "体調不良（風邪症状）により午後途中で退勤。完了件数が通常の30%程度に低下。",
+        "作成日時": "2024-11-15T17:30:00",
+        "更新日時": "2024-11-15T17:30:00",
+        "作成者": "山田花子"
+      },
+      {
+        "生産性データID": "rec-001",
+        "作業実績ID": "rec-002",
+        "作業者ID": "rec-003",
+        "拠点ID": "rec-004",
+        "チームID": "rec-005",
+        "作業日": "2024-11-15T09:00:00+09:00",
+        "計画作業時間": 480,
+        "実績作業時間": 510,
+        "完了件数": 32,
+        "生産性率": 68,
+        "品質スコア": 72,
+        "エラー件数": 5,
+        "習熟度レベル": "初級",
+        "備考": "新手順導入2日目。確認作業が増加し処理時間超過。ミスが若干増加傾向。",
+        "作成日時": "2024-11-15T18:30:00+09:00",
+        "更新日時": "2024-11-15T18:30:00+09:00",
+        "作成者": "佐藤花子"
+      },
+      {
+        "生産性データID": "rec-001",
+        "作業実績ID": "rec-002",
+        "作業者ID": "rec-003",
+        "拠点ID": "rec-004",
+        "チームID": "rec-005",
+        "作業日": "2024-11-15T09:00:00Z",
+        "計画作業時間": 480,
+        "実績作業時間": 420,
+        "完了件数": 52,
+        "生産性率": 112,
+        "品質スコア": 98,
+        "エラー件数": 1,
+        "習熟度レベル": "シニア",
+        "備考": "経験を活かした工程改善で計画比20%削減。新人指導も実施。",
+        "作成日時": "2024-11-15T17:30:00Z",
+        "更新日時": "2024-11-15T17:30:00Z",
+        "作成者": "佐藤花子"
+      },
+      {
+        "生産性データID": "rec-001",
+        "作業実績ID": "rec-002",
+        "作業者ID": "rec-003",
+        "拠点ID": "rec-004",
+        "チームID": "rec-005",
+        "作業日": "2024-11-15T09:00:00Z",
+        "計画作業時間": 480,
+        "実績作業時間": 475,
+        "完了件数": 58,
+        "生産性率": 115,
+        "品質スコア": 92,
+        "エラー件数": 2,
+        "習熟度レベル": "上級",
+        "備考": "チーム内で業務分担を最適化し、経験者がサポート。計画比120%の完了件数を達成。",
+        "作成日時": "2024-11-15T18:30:00Z",
+        "更新日時": "2024-11-15T18:30:00Z",
+        "作成者": "山田花子"
+      },
+      {
+        "生産性データID": "rec-001",
+        "作業実績ID": "rec-102",
+        "作業者ID": "rec-2847",
+        "拠点ID": "rec-5031",
+        "チームID": "rec-1204",
+        "作業日": "2024-11-15T09:00:00Z",
+        "計画作業時間": 480,
+        "実績作業時間": 720,
+        "完了件数": 28,
+        "生産性率": 58,
+        "品質スコア": 72,
+        "エラー件数": 5,
+        "習熟度レベル": "中級",
+        "備考": "午前中のシステム障害により作業が中断。復旧後の再処理で実績時間が大幅増加。",
+        "作成日時": "2024-11-15T18:30:00Z",
+        "更新日時": "2024-11-15T18:30:00Z",
+        "作成者": "田中太郎"
+      }
+    ],
+    "配置計画": [
+      {
+        "配置計画ID": "rec-001",
+        "作業者ID": "rec-emp-047",
+        "配置部門": "品質管理部門",
+        "配置職務": "不良率低減プロジェクトリーダー",
+        "開始日": "2024-04-01T09:00:00",
+        "終了日": "2025-03-31T17:00:00",
+        "配置ステータス": "実行中",
+        "期待生産性目標": 92,
+        "最適化根拠": "過去12ヶ月の生産性実績が平均115%で、品質意識が高く、不良率改善プロジェクトの推進に最適と判断",
+        "作成日時": "2024-03-15T14:30:00",
+        "更新日時": "2024-04-05T10:15:00",
+        "作成者ID": "rec-usr-012"
+      },
+      {
+        "配置計画ID": "rec-001",
+        "作業者ID": "rec-emp-0847",
+        "配置部門": "営業企画部",
+        "配置職務": "営業アシスタント",
+        "開始日": "2024-04-01T09:00:00",
+        "終了日": "2024-09-30T17:00:00",
+        "配置ステータス": "実行中",
+        "期待生産性目標": 75,
+        "最適化根拠": "新入社員の基礎スキル習得期間として設定。営業企画部の経験豊富な鈴木美咲が担当。実務を通じた段階的な育成で6ヶ月後に独立業務遂行を目指す。",
+        "作成日時": "2024-03-15T14:30:00",
+        "更新日時": "2024-04-05T10:15:00",
+        "作成者ID": "rec-usr-0312"
+      },
+      {
+        "配置計画ID": "rec-001",
+        "作業者ID": "rec-emp-0847",
+        "配置部門": "製造部 組立課",
+        "配置職務": "組立作業員",
+        "開始日": "2024-12-01T08:00:00",
+        "終了日": "2025-01-31T17:00:00",
+        "配置ステータス": "実行中",
+        "期待生産性目標": 95,
+        "最適化根拠": "営業部の田中太郎は組立経験3年で技能レベルが高く、年末年始の製造部繁忙期に対応可能。製造部の生産目標達成に貢献できると判断。",
+        "作成日時": "2024-11-15T10:30:00",
+        "更新日時": "2024-12-01T08:15:00",
+        "作成者ID": "rec-user-0521"
+      },
+      {
+        "配置計画ID": "rec-001",
+        "作業者ID": "rec-emp-0847",
+        "配置部門": "デジタル変革推進室",
+        "配置職務": "システム導入プロジェクト技術リード",
+        "開始日": "2024-04-01T09:00:00",
+        "終了日": "2025-03-31T17:00:00",
+        "配置ステータス": "実行中",
+        "期待生産性目標": 120,
+        "最適化根拠": "クラウドインフラ構築経験5年以上、既存システム統合実績あり。プロジェクト成功確度向上のため専任配置が最適と判断。",
+        "作成日時": "2024-03-15T14:30:00",
+        "更新日時": "2024-04-05T10:15:00",
+        "作成者ID": "rec-usr-0312"
+      },
+      {
+        "配置計画ID": "rec-001",
+        "作業者ID": "rec-002",
+        "配置部門": "デジタル戦略推進部",
+        "配置職務": "部門長・プロジェクトリーダー",
+        "開始日": "2025-04-01T09:00:00",
+        "終了日": null,
+        "配置ステータス": "計画中",
+        "期待生産性目標": 150,
+        "最適化根拠": "18年の製造部門経験と過去3件の部門立ち上げ実績から、新部門の組織構築と業務プロセス確立に最適と判断。",
+        "作成日時": "2024-12-15T14:30:00",
+        "更新日時": "2024-12-15T14:30:00",
+        "作成者ID": "rec-003"
+      },
+      {
+        "配置計画ID": "rec-001",
+        "作業者ID": "rec-emp-0247",
+        "配置部門": "品質管理部",
+        "配置職務": "検査員",
+        "開始日": "2025-02-01T09:00:00",
+        "終了日": null,
+        "配置ステータス": "実行中",
+        "期待生産性目標": 95,
+        "最適化根拠": "前配置先（組立部門）での生産性が目標比75%に低下。適性診断結果より細かい作業と品質判定に適性が高いため、品質管理部への異動を推奨。",
+        "作成日時": "2025-01-20T14:30:00",
+        "更新日時": "2025-01-28T10:15:00",
+        "作成者ID": "rec-usr-0089"
+      },
+      {
+        "配置計画ID": "rec-001",
+        "作業者ID": "rec-emp-0847",
+        "配置部門": "物流部",
+        "配置職務": "ピッキング・梱包作業員",
+        "開始日": "2024-11-15T08:00:00",
+        "終了日": "2025-01-31T17:00:00",
+        "配置ステータス": "実行中",
+        "期待生産性目標": 450,
+        "最適化根拠": "年末年始の出荷ピーク対応として需要予測から50名の臨時人員が必要。本人は梱包経験3年で即戦力化可能。",
+        "作成日時": "2024-10-28T14:30:00",
+        "更新日時": "2024-11-15T09:15:00",
+        "作成者ID": "rec-user-0312"
+      },
+      {
+        "配置計画ID": "rec-001",
+        "作業者ID": "rec-emp-0847",
+        "配置部門": "営業企画部",
+        "配置職務": "営業戦略分析担当",
+        "開始日": "2025-04-01T09:00:00+09:00",
+        "終了日": "2025-09-30T17:00:00+09:00",
+        "配置ステータス": "計画中",
+        "期待生産性目標": 85,
+        "最適化根拠": "営業部での基礎習得後、企画スキル強化が必要。市場分析能力と提案資料作成スキルの育成を重視。",
+        "作成日時": "2024-12-15T14:30:00+09:00",
+        "更新日時": "2024-12-15T14:30:00+09:00",
+        "作成者ID": "rec-usr-0312"
+      },
+      {
+        "配置計画ID": "rec-001",
+        "作業者ID": "rec-emp-0847",
+        "配置部門": "営業企画部",
+        "配置職務": "営業事務（リハビリ勤務）",
+        "開始日": "2025-02-03T09:00:00",
+        "終了日": "2025-05-02T17:00:00",
+        "配置ステータス": "計画中",
+        "期待生産性目標": 60,
+        "最適化根拠": "復帰者向けの段階的配置。初期は軽負荷業務（データ入力・書類整理）から開始し、月ごとに負荷を段階的に増加させることで心身の安定を確保しながら通常業務への適応を支援。同部門での経験者が多く、サポート体制が充実している。",
+        "作成日時": "2025-01-20T14:30:00",
+        "更新日時": "2025-01-20T14:30:00",
+        "作成者ID": "rec-usr-0312"
+      },
+      {
+        "配置計画ID": "rec-001",
+        "作業者ID": "rec-w-0847",
+        "配置部門": "製造部 第2ライン",
+        "配置職務": "組立工程リーダー",
+        "開始日": "2024-11-01T08:00:00",
+        "終了日": "2025-01-31T17:00:00",
+        "配置ステータス": "実行中",
+        "期待生産性目標": 145,
+        "最適化根拠": "過去3ヶ月の作業分析で組立工程での適性スコア87%、同工程経験者の平均生産性130に対し当該作業者は143を達成。チームマネジメント能力も高く、リーダー配置で全体生産性15%向上を見込む。",
+        "作成日時": "2024-10-15T14:30:00",
+        "更新日時": "2024-11-05T09:15:00",
+        "作成者ID": "rec-u-0312"
+      }
+    ],
+    "初期割当": [
+      {
+        "割当ID": "rec-001",
+        "作業者ID": "rec-emp-0847",
+        "配置部門": "製造部門",
+        "配置工程": "生産ラインA",
+        "割当開始日": "2024-04-01T09:00:00+09:00",
+        "割当終了日": "2024-06-30T17:00:00+09:00",
+        "割当ステータス": "有効",
+        "備考": "新入社員研修期間（3ヶ月）。期間終了後は正式配置へ移行予定。OJT担当者：鈴木次郎",
+        "作成日時": "2024-03-25T14:30:00+09:00",
+        "更新日時": "2024-03-25T14:30:00+09:00",
+        "作成者": "rec-user-0512"
+      },
+      {
+        "割当ID": "rec-001",
+        "作業者ID": "rec-w-0847",
+        "配置部門": "品質管理部門",
+        "配置工程": "検査工程",
+        "割当開始日": "2022-04-01T09:00:00+09:00",
+        "割当終了日": null,
+        "割当ステータス": "有効",
+        "備考": "検査工程のリーダー。15年の経験を持つベテラン作業者。不良品判定の最終確認を担当。",
+        "作成日時": "2022-03-28T14:30:00+09:00",
+        "更新日時": "2024-11-15T10:45:00+09:00",
+        "作成者": "rec-u-0012"
+      },
+      {
+        "割当ID": "rec-001",
+        "作業者ID": "rec-w-042",
+        "配置部門": "企画部門",
+        "配置工程": "新商品企画プロジェクト",
+        "割当開始日": "2024-10-15T09:00:00",
+        "割当終了日": "2025-03-31T17:00:00",
+        "割当ステータス": "有効",
+        "備考": "営業部門からの一時出向。顧客ニーズ調査および営業視点での企画支援を担当。",
+        "作成日時": "2024-10-10T14:30:00",
+        "更新日時": "2024-10-10T14:30:00",
+        "作成者": "rec-u-015"
+      },
+      {
+        "割当ID": "rec-001",
+        "作業者ID": "rec-002",
+        "配置部門": "生産部",
+        "配置工程": "生産ラインB",
+        "割当開始日": "2024-04-01T08:00:00",
+        "割当終了日": null,
+        "割当ステータス": "一時停止",
+        "備考": "2025-01-15の機械故障に伴い一時停止。復旧予定日は別途通知予定。",
+        "作成日時": "2024-04-01T09:30:00",
+        "更新日時": "2025-01-15T14:45:00",
+        "作成者": "rec-003"
+      },
+      {
+        "割当ID": "rec-001",
+        "作業者ID": "rec-w-0847",
+        "配置部門": "製造部",
+        "配置工程": "検査工程",
+        "割当開始日": "2025-04-01T09:00:00+09:00",
+        "割当終了日": null,
+        "割当ステータス": "有効",
+        "備考": "ジョブローテーション計画により組立工程から検査工程へ異動。品質管理スキル習得予定。",
+        "作成日時": "2025-03-15T14:30:00+09:00",
+        "更新日時": "2025-03-15T14:30:00+09:00",
+        "作成者": "rec-u-0012"
+      },
+      {
+        "割当ID": "rec-001",
+        "作業者ID": "rec-0847",
+        "配置部門": "物流部門",
+        "配置工程": "梱包工程",
+        "割当開始日": "2024-11-15T08:00:00+09:00",
+        "割当終了日": "2025-01-31T17:00:00+09:00",
+        "割当ステータス": "有効",
+        "備考": "年末年始ピーク対応。派遣契約期間限定。",
+        "作成日時": "2024-11-08T10:30:00+09:00",
+        "更新日時": "2024-11-08T10:30:00+09:00",
+        "作成者": "rec-0512"
+      },
+      {
+        "割当ID": "rec-001",
+        "作業者ID": "rec-worker-042",
+        "配置部門": "製造部 溶接課",
+        "配置工程": "溶接工程",
+        "割当開始日": "2024-04-01T09:00:00+09:00",
+        "割当終了日": null,
+        "割当ステータス": "有効",
+        "備考": "指導者：佐藤健一。3ヶ月の育成期間を経て本配置予定。",
+        "作成日時": "2024-03-28T14:30:00+09:00",
+        "更新日時": "2024-03-28T14:30:00+09:00",
+        "作成者": "rec-user-008"
+      },
+      {
+        "割当ID": "rec-001",
+        "作業者ID": "rec-0847",
+        "配置部門": "製造部",
+        "配置工程": "検査・梱包工程",
+        "割当開始日": "2025-01-15T08:00:00",
+        "割当終了日": null,
+        "割当ステータス": "有効",
+        "備考": "定年前対応により重作業工程から配置変更。体力軽減のため検査・梱包業務に従事。",
+        "作成日時": "2024-12-20T14:30:00",
+        "更新日時": "2024-12-20T14:30:00",
+        "作成者": "rec-0521"
+      },
+      {
+        "割当ID": "rec-001",
+        "作業者ID": "rec-w-0847",
+        "配置部門": "製造部 第2工場",
+        "配置工程": "組立工程",
+        "割当開始日": "2024-04-01T08:00:00+09:00",
+        "割当終了日": null,
+        "割当ステータス": "有効",
+        "備考": "生産効率改善プロジェクト兼務。毎週水曜午後に改善活動。現配置業務に支障なし",
+        "作成日時": "2024-03-25T14:30:00+09:00",
+        "更新日時": "2024-03-25T14:30:00+09:00",
+        "作成者": "rec-u-0312"
+      },
+      {
+        "割当ID": "rec-001",
+        "作業者ID": "wrk-0847",
+        "配置部門": "製造部",
+        "配置工程": "組立工程",
+        "割当開始日": "2024-08-01T08:00:00+09:00",
+        "割当終了日": "2024-08-31T17:00:00+09:00",
+        "割当ステータス": "有効",
+        "備考": "鈴木花子の夏季休暇代替要員として配置",
+        "作成日時": "2024-07-15T14:30:00+09:00",
+        "更新日時": "2024-07-15T14:30:00+09:00",
+        "作成者": "usr-0312"
+      }
+    ],
+    "実績記録": [
+      {
+        "実績記録ID": "rec-001",
+        "作業者ID": "usr-0847",
+        "配置計画ID": "plan-0523",
+        "作業日": "2024-12-19T08:30:00",
+        "作業内容": "部品組立",
+        "完了数量": 145,
+        "所要時間分": 480,
+        "品質スコア": 92,
+        "備考": "標準時間内に完了。不良品なし。",
+        "作成日時": "2024-12-19T17:15:00",
+        "更新日時": "2024-12-19T17:15:00",
+        "作成者": "usr-0102"
+      },
+      {
+        "実績記録ID": "rec-001",
+        "作業者ID": "usr-0847",
+        "配置計画ID": "plan-2024-0512",
+        "作業日": "2024-11-15T09:00:00Z",
+        "作業内容": "部品検査・梱包",
+        "完了数量": 240,
+        "所要時間分": 480,
+        "品質スコア": 28,
+        "備考": "検査見落としにより不良品10個を出荷。検査手順の確認不足が原因。",
+        "作成日時": "2024-11-15T17:30:00Z",
+        "更新日時": "2024-11-16T10:15:00Z",
+        "作成者": "usr-0156"
+      },
+      {
+        "実績記録ID": "rec-001",
+        "作業者ID": "usr-0847",
+        "配置計画ID": "plan-0312",
+        "作業日": "2024-11-15T09:00:00Z",
+        "作業内容": "部品検査・梱包",
+        "完了数量": 145,
+        "所要時間分": 480,
+        "品質スコア": 82,
+        "備考": "研修3週目。検査精度向上、梱包速度は目標の85%達成。",
+        "作成日時": "2024-11-15T17:30:00Z",
+        "更新日時": "2024-11-15T17:30:00Z",
+        "作成者": "usr-0102"
+      },
+      {
+        "実績記録ID": "rec-001",
+        "作業者ID": "usr-2847",
+        "配置計画ID": "plan-5621",
+        "作業日": "2024-11-15T09:30:00Z",
+        "作業内容": "プレス機械による部品加工",
+        "完了数量": 187,
+        "所要時間分": 245,
+        "品質スコア": 92,
+        "備考": "10:45に油圧系統トラブルで中断、11:20に復帰。ロス時間35分を含む",
+        "作成日時": "2024-11-15T17:15:00Z",
+        "更新日時": "2024-11-15T17:15:00Z",
+        "作成者": "usr-1203"
+      },
+      {
+        "実績記録ID": "rec-001",
+        "作業者ID": "usr-2024-0847",
+        "配置計画ID": "plan-2024-1205",
+        "作業日": "2024-12-20T08:00:00+09:00",
+        "作業内容": "商品ピッキング・梱包",
+        "完了数量": 480,
+        "所要時間分": 570,
+        "品質スコア": 92,
+        "備考": "繁忙期対応で残業3時間。ミス率0.8%。",
+        "作成日時": "2024-12-20T18:15:00+09:00",
+        "更新日時": "2024-12-20T18:15:00+09:00",
+        "作成者": "usr-2024-0102"
+      },
+      {
+        "実績記録ID": "rec-001",
+        "作業者ID": "usr-0847",
+        "配置計画ID": "plan-0523",
+        "作業日": "2024-11-15T09:00:00Z",
+        "作業内容": "梱包・検品作業",
+        "完了数量": 156,
+        "所要時間分": 480,
+        "品質スコア": 78,
+        "備考": "配置変更初日。既存の仕分け作業から梱包へ異動。手順理解に時間を要したが、後半は安定した作業速度を維持。",
+        "作成日時": "2024-11-15T17:30:00Z",
+        "更新日時": "2024-11-15T17:30:00Z",
+        "作成者": "usr-0102"
+      },
+      {
+        "実績記録ID": "rec-001",
+        "作業者ID": "usr-0847",
+        "配置計画ID": "plan-2024-1203",
+        "作業日": "2024-12-03",
+        "作業内容": "部品検査・梱包",
+        "完了数量": 480,
+        "所要時間分": 480,
+        "品質スコア": 98,
+        "備考": "不良品0件。標準時間内に完了、品質基準超過達成",
+        "作成日時": "2024-12-03T17:30:00+09:00",
+        "更新日時": "2024-12-03T17:30:00+09:00",
+        "作成者": "usr-0102"
+      },
+      {
+        "実績記録ID": "rec-001",
+        "作業者ID": "usr-2847",
+        "配置計画ID": "plan-5623",
+        "作業日": "2025-01-15T09:00:00Z",
+        "作業内容": "部品検査（改善後方法適用）",
+        "完了数量": 245,
+        "所要時間分": 480,
+        "品質スコア": 94,
+        "備考": "改善前比較：従来法では同時間で180個。新検査フロー導成で処理効率36%向上",
+        "作成日時": "2025-01-15T17:30:00Z",
+        "更新日時": "2025-01-15T17:30:00Z",
+        "作成者": "usr-1203"
+      },
+      {
+        "実績記録ID": "rec-001",
+        "作業者ID": "usr-0847",
+        "配置計画ID": "plan-0523",
+        "作業日": "2024-11-15T09:00:00Z",
+        "作業内容": "顧客問い合わせ対応（メール）",
+        "完了数量": 12,
+        "所要時間分": 240,
+        "品質スコア": 78,
+        "備考": "復帰初週のため軽微な案件のみ割当。対応品質は良好だが処理速度はやや低下。",
+        "作成日時": "2024-11-15T17:30:00Z",
+        "更新日時": "2024-11-15T17:30:00Z",
+        "作成者": "usr-0102"
+      },
+      {
+        "実績記録ID": "rec-001",
+        "作業者ID": "usr-0847",
+        "配置計画ID": "plan-0523",
+        "作業日": "2024-11-15T09:00:00Z",
+        "作業内容": "精密基板配線検査",
+        "完了数量": 8,
+        "所要時間分": 480,
+        "品質スコア": 98,
+        "備考": "微細配線の断線検査。全数検査実施、不良品なし。",
+        "作成日時": "2024-11-15T17:30:00Z",
+        "更新日時": "2024-11-15T17:30:00Z",
+        "作成者": "usr-0102"
+      }
+    ],
+    "作業タイプ": [
+      {
+        "作業タイプID": "rec-001",
+        "作業タイプ名": "基板半田付け組立",
+        "説明": "電子部品を基板上の指定位置に半田付けして接合する精密組立作業",
+        "標準生産性": 45,
+        "難易度レベル": 4,
+        "有効フラグ": true,
+        "作成日時": "2024-04-15T09:30:00+09:00",
+        "更新日時": "2024-11-20T14:15:00+09:00",
+        "作成者": "rec-user-0001"
+      },
+      {
+        "作業タイプID": "rec-001",
+        "作業タイプ名": "完成品外観・機能検査",
+        "説明": "製造完了した製品の外観傷・色合い・寸法精度および基本機能動作を検査する工程",
+        "標準生産性": 45,
+        "難易度レベル": 4,
+        "有効フラグ": true,
+        "作成日時": "2024-04-15T09:30:00+09:00",
+        "更新日時": "2025-01-20T14:15:00+09:00",
+        "作成者": "rec-user-0001"
+      },
+      {
+        "作業タイプID": "rec-001",
+        "作業タイプ名": "箱詰め梱包",
+        "説明": "検査済み製品を指定の箱に詰め、緩衝材を入れて梱包する作業",
+        "標準生産性": 45,
+        "難易度レベル": 2,
+        "有効フラグ": true,
+        "作成日時": "2024-04-15T09:30:00+09:00",
+        "更新日時": "2024-11-20T14:22:00+09:00",
+        "作成者": "rec-user-0847"
+      },
+      {
+        "作業タイプID": "rec-001",
+        "作業タイプ名": "宛先ラベル貼付",
+        "説明": "梱包製品に宛先ラベルを正確に貼付する作業。位置精度と貼付品質が重要。",
+        "標準生産性": 180,
+        "難易度レベル": 2,
+        "有効フラグ": true,
+        "作成日時": "2024-04-15T09:30:00+09:00",
+        "更新日時": "2025-01-20T14:45:00+09:00",
+        "作成者": "rec-0001"
+      },
+      {
+        "作業タイプID": "rec-001",
+        "作業タイプ名": "品質検査",
+        "説明": "製品の外観、寸法、機能を確認し不良品を判定する作業",
+        "標準生産性": 45,
+        "難易度レベル": 4,
+        "有効フラグ": true,
+        "作成日時": "2024-04-15T09:30:00+09:00",
+        "更新日時": "2024-12-10T14:22:00+09:00",
+        "作成者": "rec-user-0847"
+      },
+      {
+        "作業タイプID": "rec-001",
+        "作業タイプ名": "入庫検収・棚入れ",
+        "説明": "受け入れた部品の数量確認、品質検査、ロケーション管理を行い、倉庫棚への格納作業",
+        "標準生産性": 120,
+        "難易度レベル": 3,
+        "有効フラグ": true,
+        "作成日時": "2024-04-15T09:30:00",
+        "更新日時": "2025-01-10T14:22:00",
+        "作成者": "rec-user-0001"
+      },
+      {
+        "作業タイプID": "rec-001",
+        "作業タイプ名": "機械オペレーション",
+        "説明": "CNC工作機械やプレス機の操作・監視・材料セット・成形品の取り外し",
+        "標準生産性": 45,
+        "難易度レベル": 4,
+        "有効フラグ": true,
+        "作成日時": "2024-04-15T09:30:00+09:00",
+        "更新日時": "2025-01-20T14:15:00+09:00",
+        "作成者": "rec-user-0001"
+      },
+      {
+        "作業タイプID": "rec-001",
+        "作業タイプ名": "出荷前最終確認・仕分け",
+        "説明": "完成品の品質確認、梱包状態検査、出荷先別の仕分け作業",
+        "標準生産性": 45,
+        "難易度レベル": 3,
+        "有効フラグ": true,
+        "作成日時": "2024-04-15T09:30:00+09:00",
+        "更新日時": "2024-11-20T14:15:00+09:00",
+        "作成者": "rec-user-0847"
+      },
+      {
+        "作業タイプID": "rec-001",
+        "作業タイプ名": "不良品分解・原因分析",
+        "説明": "返品・クレーム品の分解検査と不具合原因の特定作業",
+        "標準生産性": 8,
+        "難易度レベル": 4,
+        "有効フラグ": true,
+        "作成日時": "2024-04-15T09:30:00+09:00",
+        "更新日時": "2024-11-20T14:45:00+09:00",
+        "作成者": "rec-user-0042"
+      },
+      {
+        "作業タイプID": "rec-001",
+        "作業タイプ名": "返品製品再検査・修復",
+        "説明": "顧客返品製品の不具合原因調査、機能検査、および部品交換・調整による修復作業",
+        "標準生産性": 8,
+        "難易度レベル": 4,
+        "有効フラグ": true,
+        "作成日時": "2024-11-15T09:30:00+09:00",
+        "更新日時": "2024-11-15T09:30:00+09:00",
+        "作成者": "rec-user-0042"
+      }
+    ],
+    "部門": [
+      {
+        "部門ID": "rec-001",
+        "部門名": "製造統括部",
+        "部門コード": "MFG-HQ-001",
+        "説明": "本社製造部門を統括し、全製造拠点の生産計画・品質管理・安全衛生を総括する部門",
+        "親部門ID": null,
+        "責任者ユーザーID": "rec-usr-0042",
+        "ステータス": "active",
+        "作成日時": "2024-04-01T09:00:00Z",
+        "更新日時": "2025-01-15T14:30:00Z",
+        "作成者": "rec-usr-0001"
+      },
+      {
+        "部門ID": "rec-001",
+        "部門名": "製造部",
+        "部門コード": "MFG001",
+        "説明": "プラスチック成形機による製品製造及び組立作業を担当する部門。品質基準に基づいた生産管理を実施。",
+        "親部門ID": "rec-parent-001",
+        "責任者ユーザーID": "user-001",
+        "ステータス": "active",
+        "作成日時": "2024-04-01T09:00:00+09:00",
+        "更新日時": "2025-01-15T14:30:00+09:00",
+        "作成者": "user-admin-001"
+      },
+      {
+        "部門ID": "rec-001",
+        "部門名": "品質管理部",
+        "部門コード": "QA001",
+        "説明": "製品の品質検査および品質基準の維持管理を担当する部門",
+        "親部門ID": "rec-parent-001",
+        "責任者ユーザーID": "rec-user-001",
+        "ステータス": "active",
+        "作成日時": "2024-04-01T09:00:00Z",
+        "更新日時": "2025-01-15T14:30:00Z",
+        "作成者": "rec-user-admin-001"
+      },
+      {
+        "部門ID": "rec-001",
+        "部門名": "組立課",
+        "部門コード": "ASM001",
+        "説明": "製造部内で製品の組立業務を統括し、品質基準に沿った効率的な生産を管理する部門。",
+        "親部門ID": "rec-mfg-001",
+        "責任者ユーザーID": "rec-user-045",
+        "ステータス": "active",
+        "作成日時": "2024-04-15T09:30:00Z",
+        "更新日時": "2025-01-20T14:15:00Z",
+        "作成者": "rec-user-001"
+      },
+      {
+        "部門ID": "rec-001",
+        "部門名": "検査課",
+        "部門コード": "MFG-INS-001",
+        "説明": "製造部内の検査ラインを統括し、製品品質検査および検査データ管理を担当",
+        "親部門ID": "rec-mfg",
+        "責任者ユーザーID": "rec-user-0042",
+        "ステータス": "active",
+        "作成日時": "2024-04-01T08:30:00+09:00",
+        "更新日時": "2025-01-15T14:20:00+09:00",
+        "作成者": "rec-user-0001"
+      },
+      {
+        "部門ID": "rec-001",
+        "部門名": "生産管理部",
+        "部門コード": "PRM001",
+        "説明": "生産計画の策定、納期管理、生産進捗管理を担当する部門",
+        "親部門ID": "rec-parent-001",
+        "責任者ユーザーID": "rec-user-001",
+        "ステータス": "active",
+        "作成日時": "2024-04-01T09:00:00Z",
+        "更新日時": "2025-01-15T14:30:00Z",
+        "作成者": "rec-user-admin-001"
+      },
+      {
+        "部門ID": "rec-001",
+        "部門名": "保全部",
+        "部門コード": "MNT001",
+        "説明": "機械設備のメンテナンス、修理、予防保全を担当する部門",
+        "親部門ID": "rec-parent-001",
+        "責任者ユーザーID": "rec-user-001",
+        "ステータス": "active",
+        "作成日時": "2024-04-01T09:00:00+09:00",
+        "更新日時": "2025-01-15T14:30:00+09:00",
+        "作成者": "rec-user-admin-001"
+      },
+      {
+        "部門ID": "rec-001",
+        "部門名": "技術開発部",
+        "部門コード": "TEC001",
+        "説明": "新製品開発と既存製品の技術改善を担当。研究開発から試作、評価までの一連のプロセスを推進。",
+        "親部門ID": "rec-parent-001",
+        "責任者ユーザーID": "rec-user-001",
+        "ステータス": "active",
+        "作成日時": "2024-04-15T09:30:00+09:00",
+        "更新日時": "2025-01-10T14:20:00+09:00",
+        "作成者": "rec-user-admin-001"
+      },
+      {
+        "部門ID": "rec-001",
+        "部門名": "物流部",
+        "部門コード": "LOG001",
+        "説明": "在庫管理と物流業務全般を担当。入出荷管理、在庫最適化、配送手配を統括。",
+        "親部門ID": "rec-999",
+        "責任者ユーザーID": "usr-045",
+        "ステータス": "active",
+        "作成日時": "2024-04-01T09:00:00+09:00",
+        "更新日時": "2025-01-15T14:30:00+09:00",
+        "作成者": "usr-001"
+      }
+    ],
+    "割当変更履歴": [
+      {
+        "割当変更履歴ID": "rec-001",
+        "作業者ID": "rec-002",
+        "変更前配置計画ID": "rec-003",
+        "変更後配置計画ID": "rec-004",
+        "変更前部門ID": "rec-005",
+        "変更後部門ID": "rec-006",
+        "変更前作業タイプID": "rec-007",
+        "変更後作業タイプID": "rec-008",
+        "変更理由": "スキル育成",
+        "変更理由詳細": "現部門での生産性が目標比80%に低迷。新部門での多様な業務経験によるスキル向上を期待。",
+        "変更実行日": "2024-12-16T09:00:00",
+        "予定変更日": "2024-12-16T09:00:00",
+        "作成日時": "2024-11-28T14:30:00",
+        "作成者ID": "rec-009",
+        "承認者ID": "rec-010",
+        "承認日時": "2024-12-02T10:15:00",
+        "ステータス": "実行済"
+      },
+      {
+        "割当変更履歴ID": "rec-001",
+        "作業者ID": "rec-002",
+        "変更前配置計画ID": "rec-003",
+        "変更後配置計画ID": "rec-004",
+        "変更前部門ID": "rec-005",
+        "変更後部門ID": "rec-006",
+        "変更前作業タイプID": "rec-007",
+        "変更後作業タイプID": "rec-008",
+        "変更理由": "負荷分散",
+        "変更理由詳細": "繁忙期受注増加対応のため、一般組立部門から高生産性部門への一時配置",
+        "変更実行日": "2024-11-15T08:00:00",
+        "予定変更日": "2024-11-15T08:00:00",
+        "作成日時": "2024-11-08T14:30:00",
+        "作成者ID": "rec-009",
+        "承認者ID": "rec-010",
+        "承認日時": "2024-11-10T09:45:00",
+        "ステータス": "実行済"
+      },
+      {
+        "割当変更履歴ID": "rec-001",
+        "作業者ID": "rec-002",
+        "変更前配置計画ID": "rec-003",
+        "変更後配置計画ID": "rec-004",
+        "変更前部門ID": "rec-005",
+        "変更後部門ID": "rec-006",
+        "変更前作業タイプID": "rec-007",
+        "変更後作業タイプID": "rec-008",
+        "変更理由": "スキル育成",
+        "変更理由詳細": "適性診断結果において分析・企画領域で高適性を示したため、品質管理業務から生産企画業務への転換を実施",
+        "変更実行日": "2025-02-01T09:00:00",
+        "予定変更日": "2025-02-01T00:00:00",
+        "作成日時": "2025-01-20T14:30:00",
+        "作成者ID": "rec-009",
+        "承認者ID": "rec-010",
+        "承認日時": "2025-01-28T10:15:00",
+        "ステータス": "実行済"
+      },
+      {
+        "割当変更履歴ID": "rec-001",
+        "作業者ID": "rec-002",
+        "変更前配置計画ID": "rec-003",
+        "変更後配置計画ID": "rec-004",
+        "変更前部門ID": "rec-005",
+        "変更後部門ID": "rec-006",
+        "変更前作業タイプID": "rec-007",
+        "変更後作業タイプID": "rec-008",
+        "変更理由": "育児休暇復帰対応",
+        "変更理由詳細": "育児休暇から復帰のため、時短勤務（6時間/日）に対応した事務部門への配置変更。柔軟な勤務体制が可能な環境への移行。",
+        "変更実行日": "2025-02-01T09:00:00",
+        "予定変更日": "2025-02-01T09:00:00",
+        "作成日時": "2025-01-15T14:30:00",
+        "作成者ID": "rec-009",
+        "承認者ID": "rec-010",
+        "承認日時": "2025-01-20T10:15:00",
+        "ステータス": "実行済"
+      },
+      {
+        "割当変更履歴ID": "rec-001",
+        "作業者ID": "rec-002",
+        "変更前配置計画ID": "rec-003",
+        "変更後配置計画ID": "rec-004",
+        "変更前部門ID": "rec-005",
+        "変更後部門ID": "rec-006",
+        "変更前作業タイプID": "rec-007",
+        "変更後作業タイプID": "rec-008",
+        "変更理由": "プロジェクト完了",
+        "変更理由詳細": "システム開発プロジェクト完了に伴い、営業支援システム構築チームから営業企画部への復帰配置",
+        "変更実行日": "2025-01-15T09:00:00",
+        "予定変更日": "2025-01-15T09:00:00",
+        "作成日時": "2025-01-10T14:30:00",
+        "作成者ID": "rec-009",
+        "承認者ID": "rec-010",
+        "承認日時": "2025-01-12T11:00:00",
+        "ステータス": "実行済"
+      },
+      {
+        "割当変更履歴ID": "rec-001",
+        "作業者ID": "rec-002",
+        "変更前配置計画ID": "rec-003",
+        "変更後配置計画ID": "rec-004",
+        "変更前部門ID": "rec-005",
+        "変更後部門ID": "rec-005",
+        "変更前作業タイプID": "rec-006",
+        "変更後作業タイプID": "rec-007",
+        "変更理由": "スキル育成",
+        "変更理由詳細": "精密組立技能研修修了に伴い、品質検査員から検査主任へ昇格配置。",
+        "変更実行日": "2025-02-15T09:00:00",
+        "予定変更日": "2025-02-15T09:00:00",
+        "作成日時": "2025-01-20T14:30:00",
+        "作成者ID": "rec-008",
+        "承認者ID": "rec-009",
+        "承認日時": "2025-02-01T10:45:00",
+        "ステータス": "実行済"
+      },
+      {
+        "割当変更履歴ID": "rec-001",
+        "作業者ID": "rec-002",
+        "変更前配置計画ID": "rec-003",
+        "変更後配置計画ID": "rec-004",
+        "変更前部門ID": "rec-005",
+        "変更後部門ID": "rec-006",
+        "変更前作業タイプID": "rec-007",
+        "変更後作業タイプID": "rec-008",
+        "変更理由": "負荷分散",
+        "変更理由詳細": "営業部門の業務量集中を緩和するため、佐藤花子を企画部門へ配置転換。営業部門は月間案件処理数が目標比120%に達しており、企画部門は稼働率が低い状況。",
+        "変更実行日": "2024-12-16T09:00:00Z",
+        "予定変更日": "2024-12-16T09:00:00Z",
+        "作成日時": "2024-12-10T14:30:00Z",
+        "作成者ID": "rec-009",
+        "承認者ID": "rec-010",
+        "承認日時": "2024-12-13T10:15:00Z",
+        "ステータス": "実行済"
+      },
+      {
+        "割当変更履歴ID": "rec-001",
+        "作業者ID": "rec-002",
+        "変更前配置計画ID": "rec-003",
+        "変更後配置計画ID": "rec-004",
+        "変更前部門ID": "rec-005",
+        "変更後部門ID": "rec-006",
+        "変更前作業タイプID": "rec-007",
+        "変更後作業タイプID": "rec-008",
+        "変更理由": "スキル育成",
+        "変更理由詳細": "新規半導体検査装置導入に伴い、既存装置の経験者を配置転換して技術移転を推進",
+        "変更実行日": "2025-02-10T09:00:00",
+        "予定変更日": "2025-02-10T09:00:00",
+        "作成日時": "2025-01-28T14:30:00",
+        "作成者ID": "rec-009",
+        "承認者ID": "rec-010",
+        "承認日時": "2025-02-03T11:15:00",
+        "ステータス": "実行済"
+      },
+      {
+        "割当変更履歴ID": "rec-001",
+        "作業者ID": "rec-002",
+        "変更前配置計画ID": "rec-003",
+        "変更後配置計画ID": "rec-004",
+        "変更前部門ID": "rec-005",
+        "変更後部門ID": "rec-005",
+        "変更前作業タイプID": "rec-006",
+        "変更後作業タイプID": "rec-007",
+        "変更理由": "健康管理",
+        "変更理由詳細": "健康診断で腰部負荷が指摘されたため、立位作業から座位作業への変更",
+        "変更実行日": "2024-12-16T09:00:00",
+        "予定変更日": "2024-12-16T09:00:00",
+        "作成日時": "2024-12-10T14:30:00",
+        "作成者ID": "rec-008",
+        "承認者ID": "rec-009",
+        "承認日時": "2024-12-12T11:15:00",
+        "ステータス": "実行済"
+      },
+      {
+        "割当変更履歴ID": "rec-001",
+        "作業者ID": "rec-102",
+        "変更前配置計画ID": "rec-203",
+        "変更後配置計画ID": "rec-204",
+        "変更前部門ID": "rec-301",
+        "変更後部門ID": "rec-302",
+        "変更前作業タイプID": "rec-401",
+        "変更後作業タイプID": "rec-402",
+        "変更理由": "スキル育成",
+        "変更理由詳細": "営業部門への配置転換によるキャリア開発計画でしたが、経営方針見直しにより中止となりました。",
+        "変更実行日": null,
+        "予定変更日": "2025-04-01T00:00:00Z",
+        "作成日時": "2024-12-10T09:30:00Z",
+        "作成者ID": "rec-501",
+        "承認者ID": "rec-502",
+        "承認日時": "2024-12-11T14:15:00Z",
+        "ステータス": "キャンセル"
+      }
+    ],
+    "比較分析結果": [
+      {
+        "比較分析結果ID": "rec-001",
+        "分析名": "佐藤花子の配置変更効果測定（事務部→営業支援部）",
+        "分析タイプ": "配置前後比較",
+        "対象期間開始日": "2024-10-01T00:00:00Z",
+        "対象期間終了日": "2025-01-31T23:59:59Z",
+        "比較対象1": "worker-佐藤花子-事務部",
+        "比較対象2": "worker-佐藤花子-営業支援部",
+        "平均生産性1": 28,
+        "平均生産性2": 42,
+        "生産性改善率": 50,
+        "平均品質スコア1": 82,
+        "平均品質スコア2": 89,
+        "分析結果サマリー": "営業支援部への配置変更により生産性が50%向上し、品質スコアも7ポイント改善。作業適性の向上を示唆する結果。",
+        "推奨アクション": "現配置を継続し、同様の適性を持つ他の作業者への配置変更を検討。営業支援部での教育研修プログラムの拡大を推奨。",
+        "統計的有意性": true,
+        "作成日時": "2025-02-03T14:30:00Z",
+        "更新日時": "2025-02-03T14:30:00Z",
+        "作成者": "user-鈴木次郎"
+      },
+      {
+        "比較分析結果ID": "rec-001",
+        "分析名": "2024年度繁忙期vs通常期の部門別生産性季節変動分析",
+        "分析タイプ": "時系列比較",
+        "対象期間開始日": "2024-01-01T00:00:00Z",
+        "対象期間終了日": "2024-12-31T23:59:59Z",
+        "比較対象1": "営業部門_通常期(4月〜9月)",
+        "比較対象2": "営業部門_繁忙期(10月〜3月)",
+        "平均生産性1": 42,
+        "平均生産性2": 58,
+        "生産性改善率": 38,
+        "平均品質スコア1": 82,
+        "平均品質スコア2": 78,
+        "分析結果サマリー": "繁忙期は通常期比で生産性が38%向上した一方、品質スコアは4ポイント低下。人員配置強化と業務プロセス最適化が必要。",
+        "推奨アクション": "繁忙期への事前人員配置増強、品質管理チェックポイント追加、通常期スタッフの繁忙期向け事前研修実施を推奨。",
+        "統計的有意性": true,
+        "作成日時": "2025-01-15T10:30:00Z",
+        "更新日時": "2025-01-15T10:30:00Z",
+        "作成者": "rec-user-0847"
+      },
+      {
+        "比較分析結果ID": "rec-001",
+        "分析名": "2024年新入社員研修終了後の習熟度進捗追跡",
+        "分析タイプ": "配置前後比較",
+        "対象期間開始日": "2024-04-15T09:00:00Z",
+        "対象期間終了日": "2024-07-15T17:00:00Z",
+        "比較対象1": "研修終了直後(2024年4月)",
+        "比較対象2": "配置3ヶ月後(2024年7月)",
+        "平均生産性1": 28,
+        "平均生産性2": 52,
+        "生産性改善率": 86,
+        "平均品質スコア1": 72,
+        "平均品質スコア2": 88,
+        "分析結果サマリー": "新入社員5名の研修終了直後と3ヶ月後を比較。生産性は86%向上し、品質スコアも16ポイント改善。実務経験の積み重ねにより習熟度が顕著に進捗。",
+        "推奨アクション": "現在のOJT体制は効果的。今後は個別のスキルギャップに対応したメンタリング強化と、優秀者への昇進検討を推奨。",
+        "統計的有意性": true,
+        "作成日時": "2024-07-20T14:30:00Z",
+        "更新日時": "2024-07-20T14:30:00Z",
+        "作成者": "rec-user-0042"
+      },
+      {
+        "比較分析結果ID": "rec-001",
+        "分析名": "A部門とB部門の帳票処理作業生産性比較",
+        "分析タイプ": "部門間比較",
+        "対象期間開始日": "2024-10-01T00:00:00Z",
+        "対象期間終了日": "2024-12-31T23:59:59Z",
+        "比較対象1": "A部門",
+        "比較対象2": "B部門",
+        "平均生産性1": 45,
+        "平均生産性2": 52,
+        "生産性改善率": 15,
+        "平均品質スコア1": 87,
+        "平均品質スコア2": 91,
+        "分析結果サマリー": "B部門がA部門比で生産性15%上回り、品質スコアも4ポイント高い。B部門の作業フロー最適化が要因と推定される。",
+        "推奨アクション": "A部門にB部門の業務プロセスをベンチマーク導入し、作業者への追加研修を実施することで3ヶ月以内に生産性格差の縮小を目指す。",
+        "統計的有意性": true,
+        "作成日時": "2025-01-15T10:30:00Z",
+        "更新日時": "2025-01-15T10:30:00Z",
+        "作成者": "rec-user-042"
+      },
+      {
+        "比較分析結果ID": "rec-001",
+        "分析名": "ベテラン作業者と新任作業者のペアリング配置効果検証",
+        "分析タイプ": "配置前後比較",
+        "対象期間開始日": "2024-10-01T00:00:00Z",
+        "対象期間終了日": "2024-12-31T23:59:59Z",
+        "比較対象1": "WKR-2024-0847",
+        "比較対象2": "WKR-2024-1205",
+        "平均生産性1": 85,
+        "平均生産性2": 68,
+        "生産性改善率": 25,
+        "平均品質スコア1": 92,
+        "平均品質スコア2": 88,
+        "分析結果サマリー": "ベテラン作業者（佐藤健一）と新任作業者（鈴木花子）のペアリング配置により、新任作業者の生産性が25%向上し、品質スコアも4ポイント改善。ベテラン作業者の指導効果が顕著に表れている。",
+        "推奨アクション": "同様のペアリング配置を他部門にも展開。新任作業者の育成期間を3ヶ月から2ヶ月に短縮する検討。ベテラン作業者への指導手当の導入を推奨。",
+        "統計的有意性": true,
+        "作成日時": "2025-01-15T10:30:00Z",
+        "更新日時": "2025-01-15T10:30:00Z",
+        "作成者": "usr-admin-001"
+      },
+      {
+        "比較分析結果ID": "rec-001",
+        "分析名": "2024年度シフト体制変更(交代制→固定制)による生産性影響評価",
+        "分析タイプ": "配置前後比較",
+        "対象期間開始日": "2024-01-01T00:00:00Z",
+        "対象期間終了日": "2024-12-31T23:59:59Z",
+        "比較対象1": "交代制シフト運用グループ",
+        "比較対象2": "固定制シフト運用グループ",
+        "平均生産性1": 42,
+        "平均生産性2": 58,
+        "生産性改善率": 38,
+        "平均品質スコア1": 78,
+        "平均品質スコア2": 85,
+        "分析結果サマリー": "固定制シフト導入により生産性が38%向上。品質スコアも7ポイント改善。作業者の疲労軽減と業務習熟度向上が主要因。",
+        "推奨アクション": "全部門への固定制シフト段階的導入。交代制継続部門は夜間手当の見直しと休息時間の充実を検討。",
+        "統計的有意性": true,
+        "作成日時": "2025-01-15T10:30:00Z",
+        "更新日時": "2025-01-15T10:30:00Z",
+        "作成者": "rec-user-0847"
+      },
+      {
+        "比較分析結果ID": "rec-001",
+        "分析名": "データ入力vs検品作業における作業者適性評価",
+        "分析タイプ": "作業タイプ別比較",
+        "対象期間開始日": "2024-10-01T00:00:00Z",
+        "対象期間終了日": "2024-12-31T23:59:59Z",
+        "比較対象1": "作業タイプ:データ入力",
+        "比較対象2": "作業タイプ:検品",
+        "平均生産性1": 145,
+        "平均生産性2": 78,
+        "生産性改善率": 86,
+        "平均品質スコア1": 87,
+        "平均品質スコア2": 94,
+        "分析結果サマリー": "データ入力作業は生産性が86%高いが品質スコアは7ポイント低い。検品作業は精度重視で品質スコアが優れている。作業特性に応じた適性配置の最適化が必要。",
+        "推奨アクション": "データ入力適性者の生産性維持と品質向上研修の実施、検品適性者の効率性向上トレーニングの検討。",
+        "統計的有意性": true,
+        "作成日時": "2025-01-15T10:30:00Z",
+        "更新日時": "2025-01-15T10:30:00Z",
+        "作成者": "usr-0847"
+      },
+      {
+        "比較分析結果ID": "rec-001",
+        "分析名": "2025年Q1配置計画シミュレーション検証",
+        "分析タイプ": "配置前後比較",
+        "対象期間開始日": "2025-01-01T00:00:00Z",
+        "対象期間終了日": "2025-03-31T23:59:59Z",
+        "比較対象1": "配置計画A",
+        "比較対象2": "配置計画B",
+        "平均生産性1": 42,
+        "平均生産性2": 48,
+        "生産性改善率": 14,
+        "平均品質スコア1": 87,
+        "平均品質スコア2": 91,
+        "分析結果サマリー": "配置計画Bは計画Aと比べ生産性が14%向上し、品質スコアも4ポイント改善。特に事務作業部門での効率化が顕著。",
+        "推奨アクション": "配置計画Bの本格導入を推奨。ただし新人配置の割合が高いため、OJT強化と段階的展開が必要。",
+        "統計的有意性": true,
+        "作成日時": "2025-01-15T10:30:00Z",
+        "更新日時": "2025-01-15T10:30:00Z",
+        "作成者": "rec-u-0047"
+      },
+      {
+        "比較分析結果ID": "rec-001",
+        "分析名": "2024年度Q4 外注チーム vs 内部チーム生産性ベンチマーク",
+        "分析タイプ": "部門間比較",
+        "対象期間開始日": "2024-10-01T00:00:00Z",
+        "対象期間終了日": "2024-12-31T23:59:59Z",
+        "比較対象1": "dept-ext-001",
+        "比較対象2": "dept-int-001",
+        "平均生産性1": 42,
+        "平均生産silon2": 38,
+        "生産性改善率": 11,
+        "平均品質スコア1": 82,
+        "平均品質スコア2": 87,
+        "分析結果サマリー": "外注チームは生産性で11%上回るが品質スコアで5ポイント下回る。コスト効率性と品質のトレードオフが顕著。",
+        "推奨アクション": "外注チームに対し品質管理強化研修を実施し、内部チームから品質チェックプロセスのナレッジ共有を検討。",
+        "統計的有意性": true,
+        "作成日時": "2025-01-15T10:30:00Z",
+        "更新日時": "2025-01-15T10:30:00Z",
+        "作成者": "user-yamada-001"
+      },
+      {
+        "比較分析結果ID": "rec-001",
+        "分析名": "業務管理システム導入による業務効率化効果測定",
+        "分析タイプ": "配置前後比較",
+        "対象期間開始日": "2024-01-01T00:00:00Z",
+        "対象期間終了日": "2024-12-31T23:59:59Z",
+        "比較対象1": "導入前期間(2024年1月～3月)",
+        "比較対象2": "導入後期間(2024年10月～12月)",
+        "平均生産性1": 45,
+        "平均生産性2": 68,
+        "生産性改善率": 51,
+        "平均品質スコア1": 78,
+        "平均品質スコア2": 86,
+        "分析結果サマリー": "業務管理システム導入により、平均生産性は45件/時から68件/時へ51%向上。品質スコアも78点から86点に改善。手作業の削減と自動化により工数削減が実現。",
+        "推奨アクション": "システム導入効果が確認されたため、全部門への段階的展開を推奨。追加トレーニングにより更なる効率化の余地あり。",
+        "統計的有意性": true,
+        "作成日時": "2025-01-15T09:30:00Z",
+        "更新日時": "2025-01-15T09:30:00Z",
+        "作成者": "rec-u-0847"
+      }
+    ]
+  },
+  "shellHtml": "<!doctype html>\n<html lang=\"ja\">\n<head>\n  <meta charset=\"UTF-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n  <title>作業管理システム - 作業者生産性データ分析・配置最適化支援システム</title>\n  <style>\n:root {\n  --primary: #f59e0b;\n  --primary-hover: #d97706;\n  --bg-main: #fefdf8;\n  --bg-card: #faf8f3;\n  --bg-sidebar: #f5f1e8;\n  --top-bar-bg: #fffbf0;\n  --top-bar-border: #f3e8d8;\n  --top-bar-text: #1f2937;\n  --text: #1f2937;\n  --text-muted: #6b7280;\n  --border: #e5ddd0;\n  --border-width: 1px;\n  --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;\n  --space-unit: 8px;\n  --control-height: 40px;\n  --radius-card: 12px;\n  --radius-control: 8px;\n  --shadow-card: 0 2px 8px rgba(31, 41, 55, 0.08), 0 1px 3px rgba(31, 41, 55, 0.04);\n  --motion-duration: 200ms;\n  --surface-texture: linear-gradient(90deg, transparent 0%, rgba(245, 158, 11, 0.02) 50%, transparent 100%), repeating-linear-gradient(0deg, transparent 0px, rgba(245, 158, 11, 0.01) 1px, transparent 2px, transparent 4px);\n  --surface-texture-size: 100% 100%;\n  --surface-texture-position: 0 0;\n}\n\n* {\n  margin: 0;\n  padding: 0;\n  box-sizing: border-box;\n}\n\nhtml, body {\n  height: 100%;\n  font-family: var(--font-family);\n  color: var(--text);\n  background-color: var(--bg-main);\n}\n\nbody {\n  display: flex;\n  flex-direction: column;\n}\n\n[data-aivic-shell-pattern] {\n  display: flex;\n  flex-direction: column;\n  height: 100vh;\n  overflow: hidden;\n}\n\n.shell-header {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  height: 56px;\n  background-color: var(--top-bar-bg);\n  border-bottom: var(--border-width) solid var(--top-bar-border);\n  padding: 0 calc(var(--space-unit) * 3);\n  flex-shrink: 0;\n  gap: calc(var(--space-unit) * 2);\n}\n\n.shell-header-left {\n  display: flex;\n  align-items: center;\n  gap: calc(var(--space-unit) * 3);\n  flex: 1;\n}\n\n.shell-logo-block {\n  display: flex;\n  flex-direction: column;\n  gap: 2px;\n}\n\n.shell-logo {\n  font-size: 15px;\n  font-weight: 600;\n  color: var(--text);\n  letter-spacing: -0.3px;\n}\n\n.shell-logo-system {\n  font-size: 11px;\n  color: var(--text-muted);\n  font-weight: 400;\n}\n\n.shell-nav-top {\n  display: flex;\n  gap: calc(var(--space-unit) * 0.5);\n  align-items: center;\n}\n\n.shell-nav-item {\n  display: inline-flex;\n  align-items: center;\n  height: 32px;\n  padding: 0 calc(var(--space-unit) * 2);\n  font-size: 13px;\n  font-weight: 500;\n  color: var(--top-bar-text);\n  background: transparent;\n  border: none;\n  cursor: pointer;\n  border-radius: var(--radius-control);\n  transition: background-color var(--motion-duration), color var(--motion-duration);\n  white-space: nowrap;\n}\n\n.shell-nav-item:hover {\n  background-color: rgba(245, 158, 11, 0.1);\n}\n\n.shell-nav-item.aivic-active {\n  background-color: var(--primary);\n  color: #fff;\n}\n\n.shell-header-right {\n  display: flex;\n  align-items: center;\n  gap: calc(var(--space-unit) * 2);\n}\n\n.shell-user-area {\n  display: flex;\n  align-items: center;\n  gap: calc(var(--space-unit) * 1.5);\n}\n\n.shell-user-avatar {\n  width: 32px;\n  height: 32px;\n  border-radius: 50%;\n  background-color: var(--primary);\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  color: #fff;\n  font-size: 13px;\n  font-weight: 600;\n  flex-shrink: 0;\n}\n\n.shell-user-name {\n  font-size: 13px;\n  color: var(--top-bar-text);\n  font-weight: 500;\n}\n\n.shell-user-logout {\n  font-size: 12px;\n  color: var(--text-muted);\n  text-decoration: none;\n  transition: color var(--motion-duration);\n  cursor: pointer;\n}\n\n.shell-user-logout:hover {\n  color: var(--primary);\n  text-decoration: underline;\n}\n\n.shell-body {\n  display: flex;\n  flex: 1;\n  overflow: hidden;\n}\n\n.content-area {\n  flex: 1;\n  overflow-y: auto;\n  overflow-x: hidden;\n  background-color: var(--bg-main);\n  background-image: var(--surface-texture);\n  background-size: var(--surface-texture-size);\n  background-position: var(--surface-texture-position);\n}\n\n[data-aivic-panel] {\n  display: block;\n  min-height: 100%;\n}\n\n.shell-footer {\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  height: 40px;\n  background-color: var(--bg-card);\n  border-top: var(--border-width) solid var(--border);\n  font-size: 12px;\n  color: var(--text-muted);\n  flex-shrink: 0;\n}\n\n@media (max-width: 1024px) {\n  .shell-header {\n    padding: 0 calc(var(--space-unit) * 2);\n  }\n\n  .shell-nav-item {\n    padding: 0 calc(var(--space-unit) * 1.5);\n    font-size: 12px;\n  }\n}\n\n@media (max-width: 768px) {\n  .shell-header {\n    padding: 0 calc(var(--space-unit) * 1.5);\n  }\n\n  .shell-header-left {\n    gap: calc(var(--space-unit) * 1.5);\n  }\n\n  .shell-logo {\n    font-size: 14px;\n  }\n\n  .shell-nav-top {\n    display: none;\n  }\n\n  .shell-user-name {\n    display: none;\n  }\n}\n  </style>\n  <!--AIVIC_GLOBALS-->\n</head>\n<body>\n  <div data-aivic-shell-pattern=\"command_center\" data-aivic-nav-position=\"top\" data-aivic-density=\"balanced\">\n    <header class=\"shell-header\">\n      <div class=\"shell-header-left\">\n        <div class=\"shell-logo-block\">\n          <div class=\"shell-logo\">作業管理システム</div>\n          <div class=\"shell-logo-system\">作業者生産性データ分析・配置最適化支援システム</div>\n        </div>\n        <nav class=\"shell-nav-top\">\n          <button class=\"shell-nav-item aivic-active\" data-aivic-nav=\"scr-1789461964046\" onclick=\"window.showScreen('scr-1789461964046')\">生産性ダッシュボード</button>\n          <button class=\"shell-nav-item\" data-aivic-nav=\"scr-1789461978707\" onclick=\"window.showScreen('scr-1789461978707')\">最適人員配置案</button>\n          <button class=\"shell-nav-item\" data-aivic-nav=\"scr-1789461993203\" onclick=\"window.showScreen('scr-1789461993203')\">実績データ記録</button>\n        </nav>\n      </div>\n      <div class=\"shell-header-right\">\n        <div class=\"shell-user-area\">\n          <div class=\"shell-user-avatar\">U</div>\n          <div class=\"shell-user-name\">ユーザー</div>\n          <a class=\"shell-user-logout\" href=\"./login.html\">ログアウト</a>\n        </div>\n      </div>\n    </header>\n    <div class=\"shell-body\">\n      <main class=\"content-area\">\n        <div data-aivic-panel=\"scr-1789461964046\"></div>\n        <div data-aivic-panel=\"scr-1789461978707\"></div>\n        <div data-aivic-panel=\"scr-1789461993203\"></div>\n      </main>\n    </div>\n    <footer class=\"shell-footer\">\n      © 2025 作業管理システム. All rights reserved.\n    </footer>\n  </div>\n  <!--AIVIC_RUNTIME-->\n</body>\n</html>",
+  "screenTaste": "明るい色使い"
+}

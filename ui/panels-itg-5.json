@@ -1,0 +1,4374 @@
+{
+  "systemId": "itg-5",
+  "systemName": "ベンダー選定・契約リスク評価支援システム",
+  "cssTheme": "```css\n:root {\n  /* Primary & Accent */\n  --primary: #f59e0b;\n  --primary-hover: #d97706;\n\n  /* Background Palette - 明るく爽やかなベース */\n  --bg-main: #fefdf8;\n  --bg-card: #faf8f3;\n  --bg-sidebar: #f5f1e8;\n\n  /* Top Bar - 明るさを保ちながら視覚的な分離 */\n  --top-bar-bg: #fffbf0;\n  --top-bar-border: #f3e8d8;\n  --top-bar-text: #1f2937;\n\n  /* Text Colors */\n  --text: #1f2937;\n  --text-muted: #6b7280;\n\n  /* Borders & Dividers */\n  --border: #e5ddd0;\n  --border-width: 1px;\n\n  /* Typography */\n  --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;\n\n  /* Spacing & Sizing */\n  --space-unit: 8px;\n  --control-height: 40px;\n  --radius-card: 12px;\n  --radius-control: 8px;\n\n  /* Shadows - 柔らかく明るい環境に合わせた浮遊感 */\n  --shadow-card: 0 2px 8px rgba(31, 41, 55, 0.08), 0 1px 3px rgba(31, 41, 55, 0.04);\n\n  /* Motion */\n  --motion-duration: 200ms;\n\n  /* Surface Texture - 明るく温かみのある紙のような質感 */\n  --surface-texture: \n    linear-gradient(90deg, transparent 0%, rgba(245, 158, 11, 0.02) 50%, transparent 100%),\n    repeating-linear-gradient(\n      0deg,\n      transparent 0px,\n      rgba(245, 158, 11, 0.01) 1px,\n      transparent 2px,\n      transparent 4px\n    );\n  --surface-texture-size: 100% 100%;\n  --surface-texture-position: 0 0;\n}\n```",
+  "screens": [
+    {
+      "id": "scr-1789462725117",
+      "name": "ベンダー評価ワークスペース",
+      "purpose": "ベンダー候補企業の総合評価を行うワークスペース。帝国データバンク情報の自動照会、導入実績・参照顧客・業界別適用事例の一元管理、契約書・API仕様・法務対応実績の統合管理、知的財産権・セキュリティリスク項目の業界標準パターン対比分析、リスク評価スコア算出、契約リスク評価・コンプライアンス検証、評価レポート生成を実現する",
+      "items": [
+        "ベンダー候補企業検索・選択パネル",
+        "帝国データバンク登録企業情報表示エリア",
+        "企業基本情報サマリー",
+        "導入実績一覧表示",
+        "参照顧客一覧表示",
+        "業界別適用事例一覧表示",
+        "契約書管理タブ",
+        "API仕様書管理タブ",
+        "法務対応実績管理タブ",
+        "知的財産権リスク項目リスト",
+        "セキュリティリスク項目リスト",
+        "業界標準パターン対比分析ビュー"
+      ]
+    }
+  ],
+  "screenPanels": [
+    {
+      "screenId": "scr-1789462725117",
+      "panelHtml": "<div style=\"display: flex; height: 100%; background: var(--bg-main); color: var(--text); font-family: var(--font-family);\">\n  <!-- Breadcrumb / Sub-header -->\n  <div style=\"position: absolute; top: 0; left: 0; right: 0; padding: 12px 24px; background: var(--bg-main); border-bottom: 1px solid var(--border); font-size: 12px; color: var(--text-muted); z-index: 10;\">\n    作業管理システム / ベンダー選定・契約リスク評価支援システム / ベンダー評価ワークスペース\n  </div>\n\n  <!-- Left Panel: Vendor Search & Selection -->\n  <div style=\"width: 280px; background: var(--bg-sidebar); border-right: 1px solid var(--border); display: flex; flex-direction: column; margin-top: 40px; overflow-y: auto;\">\n    <div style=\"padding: 16px; border-bottom: 1px solid var(--border);\">\n      <label style=\"display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 6px; font-weight: 600;\">企業検索</label>\n      <input \n        type=\"text\" \n        id=\"vendor-search\" \n        data-testid=\"vendor-search-input\"\n        placeholder=\"企業名で検索...\" \n        style=\"width: 100%; padding: 8px 12px; border: 1px solid var(--border); border-radius: var(--radius-control); background: var(--bg-card); color: var(--text); font-size: 13px; box-sizing: border-box;\"\n      />\n    </div>\n\n    <div style=\"padding: 12px; border-bottom: 1px solid var(--border);\">\n      <label style=\"display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 6px; font-weight: 600;\">業種</label>\n      <select \n        id=\"vendor-industry-filter\" \n        data-testid=\"vendor-industry-select\"\n        style=\"width: 100%; padding: 8px 12px; border: 1px solid var(--border); border-radius: var(--radius-control); background: var(--bg-card); color: var(--text); font-size: 13px; box-sizing: border-box;\"\n      >\n        <option value=\"\">すべて</option>\n        <option value=\"ソフトウェア\">ソフトウェア</option>\n        <option value=\"コンサルティング\">コンサルティング</option>\n        <option value=\"システムインテグレーション\">システムインテグレーション</option>\n        <option value=\"クラウドサービス\">クラウドサービス</option>\n      </select>\n    </div>\n\n    <div style=\"padding: 12px; border-bottom: 1px solid var(--border);\">\n      <label style=\"display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 6px; font-weight: 600;\">評価ステータス</label>\n      <select \n        id=\"vendor-status-filter\" \n        data-testid=\"vendor-status-select\"\n        style=\"width: 100%; padding: 8px 12px; border: 1px solid var(--border); border-radius: var(--radius-control); background: var(--bg-card); color: var(--text); font-size: 13px; box-sizing: border-box;\"\n      >\n        <option value=\"\">すべて</option>\n        <option value=\"未評価\">未評価</option>\n        <option value=\"評価中\">評価中</option>\n        <option value=\"評価完了\">評価完了</option>\n        <option value=\"却下\">却下</option>\n      </select>\n    </div>\n\n    <div style=\"flex: 1; overflow-y: auto; padding: 8px;\">\n      <div id=\"vendor-list\" style=\"display: flex; flex-direction: column; gap: 8px;\">\n        <!-- Vendors will be populated here -->\n      </div>\n    </div>\n  </div>\n\n  <!-- Center & Right Panel Container -->\n  <div style=\"flex: 1; display: flex; flex-direction: column; margin-top: 40px; overflow: hidden;\">\n    <!-- Center Panel: Vendor Details & Tabs -->\n    <div style=\"flex: 1; display: flex; overflow: hidden; gap: 16px; padding: 16px;\">\n      <!-- Center Content -->\n      <div style=\"flex: 1; display: flex; flex-direction: column; overflow: hidden;\">\n        <!-- Vendor Summary Card -->\n        <div class=\"card\" style=\"padding: 16px; margin-bottom: 12px; background-image: var(--surface-texture); background-size: var(--surface-texture-size); background-position: var(--surface-texture-position);\">\n          <div style=\"display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; font-size: 13px;\">\n            <div>\n              <div style=\"color: var(--text-muted); font-size: 11px; margin-bottom: 4px;\">企業名</div>\n              <div id=\"vendor-name\" style=\"font-weight: 600; color: var(--text);\">—</div>\n            </div>\n            <div>\n              <div style=\"color: var(--text-muted); font-size: 11px; margin-bottom: 4px;\">業種</div>\n              <div id=\"vendor-industry\" style=\"font-weight: 600; color: var(--text);\">—</div>\n            </div>\n            <div>\n              <div style=\"color: var(--text-muted); font-size: 11px; margin-bottom: 4px;\">評価ステータス</div>\n              <div id=\"vendor-eval-status\" style=\"font-weight: 600; color: var(--text);\">—</div>\n            </div>\n          </div>\n        </div>\n\n        <!-- Daibankinfo Card -->\n        <div class=\"card\" style=\"padding: 16px; margin-bottom: 12px; background-image: var(--surface-texture); background-size: var(--surface-texture-size); background-position: var(--surface-texture-position);\">\n          <div style=\"font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 12px;\">帝国データバンク情報</div>\n          <div style=\"display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 12px;\">\n            <div>\n              <div style=\"color: var(--text-muted); font-size: 11px; margin-bottom: 3px;\">所在地</div>\n              <div id=\"vendor-location\" style=\"color: var(--text);\">—</div>\n            </div>\n            <div>\n              <div style=\"color: var(--text-muted); font-size: 11px; margin-bottom: 3px;\">代表者</div>\n              <div id=\"vendor-ceo\" style=\"color: var(--text);\">—</div>\n            </div>\n            <div>\n              <div style=\"color: var(--text-muted); font-size: 11px; margin-bottom: 3px;\">資本金</div>\n              <div id=\"vendor-capital\" style=\"color: var(--text);\">—</div>\n            </div>\n            <div>\n              <div style=\"color: var(--text-muted); font-size: 11px; margin-bottom: 3px;\">従業員数</div>\n              <div id=\"vendor-employees\" style=\"color: var(--text);\">—</div>\n            </div>\n            <div>\n              <div style=\"color: var(--text-muted); font-size: 11px; margin-bottom: 3px;\">設立年</div>\n              <div id=\"vendor-founded\" style=\"color: var(--text);\">—</div>\n            </div>\n            <div>\n              <div style=\"color: var(--text-muted); font-size: 11px; margin-bottom: 3px;\">連絡先</div>\n              <div id=\"vendor-contact\" style=\"color: var(--text); word-break: break-all;\">—</div>\n            </div>\n          </div>\n        </div>\n\n        <!-- Tabs for Implementation / Customers / Cases -->\n        <div style=\"flex: 1; display: flex; flex-direction: column; overflow: hidden;\">\n          <div style=\"display: flex; gap: 0; border-bottom: 1px solid var(--border); margin-bottom: 12px;\">\n            <button \n              class=\"tab-btn\" \n              data-tab=\"implementations\" \n              data-testid=\"tab-implementations\"\n              style=\"padding: 10px 16px; font-size: 12px; font-weight: 600; color: var(--text); background: transparent; border: none; border-bottom: 2px solid transparent; cursor: pointer; transition: all var(--motion-duration);\"\n            >導入実績</button>\n            <button \n              class=\"tab-btn\" \n              data-tab=\"customers\" \n              data-testid=\"tab-customers\"\n              style=\"padding: 10px 16px; font-size: 12px; font-weight: 600; color: var(--text-muted); background: transparent; border: none; border-bottom: 2px solid transparent; cursor: pointer; transition: all var(--motion-duration);\"\n            >参照顧客</button>\n            <button \n              class=\"tab-btn\" \n              data-tab=\"cases\" \n              data-testid=\"tab-cases\"\n              style=\"padding: 10px 16px; font-size: 12px; font-weight: 600; color: var(--text-muted); background: transparent; border: none; border-bottom: 2px solid transparent; cursor: pointer; transition: all var(--motion-duration);\"\n            >業界別適用事例</button>\n          </div>\n\n          <!-- Tab Content -->\n          <div style=\"flex: 1; overflow-y: auto;\">\n            <!-- Implementations Tab -->\n            <div id=\"tab-implementations\" class=\"tab-content\" style=\"display: block;\">\n              <div class=\"table-wrap\" style=\"overflow-x: auto;\">\n                <table data-testid=\"implementations-table\" style=\"width: 100%; font-size: 12px; border-collapse: collapse;\">\n                  <thead>\n                    <tr style=\"background: var(--bg-sidebar); border-bottom: 1px solid var(--border);\">\n                      <th style=\"padding: 10px 12px; text-align: left; color: var(--text); font-weight: 600; border-right: 1px solid var(--border);\">プロジェクト名</th>\n                      <th style=\"padding: 10px 12px; text-align: right; color: var(--text); font-weight: 600; border-right: 1px solid var(--border);\">契約金額</th>\n                      <th style=\"padding: 10px 12px; text-align: center; color: var(--text); font-weight: 600; border-right: 1px solid var(--border);\">納期遵守</th>\n                      <th style=\"padding: 10px 12px; text-align: center; color: var(--text); font-weight: 600; border-right: 1px solid var(--border);\">品質評価</th>\n                      <th style=\"padding: 10px 12px; text-align: center; color: var(--text); font-weight: 600;\">顧客満足度</th>\n                    </tr>\n                  </thead>\n                  <tbody id=\"implementations-tbody\">\n                    <tr style=\"border-bottom: 1px solid var(--border);\">\n                      <td colspan=\"5\" style=\"padding: 20px; text-align: center; color: var(--text-muted);\">データを選択してください</td>\n                    </tr>\n                  </tbody>\n                </table>\n              </div>\n            </div>\n\n            <!-- Customers Tab -->\n            <div id=\"tab-customers\" class=\"tab-content\" style=\"display: none;\">\n              <div class=\"table-wrap\" style=\"overflow-x: auto;\">\n                <table data-testid=\"customers-table\" style=\"width: 100%; font-size: 12px; border-collapse: collapse;\">\n                  <thead>\n                    <tr style=\"background: var(--bg-sidebar); border-bottom: 1px solid var(--border);\">\n                      <th style=\"padding: 10px 12px; text-align: left; color: var(--text); font-weight: 600; border-right: 1px solid var(--border);\">顧客名</th>\n                      <th style=\"padding: 10px 12px; text-align: left; color: var(--text); font-weight: 600; border-right: 1px solid var(--border);\">業種</th>\n                      <th style=\"padding: 10px 12px; text-align: left; color: var(--text); font-weight: 600; border-right: 1px solid var(--border);\">企業規模</th>\n                      <th style=\"padding: 10px 12px; text-align: left; color: var(--text); font-weight: 600; border-right: 1px solid var(--border);\">参照用途</th>\n                      <th style=\"padding: 10px 12px; text-align: center; color: var(--text); font-weight: 600;\">ステータス</th>\n                    </tr>\n                  </thead>\n                  <tbody id=\"customers-tbody\">\n                    <tr style=\"border-bottom: 1px solid var(--border);\">\n                      <td colspan=\"5\" style=\"padding: 20px; text-align: center; color: var(--text-muted);\">データを選択してください</td>\n                    </tr>\n                  </tbody>\n                </table>\n              </div>\n            </div>\n\n            <!-- Cases Tab -->\n            <div id=\"tab-cases\" class=\"tab-content\" style=\"display: none;\">\n              <div class=\"table-wrap\" style=\"overflow-x: auto;\">\n                <table data-testid=\"cases-table\" style=\"width: 100%; font-size: 12px; border-collapse: collapse;\">\n                  <thead>\n                    <tr style=\"background: var(--bg-sidebar); border-bottom: 1px solid var(--border);\">\n                      <th style=\"padding: 10px 12px; text-align: left; color: var(--text); font-weight: 600; border-right: 1px solid var(--border);\">業界</th>\n                      <th style=\"padding: 10px 12px; text-align: left; color: var(--text); font-weight: 600; border-right: 1px solid var(--border);\">事例名</th>\n                      <th style=\"padding: 10px 12px; text-align: left; color: var(--text); font-weight: 600; border-right: 1px solid var(--border);\">適用効果</th>\n                      <th style=\"padding: 10px 12px; text-align: center; color: var(--text); font-weight: 600; border-right: 1px solid var(--border);\">導入期間</th>\n                      <th style=\"padding: 10px 12px; text-align: center; color: var(--text); font-weight: 600;\">推奨度</th>\n                    </tr>\n                  </thead>\n                  <tbody id=\"cases-tbody\">\n                    <tr style=\"border-bottom: 1px solid var(--border);\">\n                      <td colspan=\"5\" style=\"padding: 20px; text-align: center; color: var(--text-muted);\">データを選択してください</td>\n                    </tr>\n                  </tbody>\n                </table>\n              </div>\n            </div>\n          </div>\n        </div>\n      </div>\n\n      <!-- Right Panel: Risk Assessment & Scores -->\n      <div style=\"width: 320px; background: var(--bg-card); border-left: 1px solid var(--border); display: flex; flex-direction: column; overflow-y: auto; padding: 12px;\">\n        \n        <!-- Contract & API Tabs -->\n        <div style=\"margin-bottom: 12px;\">\n          <div style=\"display: flex; gap: 0; border-bottom: 1px solid var(--border); margin-bottom: 8px;\">\n            <button \n              class=\"right-tab-btn\" \n              data-tab=\"contracts\" \n              data-testid=\"tab-contracts\"\n              style=\"flex: 1; padding: 8px; font-size: 11px; font-weight: 600; color: var(--text); background: transparent; border: none; border-bottom: 2px solid var(--primary); cursor: pointer; transition: all var(--motion-duration);\"\n            >契約書</button>\n            <button \n              class=\"right-tab-btn\" \n              data-tab=\"api-specs\" \n              data-testid=\"tab-api-specs\"\n              style=\"flex: 1; padding: 8px; font-size: 11px; font-weight: 600; color: var(--text-muted); background: transparent; border: none; border-bottom: 2px solid transparent; cursor: pointer; transition: all var(--motion-duration);\"\n            >API仕様</button>\n            <button \n              class=\"right-tab-btn\" \n              data-tab=\"legal\" \n              data-testid=\"tab-legal\"\n              style=\"flex: 1; padding: 8px; font-size: 11px; font-weight: 600; color: var(--text-muted); background: transparent; border: none; border-bottom: 2px solid transparent; cursor: pointer; transition: all var(--motion-duration);\"\n            >法務対応</button>\n          </div>\n\n          <!-- Contracts Tab Content -->\n          <div id=\"right-tab-contracts\" class=\"right-tab-content\" style=\"display: block; font-size: 11px; max-height: 180px; overflow-y: auto;\">\n            <div id=\"contracts-list\" style=\"display: flex; flex-direction: column; gap: 8px;\">\n              <div style=\"padding: 8px; background: var(--bg-sidebar); border-radius: var(--radius-control); color: var(--text-muted);\">契約情報なし</div>\n            </div>\n          </div>\n\n          <!-- API Specs Tab Content -->\n          <div id=\"right-tab-api-specs\" class=\"right-tab-content\" style=\"display: none; font-size: 11px; max-height: 180px; overflow-y: auto;\">\n            <div id=\"api-specs-list\" style=\"display: flex; flex-direction: column; gap: 8px;\">\n              <div style=\"padding: 8px; background: var(--bg-sidebar); border-radius: var(--radius-control); color: var(--text-muted);\">API仕様情報なし</div>\n            </div>\n          </div>\n\n          <!-- Legal Tab Content -->\n          <div id=\"right-tab-legal\" class=\"right-tab-content\" style=\"display: none; font-size: 11px; max-height: 180px; overflow-y: auto;\">\n            <div id=\"legal-list\" style=\"display: flex; flex-direction: column; gap: 8px;\">\n              <div style=\"padding: 8px; background: var(--bg-sidebar); border-radius: var(--radius-control); color: var(--text-muted);\">法務対応実績なし</div>\n            </div>\n          </div>\n        </div>\n\n        <!-- IP Risk Items -->\n        <div class=\"card\" style=\"padding: 12px; margin-bottom: 12px; background-image: var(--surface-texture); background-size: var(--surface-texture-size); background-position: var(--surface-texture-position);\">\n          <div style=\"font-size: 11px; font-weight: 600; color: var(--text); margin-bottom: 8px;\">知的財産権リスク項目</div>\n          <div id=\"ip-risk-items\" style=\"display: flex; flex-direction: column; gap: 6px; max-height: 140px; overflow-y: auto;\">\n            <label style=\"display: flex; align-items: center; gap: 6px; font-size: 11px; cursor: pointer;\">\n              <input type=\"checkbox\" style=\"accent-color: var(--primary);\" />\n              <span style=\"color: var(--text);\">特許侵害リスク</span>\n            </label>\n            <label style=\"display: flex; align-items: center; gap: 6px; font-size: 11px; cursor: pointer;\">\n              <input type=\"checkbox\" style=\"accent-color: var(--primary);\" />\n              <span style=\"color: var(--text);\">著作権侵害リスク</span>\n            </label>\n            <label style=\"display: flex; align-items: center; gap: 6px; font-size: 11px; cursor: pointer;\">\n              <input type=\"checkbox\" style=\"accent-color: var(--primary);\" />\n              <span style=\"color: var(--text);\">営業秘密漏洩リスク</span>\n            </label>\n          </div>\n        </div>\n\n        <!-- Security Risk Items -->\n        <div class=\"card\" style=\"padding: 12px; margin-bottom: 12px; background-image: var(--surface-texture); background-size: var(--surface-texture-size); background-position: var(--surface-texture-position);\">\n          <div style=\"font-size: 11px; font-weight: 600; color: var(--text); margin-bottom: 8px;\">セキュリティリスク項目</div>\n          <div id=\"security-risk-items\" style=\"display: flex; flex-direction: column; gap: 6px; max-height: 140px; overflow-y: auto;\">\n            <label style=\"display: flex; align-items: center; gap: 6px; font-size: 11px; cursor: pointer;\">\n              <input type=\"checkbox\" style=\"accent-color: var(--primary);\" />\n              <span style=\"color: var(--text);\">データ保護対応</span>\n            </label>\n            <label style=\"display: flex; align-items: center; gap: 6px; font-size: 11px; cursor: pointer;\">\n              <input type=\"checkbox\" style=\"accent-color: var(--primary);\" />\n              <span style=\"color: var(--text);\">アクセス制御</span>\n            </label>\n            <label style=\"display: flex; align-items: center; gap: 6px; font-size: 11px; cursor: pointer;\">\n              <input type=\"checkbox\" style=\"accent-color: var(--primary);\" />\n              <span style=\"color: var(--text);\">インシデント対応</span>\n            </label>\n          </div>\n        </div>\n\n        <!-- Industry Pattern Alignment -->\n        <div class=\"card\" style=\"padding: 12px; margin-bottom: 12px; background-image: var(--surface-texture); background-size: var(--surface-texture-size); background-position: var(--surface-texture-position);\">\n          <div style=\"font-size: 11px; font-weight: 600; color: var(--text); margin-bottom: 8px;\">業界標準パターン適合度</div>\n          <div id=\"industry-pattern\" style=\"font-size: 11px; color: var(--text-muted);\">\n            <div style=\"padding: 8px; background: var(--bg-sidebar); border-radius: var(--radius-control);\">パターン情報なし</div>\n          </div>\n        </div>\n\n        <!-- Risk Scores -->\n        <div class=\"card\" style=\"padding: 12px; margin-bottom: 12px; background-image: var(--surface-texture); background-size: var(--surface-texture-size); background-position: var(--surface-texture-position);\">\n          <div style=\"font-size: 11px; font-weight: 600; color: var(--text); margin-bottom: 10px;\">リスク評価スコア</div>\n          <div style=\"display: flex; flex-direction: column; gap: 8px; font-size: 11px;\">\n            <div>\n              <div style=\"display: flex; justify-content: space-between; margin-bottom: 3px;\">\n                <span style=\"color: var(--text-muted);\">セキュリティ</span>\n                <span id=\"score-security\" style=\"color: var(--text); font-weight: 600;\">—</span>\n              </div>\n              <div style=\"height: 4px; background: var(--bg-sidebar); border-radius: 2px; overflow: hidden;\">\n                <div id=\"score-security-bar\" style=\"height: 100%; background: var(--primary); width: 0%;\"></div>\n              </div>\n            </div>\n            <div>\n              <div style=\"display: flex; justify-content: space-between; margin-bottom: 3px;\">\n                <span style=\"color: var(--text-muted);\">知的財産権</span>\n                <span id=\"score-ip\" style=\"color: var(--text); font-weight: 600;\">—</span>\n              </div>\n              <div style=\"height: 4px; background: var(--bg-sidebar); border-radius: 2px; overflow: hidden;\">\n                <div id=\"score-ip-bar\" style=\"height: 100%; background: var(--primary); width: 0%;\"></div>\n              </div>\n            </div>\n            <div>\n              <div style=\"display: flex; justify-content: space-between; margin-bottom: 3px;\">\n                <span style=\"color: var(--text-muted);\">法務リスク</span>\n                <span id=\"score-legal\" style=\"color: var(--text); font-weight: 600;\">—</span>\n              </div>\n              <div style=\"height: 4px; background: var(--bg-sidebar); border-radius: 2px; overflow: hidden;\">\n                <div id=\"score-legal-bar\" style=\"height: 100%; background: var(--primary); width: 0%;\"></div>\n              </div>\n            </div>\n            <div>\n              <div style=\"display: flex; justify-content: space-between; margin-bottom: 3px;\">\n                <span style=\"color: var(--text-muted);\">業界適合性</span>\n                <span id=\"score-industry\" style=\"color: var(--text); font-weight: 600;\">—</span>\n              </div>\n              <div style=\"height: 4px; background: var(--bg-sidebar); border-radius: 2px; overflow: hidden;\">\n                <div id=\"score-industry-bar\" style=\"height: 100%; background: var(--primary); width: 0%;\"></div>\n              </div>\n            </div>\n            <div style=\"border-top: 1px solid var(--border); padding-top: 8px; margin-top: 8px;\">\n              <div style=\"display: flex; justify-content: space-between;\">\n                <span style=\"color: var(--text); font-weight: 600;\">総合リスク</span>\n                <span id=\"score-total\" style=\"color: var(--primary); font-weight: 600; font-size: 12px;\">—</span>\n              </div>\n            </div>\n          </div>\n        </div>\n\n        <!-- Vendor Evaluation Scores -->\n        <div class=\"card\" style=\"padding: 12px; margin-bottom: 12px; background-image: var(--surface-texture); background-size: var(--surface-texture-size); background-position: var(--surface-texture-position);\">\n          <div style=\"font-size: 11px; font-weight: 600; color: var(--text); margin-bottom: 10px;\">ベンダー評価スコア</div>\n          <div style=\"display: flex; flex-direction: column; gap: 8px; font-size: 11px;\">\n            <div>\n              <div style=\"display: flex; justify-content: space-between; margin-bottom: 3px;\">\n                <span style=\"color: var(--text-muted);\">財務健全性</span>\n                <span id=\"eval-financial\" style=\"color: var(--text); font-weight: 600;\">—</span>\n              </div>\n              <div style=\"height: 4px; background: var(--bg-sidebar); border-radius: 2px; overflow: hidden;\">\n                <div id=\"eval-financial-bar\" style=\"height: 100%; background: var(--primary); width: 0%;\"></div>\n              </div>\n            </div>\n            <div>\n              <div style=\"display: flex; justify-content: space-between; margin-bottom: 3px;\">\n                <span style=\"color: var(--text-muted);\">技術力</span>\n                <span id=\"eval-tech\" style=\"color: var(--text); font-weight: 600;\">—</span>\n              </div>\n              <div style=\"height: 4px; background: var(--bg-sidebar); border-radius: 2px; overflow: hidden;\">\n                <div id=\"eval-tech-bar\" style=\"height: 100%; background: var(--primary); width: 0%;\"></div>\n              </div>\n            </div>\n            <div>\n              <div style=\"display: flex; justify-content: space-between; margin-bottom: 3px;\">\n                <span style=\"color: var(--text-muted);\">セキュリティ</span>\n                <span id=\"eval-security\" style=\"color: var(--text); font-weight: 600;\">—</span>\n              </div>\n              <div style=\"height: 4px; background: var(--bg-sidebar); border-radius: 2px; overflow: hidden;\">\n                <div id=\"eval-security-bar\" style=\"height: 100%; background: var(--primary); width: 0%;\"></div>\n              </div>\n            </div>\n            <div>\n              <div style=\"display: flex; justify-content: space-between; margin-bottom: 3px;\">\n                <span style=\"color: var(--text-muted);\">法務コンプライアンス</span>\n                <span id=\"eval-compliance\" style=\"color: var(--text); font-weight: 600;\">—</span>\n              </div>\n              <div style=\"height: 4px; background: var(--bg-sidebar); border-radius: 2px; overflow: hidden;\">\n                <div id=\"eval-compliance-bar\" style=\"height: 100%; background: var(--primary); width: 0%;\"></div>\n              </div>\n            </div>\n            <div style=\"border-top: 1px solid var(--border); padding-top: 8px; margin-top: 8px;\">\n              <div style=\"display: flex; justify-content: space-between;\">\n                <span style=\"color: var(--text); font-weight: 600;\">総合評価</span>\n                <span id=\"eval-total\" style=\"color: var(--primary); font-weight: 600; font-size: 12px;\">—</span>\n              </div>\n            </div>\n          </div>\n        </div>\n\n        <!-- Recommendation Badge -->\n        <div class=\"card\" style=\"padding: 12px; margin-bottom: 12px; background-image: var(--surface-texture); background-size: var(--surface-texture-size); background-position: var(--surface-texture-position); text-align: center;\">\n          <div style=\"font-size: 11px; color: var(--text-muted); margin-bottom: 8px;\">推奨判定</div>\n          <div id=\"recommendation-badge\" style=\"display: inline-block; padding: 8px 16px; border-radius: var(--radius-control); font-weight: 600; font-size: 12px; color: #fff; background: var(--primary);\">\n            —\n          </div>\n        </div>\n\n        <!-- Generate Report Button -->\n        <button \n          id=\"generate-report-btn\" \n          data-testid=\"generate-report-button\"\n          class=\"action-btn\" \n          style=\"width: 100%; padding: 10px; margin-bottom: 12px; background: var(--primary); color: #fff; border: none; border-radius: var(--radius-control); font-size: 12px; font-weight: 600; cursor: pointer; transition: background var(--motion-duration);\"\n        >\n          評価レポート生成\n        </button>\n\n        <!-- Operation History -->\n        <div class=\"card\" style=\"padding: 12px; background-image: var(--surface-texture); background-size: var(--surface-texture-size); background-position: var(--surface-texture-position);\">\n          <div style=\"font-size: 11px; font-weight: 600; color: var(--text); margin-bottom: 8px;\">操作履歴</div>\n          <div id=\"operation-history\" style=\"font-size: 10px; color: var(--text-muted); line-height: 1.6;\">\n            <div style=\"padding: 8px; background: var(--bg-sidebar); border-radius: var(--radius-control);\">履歴なし</div>\n          </div>\n        </div>\n      </div>\n    </div>\n  </div>\n</div>\n\n<!-- Report Modal -->\n<div id=\"report-modal\" class=\"modal-overlay\" style=\"display: none; position: fixed; inset: 0; z-index: 1000; background: rgba(0, 0, 0, 0.55); display: flex; align-items: center; justify-content: center;\">\n  <div style=\"background: var(--bg-card); color: var(--text); padding: 24px; border-radius: 8px; max-width: 90vw; max-height: 90vh; overflow: auto; box-shadow: 0 8px 32px rgba(0,0,0,0.4);\">\n    <div style=\"display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;\">\n      <h3 style=\"font-size: 16px; font-weight: 600; margin: 0;\">評価レポート生成</h3>\n      <button \n        id=\"close-report-modal\" \n        data-testid=\"close-report-modal\"\n        style=\"background: transparent; border: none; font-size: 20px; cursor: pointer; color: var(--text-muted);\"\n      >\n        ×\n      </button>\n    </div>\n    <div style=\"margin-bottom: 16px;\">\n      <label style=\"display: block; font-size: 12px; color: var(--text-muted); margin-bottom: 8px; font-weight: 600;\">出力形式</label>\n      <select \n        id=\"report-format\" \n        data-testid=\"report-format-select\"\n        style=\"width: 100%; padding: 8px 12px; border: 1px solid var(--border); border-radius: var(--radius-control); background: var(--bg-card); color: var(--text); font-size: 13px; box-sizing: border-box;\"\n      >\n        <option value=\"pdf\">PDF形式</option>\n        <option value=\"excel\">Excel形式</option>\n      </select>\n    </div>\n    <div style=\"display: flex; gap: 8px; justify-content: flex-end;\">\n      <button \n        id=\"cancel-report-btn\" \n        data-testid=\"cancel-report-button\"\n        class=\"action-btn secondary\" \n        style=\"padding: 10px 16px; background: transparent; color: var(--text); border: 1px solid var(--border); border-radius: var(--radius-control); font-size: 12px; font-weight: 600; cursor: pointer;\"\n      >\n        キャンセル\n      </button>\n      <button \n        id=\"confirm-report-btn\" \n        data-testid=\"confirm-report-button\"\n        class=\"action-btn\" \n        style=\"padding: 10px 16px; background: var(--primary); color: #fff; border: none; border-radius: var(--radius-control); font-size: 12px; font-weight: 600; cursor: pointer;\"\n      >\n        生成\n      </button>\n    </div>\n  </div>\n</div>",
+      "initJs": "",
+      "method": "ai"
+    }
+  ],
+  "tableDefinitions": [
+    {
+      "tableName": "ユーザー権限",
+      "purpose": "ユーザーが各機能・データへのアクセス権限を管理し、作業進捗・人員配置システムにおける操作可能な範囲を制御する",
+      "columns": [
+        {
+          "name": "ユーザー権限ID",
+          "type": "uuid",
+          "required": true,
+          "description": "ユーザー権限レコードの一意識別子"
+        },
+        {
+          "name": "ユーザーID",
+          "type": "uuid",
+          "required": true,
+          "description": "権限が付与されるユーザーの外部キー参照"
+        },
+        {
+          "name": "拠点ID",
+          "type": "uuid",
+          "required": false,
+          "description": "権限が適用される拠点の外部キー参照、NULLの場合は全拠点対象"
+        },
+        {
+          "name": "チームID",
+          "type": "uuid",
+          "required": false,
+          "description": "権限が適用されるチームの外部キー参照、NULLの場合は全チーム対象"
+        },
+        {
+          "name": "権限種別",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "付与される権限の種類（例：作業指示作成、進捗確認、人員配置編集、レポート閲覧等）"
+        },
+        {
+          "name": "操作可能",
+          "type": "boolean",
+          "required": true,
+          "description": "権限が有効か無効かを示すフラグ"
+        },
+        {
+          "name": "有効開始日時",
+          "type": "timestamp",
+          "required": false,
+          "description": "権限の有効期間開始日時"
+        },
+        {
+          "name": "有効終了日時",
+          "type": "timestamp",
+          "required": false,
+          "description": "権限の有効期間終了日時"
+        },
+        {
+          "name": "作成日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "権限レコードの作成日時"
+        },
+        {
+          "name": "更新日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "権限レコードの最終更新日時"
+        },
+        {
+          "name": "作成者",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "権限レコードを作成したユーザーの識別子"
+        },
+        {
+          "name": "更新者",
+          "type": "varchar(100)",
+          "required": false,
+          "description": "権限レコードを最後に更新したユーザーの識別子"
+        }
+      ]
+    },
+    {
+      "tableName": "API仕様書",
+      "purpose": "既存システムのAPI仕様情報を管理し、技術実現可能性検証時に参照・比較するためのマスタテーブル",
+      "columns": [
+        {
+          "name": "api_spec_id",
+          "type": "uuid",
+          "required": true,
+          "description": "API仕様書の一意識別子"
+        },
+        {
+          "name": "system_id",
+          "type": "uuid",
+          "required": true,
+          "description": "関連するシステムの識別子（システムテーブルへの外部キー）"
+        },
+        {
+          "name": "api_name",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "API名称"
+        },
+        {
+          "name": "api_endpoint",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "APIエンドポイントURL"
+        },
+        {
+          "name": "http_method",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "HTTPメソッド（GET、POST、PUT、DELETE等）"
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "required": false,
+          "description": "API仕様の詳細説明"
+        },
+        {
+          "name": "request_format",
+          "type": "text",
+          "required": false,
+          "description": "リクエストフォーマット仕様"
+        },
+        {
+          "name": "response_format",
+          "type": "text",
+          "required": false,
+          "description": "レスポンスフォーマット仕様"
+        },
+        {
+          "name": "authentication_type",
+          "type": "varchar(100)",
+          "required": false,
+          "description": "認証方式（OAuth、API Key、Basic等）"
+        },
+        {
+          "name": "rate_limit",
+          "type": "varchar(100)",
+          "required": false,
+          "description": "レート制限情報"
+        },
+        {
+          "name": "version",
+          "type": "varchar(100)",
+          "required": false,
+          "description": "APIバージョン"
+        },
+        {
+          "name": "status",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "API仕様の状態（有効、廃止予定、廃止等）"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp",
+          "required": true,
+          "description": "作成日時"
+        },
+        {
+          "name": "created_by",
+          "type": "uuid",
+          "required": true,
+          "description": "作成者ユーザーID"
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp",
+          "required": true,
+          "description": "更新日時"
+        },
+        {
+          "name": "updated_by",
+          "type": "uuid",
+          "required": true,
+          "description": "更新者ユーザーID"
+        }
+      ]
+    },
+    {
+      "tableName": "操作履歴",
+      "purpose": "ユーザーによるシステム操作の全履歴を記録し、監査証跡・操作追跡・システム利用分析に活用する",
+      "columns": [
+        {
+          "name": "操作履歴ID",
+          "type": "uuid",
+          "required": true,
+          "description": "操作履歴の一意識別子"
+        },
+        {
+          "name": "ユーザーID",
+          "type": "uuid",
+          "required": true,
+          "description": "操作を実行したユーザーの識別子"
+        },
+        {
+          "name": "操作種別",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "実行された操作の種類(作業指示作成、人員配置実行、進捗更新等)"
+        },
+        {
+          "name": "操作対象テーブル",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "操作の対象となったテーブル名"
+        },
+        {
+          "name": "操作対象ID",
+          "type": "uuid",
+          "required": false,
+          "description": "操作の対象となったレコードの識別子"
+        },
+        {
+          "name": "操作内容",
+          "type": "text",
+          "required": false,
+          "description": "操作の詳細内容や変更内容"
+        },
+        {
+          "name": "変更前値",
+          "type": "text",
+          "required": false,
+          "description": "更新操作の場合の変更前の値"
+        },
+        {
+          "name": "変更後値",
+          "type": "text",
+          "required": false,
+          "description": "更新操作の場合の変更後の値"
+        },
+        {
+          "name": "操作ステータス",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "操作の実行結果(成功、失敗、部分成功等)"
+        },
+        {
+          "name": "エラーメッセージ",
+          "type": "text",
+          "required": false,
+          "description": "操作失敗時のエラーメッセージ"
+        },
+        {
+          "name": "IPアドレス",
+          "type": "varchar(100)",
+          "required": false,
+          "description": "操作を実行したクライアントのIPアドレス"
+        },
+        {
+          "name": "セッションID",
+          "type": "varchar(100)",
+          "required": false,
+          "description": "操作時のセッション識別子"
+        },
+        {
+          "name": "操作日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "操作が実行された日時"
+        },
+        {
+          "name": "作成日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "操作履歴レコードが作成された日時"
+        }
+      ]
+    },
+    {
+      "tableName": "ログインユーザー",
+      "purpose": "ベンダー選定・契約リスク評価支援システムのユーザー認証・管理を行い、ログイン情報と基本属性を保持する",
+      "columns": [
+        {
+          "name": "ユーザーID",
+          "type": "uuid",
+          "required": true,
+          "description": "ユーザーの一意識別子"
+        },
+        {
+          "name": "ログインID",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "ログイン時に使用するユーザー識別名、システム内で一意"
+        },
+        {
+          "name": "メールアドレス",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "ユーザーのメールアドレス、パスワードリセット等の通知に使用"
+        },
+        {
+          "name": "パスワードハッシュ",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "ハッシュ化されたパスワード"
+        },
+        {
+          "name": "ユーザー名",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "ユーザーの表示名"
+        },
+        {
+          "name": "部門",
+          "type": "varchar(100)",
+          "required": false,
+          "description": "ユーザーが属する部門"
+        },
+        {
+          "name": "ステータス",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "ユーザーのステータス（有効/無効/休止等）"
+        },
+        {
+          "name": "最終ログイン日時",
+          "type": "timestamp",
+          "required": false,
+          "description": "ユーザーが最後にログインした日時"
+        },
+        {
+          "name": "作成日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "ユーザーレコード作成日時"
+        },
+        {
+          "name": "更新日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "ユーザーレコード最終更新日時"
+        },
+        {
+          "name": "作成者",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "ユーザーレコードを作成したユーザーID"
+        }
+      ]
+    },
+    {
+      "tableName": "ベンダー候補企業",
+      "purpose": "ベンダー選定・契約リスク評価支援システムにおいて、評価対象となるベンダー候補企業の基本情報、評価スコア、契約リスク情報を一元管理するマスタテーブル",
+      "columns": [
+        {
+          "name": "ベンダーID",
+          "type": "uuid",
+          "required": true,
+          "description": "ベンダー候補企業を一意に識別するプライマリキー"
+        },
+        {
+          "name": "企業名",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "ベンダー候補企業の正式な企業名"
+        },
+        {
+          "name": "企業名カナ",
+          "type": "varchar(100)",
+          "required": false,
+          "description": "ベンダー候補企業名のカナ表記、検索用"
+        },
+        {
+          "name": "業種",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "ベンダーの業種分類"
+        },
+        {
+          "name": "所在地",
+          "type": "varchar(100)",
+          "required": false,
+          "description": "ベンダー候補企業の本社所在地"
+        },
+        {
+          "name": "代表者名",
+          "type": "varchar(100)",
+          "required": false,
+          "description": "ベンダー候補企業の代表者名"
+        },
+        {
+          "name": "資本金",
+          "type": "varchar(100)",
+          "required": false,
+          "description": "ベンダー候補企業の資本金"
+        },
+        {
+          "name": "従業員数",
+          "type": "integer",
+          "required": false,
+          "description": "ベンダー候補企業の従業員数"
+        },
+        {
+          "name": "設立年",
+          "type": "integer",
+          "required": false,
+          "description": "ベンダー候補企業の設立年"
+        },
+        {
+          "name": "連絡先電話番号",
+          "type": "varchar(100)",
+          "required": false,
+          "description": "ベンダー候補企業の代表電話番号"
+        },
+        {
+          "name": "連絡先メールアドレス",
+          "type": "varchar(100)",
+          "required": false,
+          "description": "ベンダー候補企業の代表メールアドレス"
+        },
+        {
+          "name": "評価ステータス",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "評価状況を示すステータス（未評価、評価中、評価完了、却下等）"
+        },
+        {
+          "name": "総合評価スコア",
+          "type": "integer",
+          "required": false,
+          "description": "ベンダー候補企業の総合評価スコア（0-100）"
+        },
+        {
+          "name": "契約リスク評価",
+          "type": "varchar(100)",
+          "required": false,
+          "description": "契約リスク評価レベル（低、中、高等）"
+        },
+        {
+          "name": "推奨度",
+          "type": "varchar(100)",
+          "required": false,
+          "description": "ベンダー選定における推奨度（推奨、条件付き推奨、非推奨等）"
+        },
+        {
+          "name": "備考",
+          "type": "text",
+          "required": false,
+          "description": "ベンダー候補企業に関する特記事項や評価コメント"
+        },
+        {
+          "name": "作成日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "ベンダー候補企業レコードの作成日時"
+        },
+        {
+          "name": "作成者",
+          "type": "uuid",
+          "required": true,
+          "description": "ベンダー候補企業レコードを作成したユーザーID"
+        },
+        {
+          "name": "更新日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "ベンダー候補企業レコードの最終更新日時"
+        },
+        {
+          "name": "更新者",
+          "type": "uuid",
+          "required": true,
+          "description": "ベンダー候補企業レコードを最後に更新したユーザーID"
+        }
+      ]
+    },
+    {
+      "tableName": "企業基本情報",
+      "purpose": "ベンダー選定・契約リスク評価支援システムにおいて、ベンダー候補企業の基本情報を一元管理し、リスク評価や契約判断の基礎データとなる企業マスタテーブル",
+      "columns": [
+        {
+          "name": "企業ID",
+          "type": "uuid",
+          "required": true,
+          "description": "企業を一意に識別するプライマリキー"
+        },
+        {
+          "name": "企業名",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "ベンダー企業の正式名称"
+        },
+        {
+          "name": "企業名カナ",
+          "type": "varchar(100)",
+          "required": false,
+          "description": "企業名のカナ表記、検索用"
+        },
+        {
+          "name": "業種",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "企業の主要業種分類"
+        },
+        {
+          "name": "所在地",
+          "type": "text",
+          "required": true,
+          "description": "企業の本社所在地住所"
+        },
+        {
+          "name": "代表者名",
+          "type": "varchar(100)",
+          "required": false,
+          "description": "企業の代表取締役等の名前"
+        },
+        {
+          "name": "設立年月日",
+          "type": "timestamp",
+          "required": false,
+          "description": "企業の設立日"
+        },
+        {
+          "name": "資本金",
+          "type": "integer",
+          "required": false,
+          "description": "企業の資本金額（万円単位）"
+        },
+        {
+          "name": "従業員数",
+          "type": "integer",
+          "required": false,
+          "description": "企業の従業員数"
+        },
+        {
+          "name": "売上高",
+          "type": "integer",
+          "required": false,
+          "description": "企業の直近年度売上高（万円単位）"
+        },
+        {
+          "name": "電話番号",
+          "type": "varchar(100)",
+          "required": false,
+          "description": "企業の代表電話番号"
+        },
+        {
+          "name": "メールアドレス",
+          "type": "varchar(100)",
+          "required": false,
+          "description": "企業の代表メールアドレス"
+        },
+        {
+          "name": "ウェブサイトURL",
+          "type": "varchar(100)",
+          "required": false,
+          "description": "企業の公式ウェブサイトURL"
+        },
+        {
+          "name": "評価ステータス",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "ベンダー評価の進捗状態（未評価、評価中、評価完了等）"
+        },
+        {
+          "name": "契約状態",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "ベンダーとの契約状態（候補、交渉中、契約済、終了等）"
+        },
+        {
+          "name": "備考",
+          "type": "text",
+          "required": false,
+          "description": "企業に関する追加情報や特記事項"
+        },
+        {
+          "name": "作成日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "レコード作成日時"
+        },
+        {
+          "name": "更新日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "レコード最終更新日時"
+        },
+        {
+          "name": "作成者",
+          "type": "uuid",
+          "required": true,
+          "description": "レコード作成者のユーザーID"
+        },
+        {
+          "name": "更新者",
+          "type": "uuid",
+          "required": true,
+          "description": "レコード最終更新者のユーザーID"
+        }
+      ]
+    },
+    {
+      "tableName": "導入実績",
+      "purpose": "ベンダー選定・契約後の導入プロジェクト実績を記録し、ベンダーの実行能力・品質・納期遵守状況を評価するための履歴管理テーブル",
+      "columns": [
+        {
+          "name": "導入実績ID",
+          "type": "uuid",
+          "required": true,
+          "description": "導入実績の一意識別子"
+        },
+        {
+          "name": "ベンダーID",
+          "type": "uuid",
+          "required": true,
+          "description": "ベンダー候補企業テーブルへの外部キー"
+        },
+        {
+          "name": "プロジェクト名",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "導入プロジェクトの名称"
+        },
+        {
+          "name": "プロジェクト説明",
+          "type": "text",
+          "required": false,
+          "description": "プロジェクトの詳細説明"
+        },
+        {
+          "name": "契約金額",
+          "type": "integer",
+          "required": true,
+          "description": "プロジェクト契約金額（円）"
+        },
+        {
+          "name": "契約開始日",
+          "type": "timestamp",
+          "required": true,
+          "description": "契約開始日時"
+        },
+        {
+          "name": "契約終了日",
+          "type": "timestamp",
+          "required": true,
+          "description": "契約終了予定日時"
+        },
+        {
+          "name": "実績完了日",
+          "type": "timestamp",
+          "required": false,
+          "description": "実際のプロジェクト完了日時"
+        },
+        {
+          "name": "納期遵守状況",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "納期遵守状況（予定通り/遅延/早期完了）"
+        },
+        {
+          "name": "品質評価",
+          "type": "integer",
+          "required": true,
+          "description": "品質評価スコア（1-5段階）"
+        },
+        {
+          "name": "顧客満足度",
+          "type": "integer",
+          "required": true,
+          "description": "顧客満足度スコア（1-5段階）"
+        },
+        {
+          "name": "実績評価コメント",
+          "type": "text",
+          "required": false,
+          "description": "導入実績に関する評価・コメント"
+        },
+        {
+          "name": "作成日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "レコード作成日時"
+        },
+        {
+          "name": "更新日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "レコード最終更新日時"
+        },
+        {
+          "name": "作成者",
+          "type": "uuid",
+          "required": true,
+          "description": "ログインユーザーテーブルへの外部キー"
+        }
+      ]
+    },
+    {
+      "tableName": "参照顧客",
+      "purpose": "ベンダー選定・契約リスク評価プロセスにおいて、評価対象となる顧客企業の基本情報と参照履歴を管理し、ベンダー候補企業との関連性や導入実績との紐付けを支援するマスタテーブル",
+      "columns": [
+        {
+          "name": "顧客ID",
+          "type": "uuid",
+          "required": true,
+          "description": "参照顧客を一意に識別するプライマリキー"
+        },
+        {
+          "name": "顧客名",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "顧客企業の正式名称"
+        },
+        {
+          "name": "業種",
+          "type": "varchar(100)",
+          "required": false,
+          "description": "顧客企業の業種分類"
+        },
+        {
+          "name": "企業規模",
+          "type": "varchar(100)",
+          "required": false,
+          "description": "顧客企業の規模区分（大企業/中堅企業/中小企業等）"
+        },
+        {
+          "name": "所在地",
+          "type": "varchar(100)",
+          "required": false,
+          "description": "顧客企業の本社所在地"
+        },
+        {
+          "name": "代表者名",
+          "type": "varchar(100)",
+          "required": false,
+          "description": "顧客企業の代表者名"
+        },
+        {
+          "name": "連絡先電話番号",
+          "type": "varchar(100)",
+          "required": false,
+          "description": "顧客企業の代表電話番号"
+        },
+        {
+          "name": "連絡先メールアドレス",
+          "type": "varchar(100)",
+          "required": false,
+          "description": "顧客企業の代表メールアドレス"
+        },
+        {
+          "name": "参照用途",
+          "type": "text",
+          "required": false,
+          "description": "ベンダー評価における参照理由や用途の説明"
+        },
+        {
+          "name": "参照ステータス",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "参照顧客の状態（アクティブ/非アクティブ/検証中等）"
+        },
+        {
+          "name": "作成日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "参照顧客レコードの作成日時"
+        },
+        {
+          "name": "更新日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "参照顧客レコードの最終更新日時"
+        },
+        {
+          "name": "作成者",
+          "type": "uuid",
+          "required": true,
+          "description": "参照顧客レコードを作成したユーザーID"
+        },
+        {
+          "name": "更新者",
+          "type": "uuid",
+          "required": false,
+          "description": "参照顧客レコードを最後に更新したユーザーID"
+        }
+      ]
+    },
+    {
+      "tableName": "業界別適用事例",
+      "purpose": "ベンダー選定時に業界別の導入実績・成功事例を参照し、業界特性に応じた適切なベンダー評価を支援するマスタテーブル",
+      "columns": [
+        {
+          "name": "事例ID",
+          "type": "uuid",
+          "required": true,
+          "description": "業界別適用事例の一意識別子"
+        },
+        {
+          "name": "業界分類",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "適用対象の業界名（製造業、金融、小売等）"
+        },
+        {
+          "name": "事例名",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "適用事例の名称"
+        },
+        {
+          "name": "事例説明",
+          "type": "text",
+          "required": true,
+          "description": "業界別適用事例の詳細説明"
+        },
+        {
+          "name": "ベンダー候補企業ID",
+          "type": "uuid",
+          "required": true,
+          "description": "この事例に関連するベンダー候補企業への外部キー"
+        },
+        {
+          "name": "導入実績ID",
+          "type": "uuid",
+          "required": false,
+          "description": "参照する導入実績への外部キー"
+        },
+        {
+          "name": "参照顧客ID",
+          "type": "uuid",
+          "required": false,
+          "description": "参照顧客への外部キー"
+        },
+        {
+          "name": "適用効果",
+          "type": "text",
+          "required": false,
+          "description": "業界別適用による期待効果・実績効果"
+        },
+        {
+          "name": "導入期間月数",
+          "type": "integer",
+          "required": false,
+          "description": "導入に要した期間（月単位）"
+        },
+        {
+          "name": "ROI達成度",
+          "type": "varchar(100)",
+          "required": false,
+          "description": "ROI達成度の評価"
+        },
+        {
+          "name": "推奨度",
+          "type": "integer",
+          "required": false,
+          "description": "業界別推奨度スコア（1-5）"
+        },
+        {
+          "name": "作成日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "事例レコード作成日時"
+        },
+        {
+          "name": "更新日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "事例レコード最終更新日時"
+        },
+        {
+          "name": "作成者",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "事例レコード作成者"
+        }
+      ]
+    },
+    {
+      "tableName": "契約書",
+      "purpose": "ベンダーとの契約内容、条件、ステータス、リスク評価情報を一元管理し、契約ライフサイクル全体を追跡・評価するためのマスタテーブル",
+      "columns": [
+        {
+          "name": "契約書ID",
+          "type": "uuid",
+          "required": true,
+          "description": "契約書の一意識別子"
+        },
+        {
+          "name": "ベンダーID",
+          "type": "uuid",
+          "required": true,
+          "description": "ベンダー候補企業テーブルへの外部キー"
+        },
+        {
+          "name": "契約名",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "契約の名称・タイトル"
+        },
+        {
+          "name": "契約内容",
+          "type": "text",
+          "required": false,
+          "description": "契約の詳細内容・概要"
+        },
+        {
+          "name": "契約開始日",
+          "type": "timestamp",
+          "required": true,
+          "description": "契約の開始日"
+        },
+        {
+          "name": "契約終了日",
+          "type": "timestamp",
+          "required": true,
+          "description": "契約の終了日"
+        },
+        {
+          "name": "契約金額",
+          "type": "integer",
+          "required": false,
+          "description": "契約金額（円）"
+        },
+        {
+          "name": "契約ステータス",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "契約状態（草案、承認待ち、有効、終了、更新予定等）"
+        },
+        {
+          "name": "リスク評価レベル",
+          "type": "varchar(100)",
+          "required": false,
+          "description": "契約に関連するリスク評価（高、中、低）"
+        },
+        {
+          "name": "リスク評価詳細",
+          "type": "text",
+          "required": false,
+          "description": "リスク評価の詳細内容・根拠"
+        },
+        {
+          "name": "支払条件",
+          "type": "text",
+          "required": false,
+          "description": "支払い方法・期日等の条件"
+        },
+        {
+          "name": "納期条件",
+          "type": "text",
+          "required": false,
+          "description": "納期・デリバリー条件"
+        },
+        {
+          "name": "SLA条項",
+          "type": "text",
+          "required": false,
+          "description": "サービスレベルアグリーメント条項"
+        },
+        {
+          "name": "ペナルティ条項",
+          "type": "text",
+          "required": false,
+          "description": "違約金・ペナルティに関する条項"
+        },
+        {
+          "name": "秘密保持条項",
+          "type": "boolean",
+          "required": false,
+          "description": "秘密保持条項の有無"
+        },
+        {
+          "name": "知的財産権条項",
+          "type": "boolean",
+          "required": false,
+          "description": "知的財産権に関する条項の有無"
+        },
+        {
+          "name": "解除条件",
+          "type": "text",
+          "required": false,
+          "description": "契約解除の条件・手続き"
+        },
+        {
+          "name": "更新予定日",
+          "type": "timestamp",
+          "required": false,
+          "description": "契約更新予定日"
+        },
+        {
+          "name": "担当者ID",
+          "type": "uuid",
+          "required": false,
+          "description": "ログインユーザーテーブルへの外部キー（契約担当者）"
+        },
+        {
+          "name": "承認者ID",
+          "type": "uuid",
+          "required": false,
+          "description": "ログインユーザーテーブルへの外部キー（承認者）"
+        },
+        {
+          "name": "作成日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "契約書レコード作成日時"
+        },
+        {
+          "name": "作成者ID",
+          "type": "uuid",
+          "required": true,
+          "description": "ログインユーザーテーブルへの外部キー（作成者）"
+        },
+        {
+          "name": "更新日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "契約書レコード最終更新日時"
+        },
+        {
+          "name": "更新者ID",
+          "type": "uuid",
+          "required": true,
+          "description": "ログインユーザーテーブルへの外部キー（更新者）"
+        }
+      ]
+    },
+    {
+      "tableName": "法務対応実績",
+      "purpose": "ベンダー選定・契約リスク評価支援システムにおいて、法務部門が対応した契約審査、リスク評価、交渉結果などの実績を記録・管理し、過去の対応事例を参照して将来のベンダー評価に活用するための履歴テーブル",
+      "columns": [
+        {
+          "name": "法務対応実績ID",
+          "type": "uuid",
+          "required": true,
+          "description": "法務対応実績を一意に識別するプライマリキー"
+        },
+        {
+          "name": "ベンダー候補企業ID",
+          "type": "uuid",
+          "required": true,
+          "description": "対応対象のベンダー候補企業を特定するための外部キー"
+        },
+        {
+          "name": "契約書ID",
+          "type": "uuid",
+          "required": false,
+          "description": "関連する契約書を参照するための外部キー"
+        },
+        {
+          "name": "対応種別",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "法務対応の種類（契約審査、リスク評価、交渉対応、紛争対応など）"
+        },
+        {
+          "name": "対応内容",
+          "type": "text",
+          "required": true,
+          "description": "実施した法務対応の詳細内容"
+        },
+        {
+          "name": "指摘事項",
+          "type": "text",
+          "required": false,
+          "description": "契約審査やリスク評価で発見された問題点や懸念事項"
+        },
+        {
+          "name": "リスクレベル",
+          "type": "varchar(100)",
+          "required": false,
+          "description": "評価されたリスクの程度（高/中/低など）"
+        },
+        {
+          "name": "対応結果",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "対応の結果（承認、条件付き承認、却下、保留など）"
+        },
+        {
+          "name": "対応担当者",
+          "type": "uuid",
+          "required": true,
+          "description": "対応を実施した法務担当者のユーザーID"
+        },
+        {
+          "name": "対応日",
+          "type": "timestamp",
+          "required": true,
+          "description": "法務対応を実施した日時"
+        },
+        {
+          "name": "作成日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "レコードが作成された日時"
+        },
+        {
+          "name": "更新日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "レコードが最後に更新された日時"
+        },
+        {
+          "name": "作成者",
+          "type": "uuid",
+          "required": true,
+          "description": "レコードを作成したユーザーのID"
+        }
+      ]
+    },
+    {
+      "tableName": "知的財産権リスク項目",
+      "purpose": "ベンダー選定時の知的財産権関連リスクを評価・管理するためのマスタテーブル。リスク項目の定義、評価基準、重要度を一元管理し、ベンダー評価時の参照データとして機能する。",
+      "columns": [
+        {
+          "name": "ip_risk_item_id",
+          "type": "uuid",
+          "required": true,
+          "description": "知的財産権リスク項目の一意識別子"
+        },
+        {
+          "name": "risk_category",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "リスク項目のカテゴリ（例：特許侵害、著作権侵害、営業秘密漏洩、ライセンス違反）"
+        },
+        {
+          "name": "risk_item_name",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "リスク項目の名称"
+        },
+        {
+          "name": "risk_description",
+          "type": "text",
+          "required": true,
+          "description": "リスク項目の詳細説明"
+        },
+        {
+          "name": "severity_level",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "リスク重要度レベル（例：高、中、低）"
+        },
+        {
+          "name": "evaluation_criteria",
+          "type": "text",
+          "required": true,
+          "description": "評価基準の詳細説明"
+        },
+        {
+          "name": "mitigation_measures",
+          "type": "text",
+          "required": false,
+          "description": "リスク軽減策の推奨事項"
+        },
+        {
+          "name": "applicable_industries",
+          "type": "varchar(100)",
+          "required": false,
+          "description": "適用対象業界"
+        },
+        {
+          "name": "is_active",
+          "type": "boolean",
+          "required": true,
+          "description": "リスク項目の有効/無効フラグ"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp",
+          "required": true,
+          "description": "レコード作成日時"
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp",
+          "required": true,
+          "description": "レコード更新日時"
+        },
+        {
+          "name": "created_by",
+          "type": "uuid",
+          "required": true,
+          "description": "レコード作成者のユーザーID"
+        }
+      ]
+    },
+    {
+      "tableName": "セキュリティリスク項目",
+      "purpose": "ベンダー選定時のセキュリティリスク評価項目を管理し、リスク項目の定義、評価基準、重要度を一元管理するマスタテーブル",
+      "columns": [
+        {
+          "name": "セキュリティリスク項目ID",
+          "type": "uuid",
+          "required": true,
+          "description": "セキュリティリスク項目の一意識別子"
+        },
+        {
+          "name": "リスク項目名",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "セキュリティリスク項目の名称"
+        },
+        {
+          "name": "リスク項目説明",
+          "type": "text",
+          "required": true,
+          "description": "セキュリティリスク項目の詳細説明と評価対象範囲"
+        },
+        {
+          "name": "リスクカテゴリ",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "リスク項目の分類（例：データ保護、アクセス制御、インシデント対応等）"
+        },
+        {
+          "name": "重要度レベル",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "リスク項目の重要度（例：高、中、低）"
+        },
+        {
+          "name": "評価基準",
+          "type": "text",
+          "required": true,
+          "description": "リスク項目の評価方法と判定基準"
+        },
+        {
+          "name": "評価スケール",
+          "type": "varchar(100)",
+          "required": false,
+          "description": "評価の段階（例：1-5、合格/不合格）"
+        },
+        {
+          "name": "参照標準",
+          "type": "varchar(100)",
+          "required": false,
+          "description": "参照する規格やガイドライン（例：ISO27001、NIST等）"
+        },
+        {
+          "name": "是正期限日数",
+          "type": "integer",
+          "required": false,
+          "description": "リスク検出時の是正対応期限（日数）"
+        },
+        {
+          "name": "有効フラグ",
+          "type": "boolean",
+          "required": true,
+          "description": "評価項目が現在有効かどうか"
+        },
+        {
+          "name": "作成日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "レコード作成日時"
+        },
+        {
+          "name": "更新日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "レコード最終更新日時"
+        },
+        {
+          "name": "作成者",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "レコード作成者のユーザーID"
+        },
+        {
+          "name": "更新者",
+          "type": "varchar(100)",
+          "required": false,
+          "description": "レコード最終更新者のユーザーID"
+        }
+      ]
+    },
+    {
+      "tableName": "業界標準パターン",
+      "purpose": "業界別のベンダー選定・契約リスク評価における標準的なパターン、チェックリスト、リスク項目、契約条件テンプレートを管理し、評価プロセスの効率化と標準化を実現する",
+      "columns": [
+        {
+          "name": "業界標準パターンID",
+          "type": "uuid",
+          "required": true,
+          "description": "業界標準パターンの一意識別子"
+        },
+        {
+          "name": "業界区分",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "適用対象の業界区分コード（製造業、金融、医療、小売等）"
+        },
+        {
+          "name": "パターン名",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "業界標準パターンの名称"
+        },
+        {
+          "name": "パターン説明",
+          "type": "text",
+          "required": false,
+          "description": "パターンの詳細説明と適用シーン"
+        },
+        {
+          "name": "推奨評価項目数",
+          "type": "integer",
+          "required": false,
+          "description": "このパターンで推奨される評価項目の数"
+        },
+        {
+          "name": "リスク重要度レベル",
+          "type": "varchar(100)",
+          "required": false,
+          "description": "パターンに関連するリスクの重要度レベル（高/中/低）"
+        },
+        {
+          "name": "契約条件テンプレートID",
+          "type": "uuid",
+          "required": false,
+          "description": "このパターンに紐付く契約条件テンプレートの参照ID"
+        },
+        {
+          "name": "チェックリスト項目数",
+          "type": "integer",
+          "required": false,
+          "description": "このパターンに含まれるチェックリスト項目の総数"
+        },
+        {
+          "name": "適用開始日",
+          "type": "timestamp",
+          "required": false,
+          "description": "パターンの適用開始日時"
+        },
+        {
+          "name": "適用終了日",
+          "type": "timestamp",
+          "required": false,
+          "description": "パターンの適用終了日時（廃止予定の場合）"
+        },
+        {
+          "name": "ステータス",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "パターンの状態（有効/無効/検討中）"
+        },
+        {
+          "name": "作成日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "レコード作成日時"
+        },
+        {
+          "name": "更新日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "レコード最終更新日時"
+        },
+        {
+          "name": "作成者",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "レコード作成者のユーザーID"
+        },
+        {
+          "name": "更新者",
+          "type": "varchar(100)",
+          "required": false,
+          "description": "レコード最終更新者のユーザーID"
+        }
+      ]
+    },
+    {
+      "tableName": "リスク対比分析結果",
+      "purpose": "複数ベンダー候補企業のリスク評価を対比分析し、契約判断の根拠となるリスク評価結果を記録・管理するテーブル",
+      "columns": [
+        {
+          "name": "分析結果ID",
+          "type": "uuid",
+          "required": true,
+          "description": "リスク対比分析結果を一意に識別するID"
+        },
+        {
+          "name": "分析セッションID",
+          "type": "uuid",
+          "required": true,
+          "description": "同一の選定プロセス内で複数ベンダーを対比分析するセッションを識別するID"
+        },
+        {
+          "name": "ベンダー候補企業ID",
+          "type": "uuid",
+          "required": true,
+          "description": "ベンダー候補企業テーブルへの外部キー"
+        },
+        {
+          "name": "セキュリティリスク総合スコア",
+          "type": "integer",
+          "required": true,
+          "description": "セキュリティリスク項目の総合評価スコア(0-100)"
+        },
+        {
+          "name": "知的財産権リスク総合スコア",
+          "type": "integer",
+          "required": true,
+          "description": "知的財産権リスク項目の総合評価スコア(0-100)"
+        },
+        {
+          "name": "法務リスク総合スコア",
+          "type": "integer",
+          "required": true,
+          "description": "契約書・法務対応実績に基づく法務リスク総合スコア(0-100)"
+        },
+        {
+          "name": "業界適合性スコア",
+          "type": "integer",
+          "required": true,
+          "description": "業界別適用事例・導入実績に基づく業界適合性スコア(0-100)"
+        },
+        {
+          "name": "総合リスクスコア",
+          "type": "integer",
+          "required": true,
+          "description": "全リスク項目を加重平均した総合リスクスコア(0-100、低いほど低リスク)"
+        },
+        {
+          "name": "推奨判定",
+          "type": "varchar(20)",
+          "required": true,
+          "description": "契約判断の推奨結果(推奨/条件付き推奨/非推奨)"
+        },
+        {
+          "name": "主要リスク摘要",
+          "type": "text",
+          "required": false,
+          "description": "特に注視すべき主要リスク項目の摘要"
+        },
+        {
+          "name": "対比分析コメント",
+          "type": "text",
+          "required": false,
+          "description": "他のベンダー候補との対比における相対的な評価コメント"
+        },
+        {
+          "name": "分析実施者ID",
+          "type": "uuid",
+          "required": true,
+          "description": "ログインユーザーテーブルへの外部キー、分析を実施したユーザーID"
+        },
+        {
+          "name": "作成日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "リスク対比分析結果が作成された日時"
+        },
+        {
+          "name": "更新日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "リスク対比分析結果が最後に更新された日時"
+        }
+      ]
+    },
+    {
+      "tableName": "ベンダー評価スコア",
+      "purpose": "ベンダー候補企業に対する多角的な評価スコアを管理し、選定プロセスにおける定量的な比較基準を提供するテーブル",
+      "columns": [
+        {
+          "name": "評価スコアID",
+          "type": "uuid",
+          "required": true,
+          "description": "評価スコアレコードの一意識別子"
+        },
+        {
+          "name": "ベンダー候補企業ID",
+          "type": "uuid",
+          "required": true,
+          "description": "ベンダー候補企業テーブルへの外部キー参照"
+        },
+        {
+          "name": "評価実施日",
+          "type": "timestamp",
+          "required": true,
+          "description": "評価が実施された日時"
+        },
+        {
+          "name": "総合スコア",
+          "type": "integer",
+          "required": true,
+          "description": "全評価項目を統合した総合スコア（0-100）"
+        },
+        {
+          "name": "財務健全性スコア",
+          "type": "integer",
+          "required": true,
+          "description": "企業の財務状況に基づくスコア（0-100）"
+        },
+        {
+          "name": "技術力スコア",
+          "type": "integer",
+          "required": true,
+          "description": "技術的能力と実装経験に基づくスコア（0-100）"
+        },
+        {
+          "name": "セキュリティスコア",
+          "type": "integer",
+          "required": true,
+          "description": "セキュリティ対応能力とリスク評価に基づくスコア（0-100）"
+        },
+        {
+          "name": "法務コンプライアンススコア",
+          "type": "integer",
+          "required": true,
+          "description": "法務対応実績と知的財産権対応に基づくスコア（0-100）"
+        },
+        {
+          "name": "導入実績スコア",
+          "type": "integer",
+          "required": true,
+          "description": "過去の導入実績と参照顧客評価に基づくスコア（0-100）"
+        },
+        {
+          "name": "業界適合性スコア",
+          "type": "integer",
+          "required": true,
+          "description": "業界別適用事例と業界標準パターンへの適合度に基づくスコア（0-100）"
+        },
+        {
+          "name": "リスク評価スコア",
+          "type": "integer",
+          "required": true,
+          "description": "リスク対比分析結果に基づくリスク度合いスコア（0-100、低いほど良好）"
+        },
+        {
+          "name": "評価者ID",
+          "type": "uuid",
+          "required": true,
+          "description": "評価を実施したユーザーの識別子"
+        },
+        {
+          "name": "評価コメント",
+          "type": "text",
+          "required": false,
+          "description": "評価に関する補足説明やコメント"
+        },
+        {
+          "name": "推奨判定",
+          "type": "varchar(100)",
+          "required": true,
+          "description": "選定推奨度の判定結果（推奨/条件付き推奨/非推奨）"
+        },
+        {
+          "name": "作成日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "レコード作成日時"
+        },
+        {
+          "name": "更新日時",
+          "type": "timestamp",
+          "required": true,
+          "description": "レコード最終更新日時"
+        },
+        {
+          "name": "作成者ID",
+          "type": "uuid",
+          "required": true,
+          "description": "レコード作成者のユーザーID"
+        }
+      ]
+    }
+  ],
+  "presetSeedData": {
+    "ユーザー権限": [
+      {
+        "ユーザー権限ID": "rec-001",
+        "ユーザーID": "rec-U0847",
+        "拠点ID": null,
+        "チームID": null,
+        "権限種別": "作業指示作成",
+        "操作可能": true,
+        "有効開始日時": "2024-04-01T00:00:00",
+        "有効終了日時": "2025-03-31T23:59:59",
+        "作成日時": "2024-03-28T14:30:00",
+        "更新日時": "2024-03-28T14:30:00",
+        "作成者": "山田花子",
+        "更新者": "山田花子"
+      },
+      {
+        "ユーザー権限ID": "rec-001",
+        "ユーザーID": "rec-u-047",
+        "拠点ID": "rec-b-tokyo",
+        "チームID": "rec-t-procurement",
+        "権限種別": "進捗確認",
+        "操作可能": true,
+        "有効開始日時": "2024-04-01T00:00:00+09:00",
+        "有効終了日時": "2025-03-31T23:59:59+09:00",
+        "作成日時": "2024-03-25T10:30:00+09:00",
+        "更新日時": "2024-03-25T10:30:00+09:00",
+        "作成者": "鈴木花子",
+        "更新者": "鈴木花子"
+      },
+      {
+        "ユーザー権限ID": "rec-001",
+        "ユーザーID": "rec-0042",
+        "拠点ID": "rec-0015",
+        "チームID": null,
+        "権限種別": "人員配置編集",
+        "操作可能": true,
+        "有効開始日時": "2024-04-01 09:00:00",
+        "有効終了日時": "2025-03-31 23:59:59",
+        "作成日時": "2024-03-28 14:30:00",
+        "更新日時": "2024-03-28 14:30:00",
+        "作成者": "山田太郎",
+        "更新者": "山田太郎"
+      },
+      {
+        "ユーザー権限ID": "rec-001",
+        "ユーザーID": "rec-usr-0042",
+        "拠点ID": null,
+        "チームID": null,
+        "権限種別": "レポート閲覧",
+        "操作可能": true,
+        "有効開始日時": "2024-04-01T00:00:00+09:00",
+        "有効終了日時": null,
+        "作成日時": "2024-03-28T14:30:00+09:00",
+        "更新日時": "2024-03-28T14:30:00+09:00",
+        "作成者": "山田花子",
+        "更新者": "山田花子"
+      },
+      {
+        "ユーザー権限ID": "rec-001",
+        "ユーザーID": "rec-u-042",
+        "拠点ID": null,
+        "チームID": "rec-t-008",
+        "権限種別": "ベンダー情報閲覧",
+        "操作可能": true,
+        "有効開始日時": "2024-10-01 09:00:00",
+        "有効終了日時": "2025-03-31 17:00:00",
+        "作成日時": "2024-09-25 14:30:00",
+        "更新日時": "2024-09-25 14:30:00",
+        "作成者": "佐藤花子",
+        "更新者": "佐藤花子"
+      },
+      {
+        "ユーザー権限ID": "rec-001",
+        "ユーザーID": "rec-u-0847",
+        "拠点ID": "rec-b-0312",
+        "チームID": "rec-t-0156",
+        "権限種別": "進捗確認",
+        "操作可能": true,
+        "有効開始日時": "2024-04-01 09:00:00",
+        "有効終了日時": "2024-06-30 17:00:00",
+        "作成日時": "2024-03-28 14:30:00",
+        "更新日時": "2024-03-28 14:30:00",
+        "作成者": "田中太郎",
+        "更新者": "田中太郎"
+      },
+      {
+        "ユーザー権限ID": "rec-001",
+        "ユーザーID": "rec-u-0847",
+        "拠点ID": null,
+        "チームID": "rec-t-0312",
+        "権限種別": "見積承認",
+        "操作可能": false,
+        "有効開始日時": "2024-04-01T09:00:00",
+        "有効終了日時": "2025-03-31T17:59:59",
+        "作成日時": "2024-03-28T14:30:00",
+        "更新日時": "2024-11-15T10:45:00",
+        "作成者": "山田花子",
+        "更新者": "佐藤次郎"
+      },
+      {
+        "ユーザー権限ID": "rec-001",
+        "ユーザーID": "rec-u-0847",
+        "拠点ID": null,
+        "チームID": null,
+        "権限種別": "データ抽出",
+        "操作可能": true,
+        "有効開始日時": "2024-04-01 09:00:00",
+        "有効終了日時": "2025-03-31 17:00:00",
+        "作成日時": "2024-03-25 14:30:00",
+        "更新日時": "2024-03-25 14:30:00",
+        "作成者": "山田花子",
+        "更新者": "山田花子"
+      },
+      {
+        "ユーザー権限ID": "rec-001",
+        "ユーザーID": "rec-user-0847",
+        "拠点ID": null,
+        "チームID": null,
+        "権限種別": "ベンダー監査レポート作成",
+        "操作可能": true,
+        "有効開始日時": "2024-04-01T00:00:00",
+        "有効終了日時": "2025-03-31T23:59:59",
+        "作成日時": "2024-03-15T09:30:00",
+        "更新日時": "2024-03-15T09:30:00",
+        "作成者": "佐藤花子",
+        "更新者": "佐藤花子"
+      },
+      {
+        "ユーザー権限ID": "rec-001",
+        "ユーザーID": "rec-u-0847",
+        "拠点ID": "rec-b-0312",
+        "チームID": null,
+        "権限種別": "予算管理・承認",
+        "操作可能": true,
+        "有効開始日時": "2024-04-01 09:00:00",
+        "有効終了日時": "2025-03-31 23:59:59",
+        "作成日時": "2024-03-25 14:30:00",
+        "更新日時": "2024-03-25 14:30:00",
+        "作成者": "山田花子",
+        "更新者": "山田花子"
+      }
+    ],
+    "API仕様書": [
+      {
+        "api_spec_id": "rec-001",
+        "system_id": "rec-sys-042",
+        "api_name": "ERP受注データ同期API",
+        "api_endpoint": "https://erp.example.jp/api/v2/orders/sync",
+        "http_method": "POST",
+        "description": "既存ERPシステムから受注データをリアルタイムで同期し、受注管理システムに反映させるAPI",
+        "request_format": "JSON形式。受注ID、顧客ID、商品情報、数量、金額、納期などを含む",
+        "response_format": "JSON形式。同期結果ステータス、処理件数、エラー詳細を返却",
+        "authentication_type": "OAuth 2.0",
+        "rate_limit": "1時間あたり10000リクエスト、1秒あたり100リクエスト",
+        "version": "2.1.0",
+        "status": "有効",
+        "created_at": "2024-04-15T09:30:00+09:00",
+        "created_by": "rec-user-018",
+        "updated_at": "2025-01-08T14:22:00+09:00",
+        "updated_by": "rec-user-025"
+      },
+      {
+        "api_spec_id": "rec-001",
+        "system_id": "rec-sys-042",
+        "api_name": "仕訳自動転送API",
+        "api_endpoint": "https://api.cloud-accounting.jp/v2/journals/transfer",
+        "http_method": "POST",
+        "description": "販売管理システムから発生した取引データを自動的にクラウド会計システムへ仕訳として転送するAPI",
+        "request_format": "JSON形式。必須項目：transaction_id、amount、account_code、description。オプション：department_code、project_code、tax_category",
+        "response_format": "JSON形式。戻り値：journal_id、status、created_at、validation_errors配列",
+        "authentication_type": "OAuth 2.0",
+        "rate_limit": "1時間あたり10000リクエスト、1秒あたり50リクエスト",
+        "version": "2.1.0",
+        "status": "有効",
+        "created_at": "2024-04-15T09:30:00Z",
+        "created_by": "rec-user-108",
+        "updated_at": "2025-01-22T14:15:00Z",
+        "updated_by": "rec-user-205"
+      },
+      {
+        "api_spec_id": "rec-001",
+        "system_id": "rec-sys-042",
+        "api_name": "取引先マスタ一括更新API",
+        "api_endpoint": "/api/v2/suppliers/batch-update",
+        "http_method": "PUT",
+        "description": "取引先マスタ情報を複数件一括更新するAPI。企業名、住所、連絡先等の基本情報をCSV形式で送信し、バッチ処理にて更新する。",
+        "request_format": "multipart/form-data。csvファイル（UTF-8、最大10,000件）、update_modeパラメータ（overwrite/merge）を指定。",
+        "response_format": "JSON形式。success_count、error_count、error_details配列（supplier_id、error_message）を含む。",
+        "authentication_type": "OAuth 2.0（Bearer Token）",
+        "rate_limit": "1時間あたり100リクエスト、1リクエストあたり最大10,000件",
+        "version": "2.1.0",
+        "status": "有効",
+        "created_at": "2024-06-15T09:30:00Z",
+        "created_by": "rec-user-018",
+        "updated_at": "2025-01-20T14:45:00Z",
+        "updated_by": "rec-user-025"
+      },
+      {
+        "api_spec_id": "rec-001",
+        "system_id": "rec-sys-0042",
+        "api_name": "入金確認通知API",
+        "api_endpoint": "https://api.payment-system.co.jp/v1/deposit-notification",
+        "http_method": "POST",
+        "description": "支払管理システムから銀行口座への入金が確認された際に、関連システムへリアルタイムで通知するAPI",
+        "request_format": "JSON形式。必須項目: transaction_id, deposit_amount, deposit_date, account_number, notification_type",
+        "response_format": "JSON形式。status(成功/失敗)、message、notification_id、processed_at を返却",
+        "authentication_type": "OAuth 2.0（クライアント認証フロー）",
+        "rate_limit": "1時間あたり10,000リクエスト、バースト上限500リクエスト/分",
+        "version": "1.2.1",
+        "status": "有効",
+        "created_at": "2024-04-15 09:30:00",
+        "created_by": "rec-user-0156",
+        "updated_at": "2025-01-22 14:15:00",
+        "updated_by": "rec-user-0089"
+      },
+      {
+        "api_spec_id": "rec-001",
+        "system_id": "rec-sys-042",
+        "api_name": "ベンダー評価スコア連携API",
+        "api_endpoint": "https://api.vendor-eval.example.jp/v1/scores/sync",
+        "http_method": "POST",
+        "description": "調達システムから外部評価プラットフォームへベンダー評価スコアをリアルタイム連携するAPI",
+        "request_format": "JSON形式。ベンダーID、評価項目（品質・納期・価格・対応力）、スコア（0-100）、評価日時を含む",
+        "response_format": "JSON形式。連携ステータス、同期件数、エラー詳細を返却",
+        "authentication_type": "OAuth 2.0",
+        "rate_limit": "1時間あたり10000リクエスト",
+        "version": "1.2.0",
+        "status": "有効",
+        "created_at": "2024-04-15T09:30:00+09:00",
+        "created_by": "rec-user-108",
+        "updated_at": "2025-01-20T14:15:00+09:00",
+        "updated_by": "rec-user-156"
+      },
+      {
+        "api_spec_id": "rec-001",
+        "system_id": "rec-sys-042",
+        "api_name": "契約情報取得API",
+        "api_endpoint": "/api/v2/contracts",
+        "http_method": "GET",
+        "description": "契約書管理システムから契約ID指定で契約情報を取得するAPI",
+        "request_format": "クエリパラメータ: contract_id(必須), include_details(オプション)",
+        "response_format": "JSON形式で契約ID、契約名、契約金額、契約期間、契約状態を返却",
+        "authentication_type": "OAuth 2.0",
+        "rate_limit": "1時間あたり1000リクエスト",
+        "version": "2.1.0",
+        "status": "有効",
+        "created_at": "2024-04-15T09:30:00+09:00",
+        "created_by": "rec-user-108",
+        "updated_at": "2025-01-20T14:15:00+09:00",
+        "updated_by": "rec-user-205"
+      },
+      {
+        "api_spec_id": "rec-001",
+        "system_id": "rec-sys-042",
+        "api_name": "カタログ配信API",
+        "api_endpoint": "https://api.procurement-portal.co.jp/v2/catalog/distribute",
+        "http_method": "POST",
+        "description": "調達ポータルサイトへ商品カタログデータを配信するAPI。CSV形式のカタログを受け取り、ポータル側のデータベースに同期する。",
+        "request_format": "multipart/form-data形式。catalogファイル(CSV)、supplier_id、sync_dateを含む。",
+        "response_format": "JSON形式。status(success/error)、sync_record_count、error_detailsを返却。",
+        "authentication_type": "OAuth 2.0",
+        "rate_limit": "1時間あたり100リクエスト、1リクエストあたり最大50MB",
+        "version": "2.1.0",
+        "status": "有効",
+        "created_at": "2024-04-15T09:30:00+09:00",
+        "created_by": "rec-user-018",
+        "updated_at": "2025-01-20T14:15:00+09:00",
+        "updated_by": "rec-user-025"
+      },
+      {
+        "api_spec_id": "rec-001",
+        "system_id": "rec-sys-042",
+        "api_name": "コンプライアンスレポート出力API",
+        "api_endpoint": "/api/v1/compliance/audit-logs/report",
+        "http_method": "POST",
+        "description": "監査ログを集計し、コンプライアンスレポートをPDF形式で出力するAPI",
+        "request_format": "JSON形式。レポート期間(start_date, end_date)、対象システム(system_ids)、レポートタイプ(type)を指定",
+        "response_format": "PDF形式のバイナリデータ、またはJSON形式のエラーレスポンス",
+        "authentication_type": "OAuth 2.0",
+        "rate_limit": "1時間あたり50リクエスト",
+        "version": "1.2.0",
+        "status": "有効",
+        "created_at": "2024-04-15T09:30:00+09:00",
+        "created_by": "rec-user-018",
+        "updated_at": "2025-01-22T14:45:00+09:00",
+        "updated_by": "rec-user-025"
+      },
+      {
+        "api_spec_id": "rec-001",
+        "system_id": "rec-sys-0042",
+        "api_name": "ベンダー企業信用調査連携API",
+        "api_endpoint": "https://api.creditcheck.example.jp/v2/vendor/investigation",
+        "http_method": "POST",
+        "description": "ベンダー企業の信用情報を外部信用調査機関から取得し、調達システムに連携するAPI",
+        "request_format": "JSON形式。企業コード、法人番号、調査区分を含む。最大リクエストサイズ10KB",
+        "response_format": "JSON形式。信用スコア、財務指標、格付け、調査日時を含む。レスポンス例あり",
+        "authentication_type": "OAuth 2.0（クライアント認証フロー）",
+        "rate_limit": "1時間あたり5,000リクエスト、1日あたり50,000リクエスト",
+        "version": "2.1.0",
+        "status": "有効",
+        "created_at": "2024-04-15T09:30:00+09:00",
+        "created_by": "rec-user-0156",
+        "updated_at": "2025-01-22T14:15:00+09:00",
+        "updated_by": "rec-user-0289"
+      },
+      {
+        "api_spec_id": "rec-001",
+        "system_id": "rec-sys-042",
+        "api_name": "SLA監視ダッシュボード向けパフォーマンス指標API",
+        "api_endpoint": "https://api.monitoring.example.jp/v2/sla/metrics",
+        "http_method": "GET",
+        "description": "システムの稼働率、応答時間、エラー率などのSLA関連指標をリアルタイムで取得するAPI",
+        "request_format": "クエリパラメータ: system_id(必須)、period(日時範囲)、granularity(集計粒度:1h/1d)、metrics(指標種別:カンマ区切り)",
+        "response_format": "JSON形式、メトリクス配列(timestamp、uptime_percent、response_time_ms、error_rate_percent、request_count)",
+        "authentication_type": "OAuth 2.0",
+        "rate_limit": "1000リクエスト/時間、バースト上限200",
+        "version": "2.1.0",
+        "status": "有効",
+        "created_at": "2024-06-15T09:30:00+09:00",
+        "created_by": "rec-user-018",
+        "updated_at": "2025-01-22T14:15:00+09:00",
+        "updated_by": "rec-user-025"
+      }
+    ],
+    "操作履歴": [
+      {
+        "操作履歴ID": "rec-001",
+        "ユーザーID": "rec-u-042",
+        "操作種別": "ベンダー候補企業登録",
+        "操作対象テーブル": "ベンダー候補企業",
+        "操作対象ID": "rec-v-156",
+        "操作内容": "株式会社プロテック工業の基本情報を新規登録。業種：精密機械部品製造、所在地：愛知県豊田市",
+        "変更前値": null,
+        "変更後値": "企業名:株式会社プロテック工業、代表者:鈴木健一、資本金:5000万円、従業員数:120名、認定資格:ISO9001",
+        "操作ステータス": "成功",
+        "エラーメッセージ": null,
+        "IPアドレス": "192.168.1.105",
+        "セッションID": "sess-2024-11-15-08-42-001",
+        "操作日時": "2024-11-15T08:42:37+09:00",
+        "作成日時": "2024-11-15T08:42:38+09:00"
+      },
+      {
+        "操作履歴ID": "rec-001",
+        "ユーザーID": "rec-U0042",
+        "操作種別": "リスク評価更新",
+        "操作対象テーブル": "契約",
+        "操作対象ID": "rec-C0156",
+        "操作内容": "契約リスク評価スコアを更新、関連する監視フラグも自動調整",
+        "変更前値": "低（スコア: 2.5）",
+        "変更後値": "中（スコア: 5.8）",
+        "操作ステータス": "成功",
+        "エラーメッセージ": null,
+        "IPアドレス": "192.168.1.87",
+        "セッションID": "sess-20250214-a7f2c9e1",
+        "操作日時": "2025-02-14 14:32:18",
+        "作成日時": "2025-02-14 14:32:19"
+      },
+      {
+        "操作履歴ID": "rec-001",
+        "ユーザーID": "rec-u-0847",
+        "操作種別": "ファイルダウンロード",
+        "操作対象テーブル": "ベンダー評価シート",
+        "操作対象ID": "rec-v-2401",
+        "操作内容": "複数ベンダーの比較評価シート(2024年度上期)をCSV形式でダウンロード",
+        "変更前値": null,
+        "変更後値": null,
+        "操作ステータス": "成功",
+        "エラーメッセージ": null,
+        "IPアドレス": "192.168.1.125",
+        "セッションID": "sess-8f4d2e91c7a3",
+        "操作日時": "2024-11-15 14:32:47",
+        "作成日時": "2024-11-15 14:32:48"
+      },
+      {
+        "操作履歴ID": "rec-001",
+        "ユーザーID": "rec-002",
+        "操作種別": "契約案件却下",
+        "操作対象テーブル": "契約案件",
+        "操作対象ID": "rec-003",
+        "操作内容": "承認待ち状態の契約案件を却下処理した",
+        "変更前値": "承認待ち",
+        "変更後値": "却下",
+        "操作ステータス": "成功",
+        "エラーメッセージ": null,
+        "IPアドレス": "192.168.1.105",
+        "セッションID": "sess-20250115-7842",
+        "操作日時": "2025-01-15 14:32:18",
+        "作成日時": "2025-01-15 14:32:19",
+        "却下理由": "提示見積単価が市場相場を大きく上回っており、コスト削減要件を満たさないため"
+      },
+      {
+        "操作履歴ID": "rec-001",
+        "ユーザーID": "rec-002",
+        "操作種別": "権限変更",
+        "操作対象テーブル": "ユーザー権限",
+        "操作対象ID": "rec-003",
+        "操作内容": "営業部長から一般営業へ権限を変更し、過去12ヶ月の評価データへのアクセスを制限した",
+        "変更前値": "role: 営業部長, data_access_period: 無制限",
+        "変更後値": "role: 一般営業, data_access_period: 当月のみ",
+        "操作ステータス": "成功",
+        "エラーメッセージ": null,
+        "IPアドレス": "192.168.1.45",
+        "セッションID": "sess-20250215-78a9c1d4",
+        "操作日時": "2025-02-15 14:32:18",
+        "作成日時": "2025-02-15 14:32:19"
+      },
+      {
+        "操作履歴ID": "rec-001",
+        "ユーザーID": "rec-002",
+        "操作種別": "記録更新",
+        "操作対象テーブル": "契約交渉記録",
+        "操作対象ID": "rec-003",
+        "操作内容": "議事メモを追記しました",
+        "変更前値": "次回打ち合わせ日程: 2025年1月15日",
+        "変更後値": "次回打ち合わせ日程: 2025年1月15日。議事メモ: 納期短縮要望あり、費用調整余地あり、契約条件は次回協議予定",
+        "操作ステータス": "成功",
+        "エラーメッセージ": null,
+        "IPアドレス": "192.168.1.105",
+        "セッションID": "sess-20250112-8f4k2m9p",
+        "操作日時": "2025-01-12T14:32:45+09:00",
+        "作成日時": "2025-01-12T14:32:46+09:00"
+      },
+      {
+        "操作履歴ID": "rec-001",
+        "ユーザーID": "rec-u-042",
+        "操作種別": "進捗更新",
+        "操作対象テーブル": "作業進捗",
+        "操作対象ID": "rec-p-1847",
+        "操作内容": "現場作業の進捗率を75%から85%に更新しようとした",
+        "変更前値": "75",
+        "変更後値": "85",
+        "操作ステータス": "失敗",
+        "エラーメッセージ": "リクエストタイムアウト: システムメンテナンス時間中のため操作は受け付けられません(メンテナンス予定時間: 2025-01-15 02:00-04:00)",
+        "IPアドレス": "192.168.1.105",
+        "セッションID": "sess-20250115-0158-7f3a",
+        "操作日時": "2025-01-15T02:58:47+09:00",
+        "作成日時": "2025-01-15T02:58:48+09:00"
+      },
+      {
+        "操作履歴ID": "rec-001",
+        "ユーザーID": "rec-002",
+        "操作種別": "セッション強制終了",
+        "操作対象テーブル": "セッション管理",
+        "操作対象ID": "rec-003",
+        "操作内容": "不正なアクセスパターン検知により、ユーザー田中太郎のセッションを強制終了しました",
+        "変更前値": "アクティブ",
+        "変更後値": "強制終了",
+        "操作ステータス": "成功",
+        "エラーメッセージ": null,
+        "IPアドレス": "192.168.1.100",
+        "セッションID": "sess-20250115-7f8a9c2e",
+        "操作日時": "2025-01-15 14:32:47",
+        "作成日時": "2025-01-15 14:32:48"
+      },
+      {
+        "操作履歴ID": "rec-001",
+        "ユーザーID": "rec-002",
+        "操作種別": "ベンダー選定承認",
+        "操作対象テーブル": "ベンダー選定",
+        "操作対象ID": "rec-003",
+        "操作内容": "ベンダー選定委員会による最終承認を実行。選定候補企業3社の評価を完了し、推奨ベンダーを確定。",
+        "変更前値": "承認待ち",
+        "変更後値": "最終承認完了",
+        "操作ステータス": "成功",
+        "エラーメッセージ": null,
+        "IPアドレス": "192.168.1.105",
+        "セッションID": "sess-20250115-a7f2e9c1",
+        "操作日時": "2025-01-15T14:32:18+09:00",
+        "作成日時": "2025-01-15T14:32:19+09:00"
+      },
+      {
+        "操作履歴ID": "rec-001",
+        "ユーザーID": "rec-002",
+        "操作種別": "レポートエクスポート",
+        "操作対象テーブル": "月次監査レポート",
+        "操作対象ID": "rec-003",
+        "操作内容": "2024年12月度の月次監査レポートをCSV形式でエクスポート",
+        "変更前値": null,
+        "変更後値": null,
+        "操作ステータス": "成功",
+        "エラーメッセージ": null,
+        "IPアドレス": "192.168.1.45",
+        "セッションID": "sess-20250115-7a8b9c",
+        "操作日時": "2025-01-15 14:32:18",
+        "作成日時": "2025-01-15 14:32:19"
+      }
+    ],
+    "ログインユーザー": [
+      {
+        "ユーザーID": "rec-001",
+        "ログインID": "tanaka.taro",
+        "メールアドレス": "tanaka.taro@company.jp",
+        "パスワードハッシュ": "$2b$12$abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQR",
+        "ユーザー名": "田中太郎",
+        "部門": "調達部門",
+        "ステータス": "有効",
+        "最終ログイン日時": "2025-01-15 09:30:00",
+        "作成日時": "2024-04-01 10:00:00",
+        "更新日時": "2025-01-15 09:30:00",
+        "作成者": "rec-admin-001"
+      },
+      {
+        "ユーザーID": "rec-001",
+        "ログインID": "tanaka.vendor",
+        "メールアドレス": "tanaka.vendor@company.co.jp",
+        "パスワードハッシュ": "$2b$12$abcdefghijklmnopqrstuvwxyz1234567890",
+        "ユーザー名": "田中太郎",
+        "部門": "営業部門",
+        "ステータス": "有効",
+        "最終ログイン日時": "2025-01-15 09:30:00",
+        "作成日時": "2024-04-10 14:20:00",
+        "更新日時": "2025-01-15 09:30:00",
+        "作成者": "rec-admin-001"
+      },
+      {
+        "ユーザーID": "rec-001",
+        "ログインID": "tanaka.taro",
+        "メールアドレス": "tanaka.taro@company.jp",
+        "パスワードハッシュ": "$2b$12$abcdefghijklmnopqrstuvwxyz1234567890",
+        "ユーザー名": "田中太郎",
+        "部門": "経営企画部門",
+        "ステータス": "有効",
+        "最終ログイン日時": "2025-01-15 09:30:00",
+        "作成日時": "2024-04-01 10:00:00",
+        "更新日時": "2025-01-10 14:20:00",
+        "作成者": "rec-admin-001"
+      },
+      {
+        "ユーザーID": "rec-001",
+        "ログインID": "tanaka.taro",
+        "メールアドレス": "tanaka.taro@company.jp",
+        "パスワードハッシュ": "$2b$12$abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQR",
+        "ユーザー名": "田中太郎",
+        "部門": "IT部門",
+        "ステータス": "有効",
+        "最終ログイン日時": "2025-01-15 09:32:45",
+        "作成日時": "2024-04-01 10:00:00",
+        "更新日時": "2025-01-10 14:20:30",
+        "作成者": "rec-001"
+      },
+      {
+        "ユーザーID": "rec-001",
+        "ログインID": "tanaka.hanako",
+        "メールアドレス": "tanaka.hanako@company.jp",
+        "パスワードハッシュ": "$2b$12$abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMN",
+        "ユーザー名": "田中花子",
+        "部門": "法務部門",
+        "ステータス": "有効",
+        "最終ログイン日時": "2025-01-15 09:32:00",
+        "作成日時": "2024-04-10 14:20:00",
+        "更新日時": "2025-01-15 09:32:00",
+        "作成者": "rec-admin-001"
+      },
+      {
+        "ユーザーID": "rec-001",
+        "ログインID": "tanaka.yosuke",
+        "メールアドレス": "tanaka.yosuke@company.jp",
+        "パスワードハッシュ": "$2b$12$abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQR",
+        "ユーザー名": "田中洋介",
+        "部門": "財務部門",
+        "ステータス": "有効",
+        "最終ログイン日時": "2025-01-15 09:30:00",
+        "作成日時": "2024-04-01 10:00:00",
+        "更新日時": "2025-01-15 09:30:00",
+        "作成者": "rec-admin-001"
+      },
+      {
+        "ユーザーID": "rec-001",
+        "ログインID": "satoh.yuki",
+        "メールアドレス": "satoh.yuki@company.jp",
+        "パスワードハッシュ": "$2b$12$abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQR",
+        "ユーザー名": "佐藤ユキ",
+        "部門": "調達部門",
+        "ステータス": "有効",
+        "最終ログイン日時": "2025-01-15 09:30:00",
+        "作成日時": "2024-04-01 10:00:00",
+        "更新日時": "2025-01-15 09:30:00",
+        "作成者": "rec-admin-001"
+      },
+      {
+        "ユーザーID": "rec-001",
+        "ログインID": "tanaka.hanako",
+        "メールアドレス": "tanaka.hanako@company.jp",
+        "パスワードハッシュ": "$2b$12$abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQR",
+        "ユーザー名": "田中花子",
+        "部門": "営業部",
+        "ステータス": "無効",
+        "最終ログイン日時": "2024-03-15 09:30:00",
+        "作成日時": "2023-04-01 10:00:00",
+        "更新日時": "2024-06-01 14:20:00",
+        "作成者": "rec-admin-001"
+      },
+      {
+        "ユーザーID": "rec-001",
+        "ログインID": "tanaka.taro",
+        "メールアドレス": "tanaka.taro@company.jp",
+        "パスワードハッシュ": "$2b$12$abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQ",
+        "ユーザー名": "田中太郎",
+        "部門": "営業部",
+        "ステータス": "有効",
+        "最終ログイン日時": "2025-01-15 09:30:00",
+        "作成日時": "2022-04-01 10:00:00",
+        "更新日時": "2025-01-10 14:20:00",
+        "作成者": "rec-admin"
+      },
+      {
+        "ユーザーID": "rec-001",
+        "ログインID": "consultant_yamada_2024",
+        "メールアドレス": "yamada.consultant@example.com",
+        "パスワードハッシュ": "$2b$12$abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJ",
+        "ユーザー名": "山田花子",
+        "部門": "経営企画部（外部コンサルタント）",
+        "ステータス": "有効",
+        "最終ログイン日時": "2025-01-15 14:32:00",
+        "作成日時": "2024-10-01 09:15:00",
+        "更新日時": "2025-01-15 14:32:00",
+        "作成者": "rec-admin-001"
+      }
+    ],
+    "ベンダー候補企業": [
+      {
+        "ベンダーID": "rec-001",
+        "企業名": "株式会社テックソリューション",
+        "企業名カナ": "テックソリューション",
+        "業種": "情報処理・ソフトウェア開発",
+        "所在地": "東京都千代田区丸の内1-1-1",
+        "代表者名": "山田太郎",
+        "資本金": "5億円",
+        "従業員数": 850,
+        "設立年": 2005,
+        "連絡先電話番号": "03-XXXX-5001",
+        "連絡先メールアドレス": "vendor-inquiry@techsolution.co.jp",
+        "評価ステータス": "評価完了",
+        "総合評価スコア": 92,
+        "契約リスク評価": "低",
+        "推奨度": "推奨",
+        "備考": "大規模システム開発実績豊富、ISO27001認証取得、納期遵守率99%以上、技術力・体制共に優秀",
+        "作成日時": "2024-11-15T10:30:00Z",
+        "作成者": "rec-u-0042",
+        "更新日時": "2025-01-22T14:45:00Z",
+        "更新者": "rec-u-0051"
+      },
+      {
+        "ベンダーID": "rec-001",
+        "企業名": "クラウドテック・ジャパン株式会社",
+        "企業名カナ": "クラウドテックジャパンカブシキガイシャ",
+        "業種": "情報通信業",
+        "所在地": "東京都渋谷区道玄坂1-2-3",
+        "代表者名": "山田健一",
+        "資本金": "5億円",
+        "従業員数": 280,
+        "設立年": 2015,
+        "連絡先電話番号": "03-XXXX-5678",
+        "連絡先メールアドレス": "info@cloudtech-japan.co.jp",
+        "評価ステータス": "評価完了",
+        "総合評価スコア": 72,
+        "契約リスク評価": "中",
+        "推奨度": "条件付き推奨",
+        "備考": "ISO27001取得、AWS認定パートナー。SLA履行実績良好だが、サポート体制の強化が条件。",
+        "作成日時": "2024-08-15T10:30:00Z",
+        "作成者": "rec-u001",
+        "更新日時": "2025-01-20T14:45:00Z",
+        "更新者": "rec-u002"
+      },
+      {
+        "ベンダーID": "rec-001",
+        "企業名": "グローバルテックソリューションズ・ベトナム",
+        "企業名カナ": "グローバルテックソリューションズベトナム",
+        "業種": "ソフトウェア開発・オフショア開発",
+        "所在地": "ベトナム ホーチミン市 1区",
+        "代表者名": "グエン・ミン・フイ",
+        "資本金": "250万米ドル",
+        "従業員数": 180,
+        "設立年": 2015,
+        "連絡先電話番号": "+84-28-3822-5500",
+        "連絡先メールアドレス": "contact@globaltechvn.com",
+        "評価ステータス": "評価完了",
+        "総合評価スコア": 68,
+        "契約リスク評価": "中",
+        "推奨度": "条件付き推奨",
+        "備考": "コスト競争力が高く、Web・モバイル開発実績豊富だが、日本語対応者限定、9時間の時差により即時対応困難。契約時に品質SLA・納期厳格化を条件に推奨。",
+        "作成日時": "2024-11-15T10:30:00Z",
+        "作成者": "rec-user-0042",
+        "更新日時": "2025-01-22T14:15:00Z",
+        "更新者": "rec-user-0058"
+      },
+      {
+        "ベンダーID": "rec-001",
+        "企業名": "株式会社テックメンテナンスソリューション",
+        "企業名カナ": "テックメンテナンスソリューション",
+        "業種": "情報処理・保守運用サービス",
+        "所在地": "東京都千代田区丸の内1-1-1",
+        "代表者名": "佐藤健一",
+        "資本金": "5000万円",
+        "従業員数": 150,
+        "設立年": 2010,
+        "連絡先電話番号": "03-XXXX-XXXX",
+        "連絡先メールアドレス": "contact@techmaint.co.jp",
+        "評価ステータス": "評価完了",
+        "総合評価スコア": 82,
+        "契約リスク評価": "低",
+        "推奨度": "条件付き推奨",
+        "備考": "既存契約3年継続中。対応品質・納期実績良好。次年度継続契約に向けて価格交渉予定。",
+        "作成日時": "2024-04-15T10:30:00Z",
+        "作成者": "rec-user-001",
+        "更新日時": "2025-01-20T14:45:00Z",
+        "更新者": "rec-user-002"
+      },
+      {
+        "ベンダーID": "rec-001",
+        "企業名": "クラウドワークス・イノベーション株式会社",
+        "企業名カナ": "クラウドワークスイノベーション",
+        "業種": "ソフトウェア・SaaS",
+        "所在地": "東京都渋谷区道玄坂1-2-3",
+        "代表者名": "山田太郎",
+        "資本金": "5000万円",
+        "従業員数": 45,
+        "設立年": 2021,
+        "連絡先電話番号": "03-XXXX-XXXX",
+        "連絡先メールアドレス": "contact@cloudworks-innovation.jp",
+        "評価ステータス": "評価中",
+        "総合評価スコア": 72,
+        "契約リスク評価": "中",
+        "推奨度": "条件付き推奨",
+        "備考": "提供機能は要件マッチ度が高いが、設立3年で売上成長率が不安定、キャッシュフロー確認が必要。",
+        "作成日時": "2024-11-15T10:30:00+09:00",
+        "作成者": "rec-user-002",
+        "更新日時": "2025-01-08T14:45:00+09:00",
+        "更新者": "rec-user-005"
+      },
+      {
+        "ベンダーID": "rec-001",
+        "企業名": "NTTコミュニケーションズソリューション株式会社",
+        "企業名カナ": "エヌティーティーコミュニケーションズソリューション",
+        "業種": "情報通信業",
+        "所在地": "東京都千代田区丸の内1-8-3",
+        "代表者名": "山田太郎",
+        "資本金": "50億円",
+        "従業員数": 2800,
+        "設立年": 2005,
+        "連絡先電話番号": "03-6665-1111",
+        "連絡先メールアドレス": "sales@ntt-com-sol.co.jp",
+        "評価ステータス": "却下",
+        "総合評価スコア": 82,
+        "契約リスク評価": "低",
+        "推奨度": "非推奨",
+        "備考": "大手キャリア子会社で信用度高く技術力も優秀だが、提案価格が予算比150%のため却下。価格交渉の余地を検討する価値あり。",
+        "作成日時": "2024-11-15T10:30:00Z",
+        "作成者": "rec-user-001",
+        "更新日時": "2025-01-20T14:45:00Z",
+        "更新者": "rec-user-002"
+      },
+      {
+        "ベンダーID": "rec-001",
+        "企業名": "株式会社ローカルテック",
+        "企業名カナ": "ローカルテック",
+        "業種": "情報通信業",
+        "所在地": "長野県松本市中央1-2-3",
+        "代表者名": "山田健一",
+        "資本金": "5000万円",
+        "従業員数": 45,
+        "設立年": 2008,
+        "連絡先電話番号": "0263-28-1234",
+        "連絡先メールアドレス": "info@localtech.jp",
+        "評価ステータス": "評価中",
+        "総合評価スコア": 58,
+        "契約リスク評価": "中",
+        "推奨度": "条件付き推奨",
+        "備考": "地域密着で対応性良好だが技術力評価が低め。大規模案件実績不足のため再評価予定。",
+        "作成日時": "2024-11-15T10:30:00Z",
+        "作成者": "rec-user-001",
+        "更新日時": "2025-01-10T14:45:00Z",
+        "更新者": "rec-user-002"
+      },
+      {
+        "ベンダーID": "rec-001",
+        "企業名": "アクセンチュア株式会社",
+        "企業名カナ": "アクセンチュアカブシキガイシャ",
+        "業種": "経営コンサルティング・IT戦略",
+        "所在地": "東京都港区赤坂1-8-1",
+        "代表者名": "佐藤克彦",
+        "資本金": "100億円",
+        "従業員数": 3500,
+        "設立年": 1995,
+        "連絡先電話番号": "03-6730-0000",
+        "連絡先メールアドレス": "business.inquiry@accenture.com",
+        "評価ステータス": "評価中",
+        "総合評価スコア": 82,
+        "契約リスク評価": "中",
+        "推奨度": "条件付き推奨",
+        "備考": "高度な技術力と実績は申し分ないが、プロジェクト単価が高く、契約期間の最小保証条件が厳格。現在、スコープと費用条件について交渉中。",
+        "作成日時": "2024-11-15T10:30:00",
+        "作成者": "rec-u-0042",
+        "更新日時": "2025-01-22T14:45:00",
+        "更新者": "rec-u-0042"
+      },
+      {
+        "ベンダーID": "rec-001",
+        "企業名": "株式会社イノベーティブテック",
+        "企業名カナ": "カブシキガイシャイノベーティブテック",
+        "業種": "ソフトウェア開発・AI関連",
+        "所在地": "東京都渋谷区道玄坂1-2-3 スタートアップビル5階",
+        "代表者名": "山田翔太",
+        "資本金": "5,000万円",
+        "従業員数": 28,
+        "設立年": 2021,
+        "連絡先電話番号": "03-XXXX-5678",
+        "連絡先メールアドレス": "contact@innovativetech.co.jp",
+        "評価ステータス": "評価中",
+        "総合評価スコア": 68,
+        "契約リスク評価": "中",
+        "推奨度": "条件付き推奨",
+        "備考": "生成AIを活用した業務自動化ソリューション提供。技術力は高いが大型案件実績が限定的。パイロット案件での検証後に本格導入を判断予定。",
+        "作成日時": "2024-11-15T10:30:00Z",
+        "作成者": "rec-user-042",
+        "更新日時": "2024-12-20T14:45:00Z",
+        "更新者": "rec-user-042"
+      },
+      {
+        "ベンダーID": "rec-001",
+        "企業名": "株式会社テックソリューション",
+        "企業名カナ": "テックソリューション",
+        "業種": "情報システム開発・運用",
+        "所在地": "東京都渋谷区道玄坂1-2-3",
+        "代表者名": "山田太郎",
+        "資本金": "5000万円",
+        "従業員数": 180,
+        "設立年": 2008,
+        "連絡先電話番号": "03-XXXX-5678",
+        "連絡先メールアドレス": "info@techsolution.co.jp",
+        "評価ステータス": "評価完了",
+        "総合評価スコア": 87,
+        "契約リスク評価": "低",
+        "推奨度": "条件付き推奨",
+        "備考": "既存契約満了に伴う更新検討。過去3年間の納期遵守率99%、顧客満足度は高い。競争入札により価格最適化を要望。",
+        "作成日時": "2023-06-15T10:30:00Z",
+        "作成者": "rec-u001",
+        "更新日時": "2024-11-20T14:45:00Z",
+        "更新者": "rec-u002"
+      }
+    ],
+    "企業基本情報": [
+      {
+        "企業ID": "rec-001",
+        "企業名": "株式会社デジタルソリューションズ",
+        "企業名カナ": "デジタルソリューションズ",
+        "業種": "情報通信業",
+        "所在地": "東京都千代田区丸の内1-1-1 デジタルビル10階",
+        "代表者名": "山田太郎",
+        "設立年月日": "2005-04-15T00:00:00Z",
+        "資本金": 50000,
+        "従業員数": 2800,
+        "売上高": 850000,
+        "電話番号": "03-1234-5678",
+        "メールアドレス": "vendor@digital-solutions.co.jp",
+        "ウェブサイトURL": "https://www.digital-solutions.co.jp",
+        "評価ステータス": "評価完了",
+        "契約状態": "交渉中",
+        "備考": "既存システム開発契約の更新交渉中。過去3年間の実績評価は優良。新規クラウド導入案件への対応可能性を確認予定。",
+        "作成日時": "2024-06-15T10:30:00Z",
+        "更新日時": "2025-01-20T14:45:00Z",
+        "作成者": "rec-user-001",
+        "更新者": "rec-user-002"
+      },
+      {
+        "企業ID": "rec-001",
+        "企業名": "クラウドテック・ジャパン株式会社",
+        "企業名カナ": "クラウドテックジャパン",
+        "業種": "情報通信業",
+        "所在地": "東京都渋谷区道玄坂1-2-3 クラウドビル8階",
+        "代表者名": "山田健一",
+        "設立年月日": "2018-04-15T00:00:00Z",
+        "資本金": 50000,
+        "従業員数": 250,
+        "売上高": 980000,
+        "電話番号": "03-XXXX-XXXX",
+        "メールアドレス": "info@cloudtech-japan.co.jp",
+        "ウェブサイトURL": "https://www.cloudtech-japan.co.jp",
+        "評価ステータス": "評価中",
+        "契約状態": "候補",
+        "備考": "ISO 27001、SOC 2 Type II認証取得済み。マルチクラウド対応で国内シェア拡大中。",
+        "作成日時": "2024-11-10T09:30:00Z",
+        "更新日時": "2024-12-15T14:45:00Z",
+        "作成者": "rec-user-0001",
+        "更新者": "rec-user-0002"
+      },
+      {
+        "企業ID": "rec-001",
+        "企業名": "グローバルテックソリューションズ・ベトナム",
+        "企業名カナ": "グローバルテックソリューションズベトナム",
+        "業種": "ソフトウェア開発・システムインテグレーション",
+        "所在地": "ベトナム社会主義共和国ホーチミン市1区グエンフエ通り123番地",
+        "代表者名": "グエン・ミン・タン",
+        "設立年月日": "2015-06-15T00:00:00Z",
+        "資本金": 50000,
+        "従業員数": 280,
+        "売上高": 450000,
+        "電話番号": "+84-28-3822-5555",
+        "メールアドレス": "contact@globaltechvn.com",
+        "ウェブサイトURL": "https://www.globaltechvn.com",
+        "評価ステータス": "評価中",
+        "契約状態": "交渉中",
+        "備考": "日本企業との取引実績多数。単価は日本国内比で40～50%削減可能。品質管理体制ISO9001取得済み。",
+        "作成日時": "2024-11-10T09:30:00Z",
+        "更新日時": "2025-01-15T14:20:00Z",
+        "作成者": "rec-u-001",
+        "更新者": "rec-u-002"
+      },
+      {
+        "企業ID": "rec-001",
+        "企業名": "株式会社テックメンテナンス",
+        "企業名カナ": "テックメンテナンス",
+        "業種": "情報処理・システム運用保守",
+        "所在地": "東京都渋谷区神宮前1-2-3 テックビル5F",
+        "代表者名": "山田太郎",
+        "設立年月日": "2015-04-15T00:00:00Z",
+        "資本金": 5000,
+        "従業員数": 45,
+        "売上高": 28000,
+        "電話番号": "03-XXXX-5678",
+        "メールアドレス": "info@techmaintenance.co.jp",
+        "ウェブサイトURL": "https://www.techmaintenance.co.jp",
+        "評価ステータス": "評価完了",
+        "契約状態": "契約済",
+        "備考": "2022年契約開始、24時間監視体制、SLA99.5%達成継続中。昨年度満足度評価4.8/5.0",
+        "作成日時": "2022-06-10T09:30:00Z",
+        "更新日時": "2024-11-20T14:15:00Z",
+        "作成者": "rec-u-0001",
+        "更新者": "rec-u-0002"
+      },
+      {
+        "企業ID": "rec-001",
+        "企業名": "CloudSync Technologies株式会社",
+        "企業名カナ": "クラウドシンクテクノロジーズ",
+        "業種": "ソフトウェア開発・SaaS",
+        "所在地": "東京都渋谷区道玄坂1-2-3 渋谷テックビル5階",
+        "代表者名": "山田翔太",
+        "設立年月日": "2023-06-15T00:00:00Z",
+        "資本金": 5000,
+        "従業員数": 18,
+        "売上高": 8500,
+        "電話番号": "03-xxxx-xxxx",
+        "メールアドレス": "info@cloudsync-tech.jp",
+        "ウェブサイトURL": "https://www.cloudsync-tech.jp",
+        "評価ステータス": "未評価",
+        "契約状態": "候補",
+        "備考": "AI駆動のデータ統合プラットフォーム。複数クラウド間のシームレス連携を実現。技術革新性が高く、大手企業からの引き合い多数。",
+        "作成日時": "2025-01-10T09:30:00Z",
+        "更新日時": "2025-01-10T09:30:00Z",
+        "作成者": "rec-user-001",
+        "更新者": "rec-user-001"
+      },
+      {
+        "企業ID": "rec-001",
+        "企業名": "株式会社ネットワークソリューション",
+        "企業名カナ": "ネットワークソリューション",
+        "業種": "情報通信業",
+        "所在地": "東京都千代田区丸の内1-6-2 丸の内ビルディング15階",
+        "代表者名": "山田健一",
+        "設立年月日": "2005-04-15T00:00:00Z",
+        "資本金": 50000,
+        "従業員数": 850,
+        "売上高": 285000,
+        "電話番号": "03-XXXX-5678",
+        "メールアドレス": "info@networksol.co.jp",
+        "ウェブサイトURL": "https://www.networksol.co.jp",
+        "評価ステータス": "評価完了",
+        "契約状態": "契約済",
+        "備考": "5G基盤システム構築実績あり。大手通信キャリア3社との大規模プロジェクト経験。ISO27001取得済み。",
+        "作成日時": "2024-06-10T09:30:00Z",
+        "更新日時": "2025-01-20T14:15:00Z",
+        "作成者": "rec-u-001",
+        "更新者": "rec-u-002"
+      },
+      {
+        "企業ID": "rec-001",
+        "企業名": "テックスタッフ・ソリューション株式会社",
+        "企業名カナ": "テックスタッフソリューション",
+        "業種": "人材派遣・技術者供給",
+        "所在地": "東京都渋谷区道玄坂2-10-7新大宮ビル5階",
+        "代表者名": "山田健一",
+        "設立年月日": "2015-04-15T00:00:00Z",
+        "資本金": 5000,
+        "従業員数": 120,
+        "売上高": 28500,
+        "電話番号": "03-XXXX-XXXX",
+        "メールアドレス": "info@techstaff-solution.jp",
+        "ウェブサイトURL": "https://www.techstaff-solution.jp",
+        "評価ステータス": "評価中",
+        "契約状態": "候補",
+        "備考": "システムエンジニア・プログラマー中心。直近3年間の平均派遣実績月間50名。要員確保能力と技術レベルの検証を進行中。",
+        "作成日時": "2024-11-20T09:30:00Z",
+        "更新日時": "2024-12-15T14:45:00Z",
+        "作成者": "rec-u-0001",
+        "更新者": "rec-u-0002"
+      },
+      {
+        "企業ID": "rec-001",
+        "企業名": "セキュアガード・コンサルティング株式会社",
+        "企業名カナ": "セキュアガードコンサルティング",
+        "業種": "情報通信業・コンサルティング",
+        "所在地": "東京都千代田区丸の内1-6-2 丸の内ビルディング15階",
+        "代表者名": "山田健一",
+        "設立年月日": "2015-04-15T00:00:00Z",
+        "資本金": 5000,
+        "従業員数": 45,
+        "売上高": 28000,
+        "電話番号": "03-XXXX-5678",
+        "メールアドレス": "info@secureguard-consulting.jp",
+        "ウェブサイトURL": "https://www.secureguard-consulting.jp",
+        "評価ステータス": "評価中",
+        "契約状態": "交渉中",
+        "備考": "個人情報保護法・FISC基準等の規制対応支援を主要サービスとする。金融機関向け実績多数。当社のセキュリティポリシー策定支援が必須要件。",
+        "作成日時": "2024-11-15T10:30:00Z",
+        "更新日時": "2025-01-20T14:45:00Z",
+        "作成者": "rec-user-001",
+        "更新者": "rec-user-002"
+      },
+      {
+        "企業ID": "rec-001",
+        "企業名": "クラウドインフラ・ジャパン株式会社",
+        "企業名カナ": "クラウドインフラジャパンカブシキガイシャ",
+        "業種": "情報通信業",
+        "所在地": "東京都千代田区丸の内1-8-3 丸の内トラストタワー15階",
+        "代表者名": "山田健一",
+        "設立年月日": "2015-04-15T00:00:00Z",
+        "資本金": 50000,
+        "従業員数": 280,
+        "売上高": 45000000,
+        "電話番号": "03-XXXX-5678",
+        "メールアドレス": "info@cloudinfra-jp.co.jp",
+        "ウェブサイトURL": "https://www.cloudinfra-jp.co.jp",
+        "評価ステータス": "評価完了",
+        "契約状態": "契約済",
+        "備考": "東日本・西日本に複数のデータセンター保有。直近12ヶ月のSLA達成率99.98%。24時間サポート体制完備。",
+        "作成日時": "2024-06-10T09:30:00Z",
+        "更新日時": "2025-01-15T14:22:00Z",
+        "作成者": "rec-user-001",
+        "更新者": "rec-user-002"
+      },
+      {
+        "企業ID": "rec-001",
+        "企業名": "株式会社プロセスイノベーション",
+        "企業名カナ": "カブシキガイシャプロセスイノベーション",
+        "業種": "ビジネスプロセスアウトソーシング",
+        "所在地": "東京都渋谷区道玄坂1-2-3 渋谷ビジネスセンター8階",
+        "代表者名": "鈴木健一",
+        "設立年月日": "2015-04-15T00:00:00Z",
+        "資本金": 50000,
+        "従業員数": 280,
+        "売上高": 125000,
+        "電話番号": "03-XXXX-5678",
+        "メールアドレス": "info@process-innovation.co.jp",
+        "ウェブサイトURL": "https://www.process-innovation.co.jp",
+        "評価ステータス": "評価中",
+        "契約状態": "候補",
+        "備考": "経理・人事業務の自動化提案を審査中。ISO9001認証済み、BPO実績15年以上。",
+        "作成日時": "2024-11-20T10:30:00Z",
+        "更新日時": "2025-01-15T14:45:00Z",
+        "作成者": "rec-u-001",
+        "更新者": "rec-u-002"
+      }
+    ],
+    "導入実績": [
+      {
+        "導入実績ID": "rec-001",
+        "ベンダーID": "vendor-042",
+        "プロジェクト名": "A銀行基幹勘定系システム刷新",
+        "プロジェクト説明": "レガシーシステムからの移行により、勘定系業務の処理効率化と顧客サービス向上を実現したプロジェクト。",
+        "契約金額": 850000000,
+        "契約開始日": "2024-04-01T09:00:00+09:00",
+        "契約終了日": "2024-12-31T17:00:00+09:00",
+        "実績完了日": "2024-12-20T16:30:00+09:00",
+        "納期遵守状況": "予定通り",
+        "品質評価": 5,
+        "顧客満足度": 5,
+        "実績評価コメント": "スケジュール通り完了、システム品質も高く、顧客からの評価も最高水準。運用保守体制も充実している。",
+        "作成日時": "2025-01-10T10:15:00+09:00",
+        "更新日時": "2025-01-15T14:45:00+09:00",
+        "作成者": "user-128"
+      },
+      {
+        "導入実績ID": "rec-001",
+        "ベンダーID": "vendor-0042",
+        "プロジェクト名": "A銀行基幹システムクラウドマイグレーション",
+        "プロジェクト説明": "オンプレミスの基幹システムをAWSへ移行するプロジェクト。データベース、アプリケーションサーバー、ネットワーク構成の全面刷新を実施。",
+        "契約金額": 45000000,
+        "契約開始日": "2024-04-01T09:00:00+09:00",
+        "契約終了日": "2024-12-31T17:00:00+09:00",
+        "実績完了日": "2025-02-14T16:30:00+09:00",
+        "納期遵守状況": "遅延",
+        "品質評価": 4,
+        "顧客満足度": 4,
+        "実績評価コメント": "当初予定から6週間の遅延が発生したが、データ移行精度は99.8%で高品質。顧客システム稼働後の安定性も良好。",
+        "作成日時": "2024-04-02T10:15:00+09:00",
+        "更新日時": "2025-02-15T09:45:00+09:00",
+        "作成者": "user-0156"
+      },
+      {
+        "導入実績ID": "rec-001",
+        "ベンダーID": "vendor-0042",
+        "プロジェクト名": "営業支援ツール SalesCloud 導入プロジェクト",
+        "プロジェクト説明": "営業活動の効率化と顧客管理の一元化を目的とした営業支援ツールの導入",
+        "契約金額": 4800000,
+        "契約開始日": "2024-06-15T09:00:00Z",
+        "契約終了日": "2024-11-30T17:00:00Z",
+        "実績完了日": "2024-10-18T16:30:00Z",
+        "納期遵守状況": "早期完了",
+        "品質評価": 5,
+        "顧客満足度": 5,
+        "実績評価コメント": "予定より6週間早く完了。ユーザートレーニングも充実しており、導入後の運用も円滑。顧客からの満足度は非常に高い。",
+        "作成日時": "2024-10-20T10:15:00Z",
+        "更新日時": "2024-10-20T10:15:00Z",
+        "作成者": "user-0156"
+      },
+      {
+        "導入実績ID": "rec-001",
+        "ベンダーID": "vendor-045",
+        "プロジェクト名": "営業支援DWH構築プロジェクト",
+        "プロジェクト説明": "顧客企業の営業データを統合したデータウェアハウスの構築および分析基盤の整備",
+        "契約金額": 8500000,
+        "契約開始日": "2024-04-15T09:00:00",
+        "契約終了日": "2024-11-30T17:00:00",
+        "実績完了日": "2024-12-20T16:30:00",
+        "納期遵守状況": "遅延",
+        "品質評価": 2,
+        "顧客満足度": 2,
+        "実績評価コメント": "データ品質チェック段階で不整合が多数発見され、修正対応に時間を要した。納期を20日超過し、顧客からの信頼低下が懸念される。",
+        "作成日時": "2024-12-21T10:15:00",
+        "更新日時": "2024-12-22T14:45:00",
+        "作成者": "user-078"
+      },
+      {
+        "導入実績ID": "rec-001",
+        "ベンダーID": "vendor-047",
+        "プロジェクト名": "基幹システムセキュリティ強化プロジェクト",
+        "プロジェクト説明": "既存基幹システムへの多要素認証導入、ファイアウォール更新、侵入検知システム統合によるセキュリティ体制の全面刷新",
+        "契約金額": 8500000,
+        "契約開始日": "2024-04-15T09:00:00Z",
+        "契約終了日": "2024-11-30T17:00:00Z",
+        "実績完了日": "2024-11-28T16:30:00Z",
+        "納期遵守状況": "予定通り",
+        "品質評価": 5,
+        "顧客満足度": 5,
+        "実績評価コメント": "予定より2日早く完了。システム安定性確認済み、セキュリティスコア大幅向上、ベンダー対応も迅速で高評価。",
+        "作成日時": "2024-11-29T10:15:00Z",
+        "更新日時": "2024-12-02T14:22:00Z",
+        "作成者": "user-156"
+      },
+      {
+        "導入実績ID": "rec-001",
+        "ベンダーID": "vendor-047",
+        "プロジェクト名": "販売管理システム保守・UI改善",
+        "プロジェクト説明": "既存販売管理システムの機能改善とUIリニューアル対応",
+        "契約金額": 2800000,
+        "契約開始日": "2024-09-01T09:00:00Z",
+        "契約終了日": "2024-12-20T17:00:00Z",
+        "実績完了日": "2025-01-15T16:30:00Z",
+        "納期遵守状況": "遅延",
+        "品質評価": 4,
+        "顧客満足度": 4,
+        "実績評価コメント": "要件追加により納期が26日遅延したが、品質・対応姿勢は評価。顧客の追加要望にも柔軟に対応した。",
+        "作成日時": "2025-01-16T10:15:00Z",
+        "更新日時": "2025-01-16T10:15:00Z",
+        "作成者": "user-892"
+      },
+      {
+        "導入実績ID": "rec-001",
+        "ベンダーID": "ven-042",
+        "プロジェクト名": "A社グループ統合ERP導入プロジェクト",
+        "プロジェクト説明": "複数の子会社システムを統合し、財務・販売・在庫管理を一元化するERP導入",
+        "契約金額": 45000000,
+        "契約開始日": "2024-04-15T09:00:00",
+        "契約終了日": "2025-03-31T17:00:00",
+        "実績完了日": "2025-03-28T16:30:00",
+        "納期遵守状況": "予定通り",
+        "品質評価": 5,
+        "顧客満足度": 5,
+        "実績評価コメント": "大型案件にも関わらず全フェーズで計画通り進行。システム安定性が高く、ユーザー教育も充実していた。",
+        "作成日時": "2025-03-29T10:15:00",
+        "更新日時": "2025-03-29T10:15:00",
+        "作成者": "usr-108"
+      },
+      {
+        "導入実績ID": "rec-001",
+        "ベンダーID": "vendor-042",
+        "プロジェクト名": "顧客管理システムモバイルアプリ開発",
+        "プロジェクト説明": "iOS/Android対応の営業支援モバイルアプリ開発。オフライン機能とクラウド連携を実装。",
+        "契約金額": 8500000,
+        "契約開始日": "2024-04-15T09:00:00Z",
+        "契約終了日": "2024-11-30T17:00:00Z",
+        "実績完了日": "2024-12-20T16:30:00Z",
+        "納期遵守状況": "遅延",
+        "品質評価": 5,
+        "顧客満足度": 4,
+        "実績評価コメント": "機能品質は優秀で顧客からの評価も高い。ただし工程管理の課題から納期が20日超過し、追加費用対応が発生した。",
+        "作成日時": "2024-12-21T10:15:00Z",
+        "更新日時": "2025-01-08T14:45:00Z",
+        "作成者": "user-156"
+      },
+      {
+        "導入実績ID": "rec-001",
+        "ベンダーID": "vendor-047",
+        "プロジェクト名": "A銀行基幹システムリプレイス2024",
+        "プロジェクト説明": "レガシーシステムから最新クラウドベース基幹システムへの移行。データ移行、システム統合、ユーザー教育を含む。",
+        "契約金額": 185000000,
+        "契約開始日": "2024-04-01T09:00:00Z",
+        "契約終了日": "2024-12-31T17:00:00Z",
+        "実績完了日": "2024-12-20T16:30:00Z",
+        "納期遵守状況": "予定通り",
+        "品質評価": 5,
+        "顧客満足度": 5,
+        "実績評価コメント": "予定より11日前倒しで完了。本番移行時のダウンタイムゼロを達成。バグ報告件数は業界平均の30%以下に抑制。顧客からの評価は極めて高い。",
+        "作成日時": "2025-01-10T10:15:00Z",
+        "更新日時": "2025-01-10T10:15:00Z",
+        "作成者": "user-admin-001"
+      },
+      {
+        "導入実績ID": "rec-001",
+        "ベンダーID": "vendor-0042",
+        "プロジェクト名": "営業支援システム基本導入_A社",
+        "プロジェクト説明": "中堅製造業向けの営業支援システム導入。顧客管理と見積作成機能の実装。",
+        "契約金額": 2800000,
+        "契約開始日": "2024-10-01T09:00:00",
+        "契約終了日": "2024-12-31T17:00:00",
+        "実績完了日": "2024-12-20T16:30:00",
+        "納期遵守状況": "予定通り",
+        "品質評価": 4,
+        "顧客満足度": 4,
+        "実績評価コメント": "初回案件として小規模スコープで確実に完了。ユーザー研修も好評で、顧客からの信頼獲得に成功。",
+        "作成日時": "2024-12-21T10:15:00",
+        "更新日時": "2025-01-08T14:45:00",
+        "作成者": "user-0156"
+      }
+    ],
+    "参照顧客": [
+      {
+        "顧客ID": "rec-001",
+        "顧客名": "株式会社トヨタ自動車",
+        "業種": "自動車製造業",
+        "企業規模": "大企業",
+        "所在地": "愛知県豊田市トヨタ町1番地",
+        "代表者名": "豊田章男",
+        "連絡先電話番号": "0565-28-2121",
+        "連絡先メールアドレス": "reference@toyota.co.jp",
+        "参照用途": "2024年基幹システム刷新プロジェクトにおけるERPパッケージ導入実績の確認",
+        "参照ステータス": "アクティブ",
+        "作成日時": "2024-11-15T09:30:00Z",
+        "更新日時": "2025-01-08T14:22:00Z",
+        "作成者": "rec-u-0042",
+        "更新者": "rec-u-0087"
+      },
+      {
+        "顧客ID": "rec-001",
+        "顧客名": "株式会社東日本銀行",
+        "業種": "銀行業",
+        "企業規模": "大企業",
+        "所在地": "東京都千代田区丸の内1-2-3",
+        "代表者名": "山田次郎",
+        "連絡先電話番号": "03-XXXX-5678",
+        "連絡先メールアドレス": "inquiry@touhokubank.co.jp",
+        "参照用途": "クラウド型セキュリティソリューション導入後の運用実績と効果測定の検証",
+        "参照ステータス": "アクティブ",
+        "作成日時": "2024-06-15T09:30:00Z",
+        "更新日時": "2025-01-20T14:45:00Z",
+        "作成者": "rec-u-0042",
+        "更新者": "rec-u-0089"
+      },
+      {
+        "顧客ID": "rec-001",
+        "顧客名": "株式会社東洋商事",
+        "業種": "商社",
+        "企業規模": "中堅企業",
+        "所在地": "東京都中央区日本橋",
+        "代表者名": "山田健一",
+        "連絡先電話番号": "03-XXXX-XXXX",
+        "連絡先メールアドレス": "info@toyosyoji.co.jp",
+        "参照用途": "クラウドERP導入プロジェクトにおける移行成功事例の確認および導入効果の検証",
+        "参照ステータス": "アクティブ",
+        "作成日時": "2024-11-15T09:30:00Z",
+        "更新日時": "2025-01-22T14:15:00Z",
+        "作成者": "rec-user-0042",
+        "更新者": "rec-user-0042"
+      },
+      {
+        "顧客ID": "rec-001",
+        "顧客名": "東京都渋谷区役所",
+        "業種": "公共機関・自治体",
+        "企業規模": "大企業",
+        "所在地": "東京都渋谷区道玄坂1-2-3",
+        "代表者名": "山田太郎",
+        "連絡先電話番号": "03-3463-1211",
+        "連絡先メールアドレス": "digital-promotion@shibuya.tokyo.jp",
+        "参照用途": "住民向けデジタルサービスプラットフォーム導入における実装実績の確認",
+        "参照ステータス": "アクティブ",
+        "作成日時": "2024-11-15T10:30:00+09:00",
+        "更新日時": "2025-01-08T14:22:00+09:00",
+        "作成者": "rec-user-0042",
+        "更新者": "rec-user-0042"
+      },
+      {
+        "顧客ID": "rec-001",
+        "顧客名": "株式会社フレッシュマート関東",
+        "業種": "小売業",
+        "企業規模": "中堅企業",
+        "所在地": "東京都江東区",
+        "代表者名": "鈴木健一",
+        "連絡先電話番号": "03-xxxx-5678",
+        "連絡先メールアドレス": "info@freshmart-kanto.co.jp",
+        "参照用途": "POS統合システム導入時の運用実績確認および導入効果の検証",
+        "参照ステータス": "アクティブ",
+        "作成日時": "2024-11-15T10:30:00Z",
+        "更新日時": "2025-01-20T14:45:00Z",
+        "作成者": "rec-u-0042",
+        "更新者": "rec-u-0042"
+      },
+      {
+        "顧客ID": "rec-001",
+        "顧客名": "社会医療法人財団慈泉会相澄病院",
+        "業種": "医療法人",
+        "企業規模": "中堅企業",
+        "所在地": "長野県伊那市日影6606番地",
+        "代表者名": "鈴木康夫",
+        "連絡先電話番号": "0265-72-1000",
+        "連絡先メールアドレス": "admin@aizumikai.or.jp",
+        "参照用途": "カルテシステム導入実績の確認。電子カルテ運用3年以上の経験と安定稼働事例の検証",
+        "参照ステータス": "アクティブ",
+        "作成日時": "2024-11-15T09:30:00+09:00",
+        "更新日時": "2024-11-15T09:30:00+09:00",
+        "作成者": "usr-0847",
+        "更新者": "usr-0847"
+      },
+      {
+        "顧客ID": "rec-001",
+        "顧客名": "株式会社大成建設",
+        "業種": "建設業",
+        "企業規模": "大企業",
+        "所在地": "東京都千代田区丸の内1-1-1",
+        "代表者名": "山田太郎",
+        "連絡先電話番号": "03-1234-5678",
+        "連絡先メールアドレス": "info@taisei-construction.co.jp",
+        "参照用途": "プロジェクト管理ツール導入時の建設業務への適合性確認",
+        "参照ステータス": "アクティブ",
+        "作成日時": "2024-11-15 09:30:00",
+        "更新日時": "2024-11-20 14:45:00",
+        "作成者": "user-0001",
+        "更新者": "user-0002"
+      },
+      {
+        "顧客ID": "rec-001",
+        "顧客名": "株式会社NTTドコモ関西支社",
+        "業種": "通信キャリア",
+        "企業規模": "大企業",
+        "所在地": "大阪府大阪市北区中之島",
+        "代表者名": "山田次郎",
+        "連絡先電話番号": "06-6946-1111",
+        "連絡先メールアドレス": "kansai-ref@docomo.co.jp",
+        "参照用途": "ネットワークインフラ保守サービスの技術対応実績と品質評価確認",
+        "参照ステータス": "アクティブ",
+        "作成日時": "2024-08-15T10:30:00Z",
+        "更新日時": "2025-01-22T14:15:00Z",
+        "作成者": "rec-user-042",
+        "更新者": "rec-user-057"
+      },
+      {
+        "顧客ID": "rec-001",
+        "顧客名": "株式会社フレッシュフーズジャパン",
+        "業種": "食品製造業",
+        "企業規模": "中堅企業",
+        "所在地": "東京都中央区日本橋",
+        "代表者名": "山田健一",
+        "連絡先電話番号": "03-XXXX-5678",
+        "連絡先メールアドレス": "info@freshfoods-jp.co.jp",
+        "参照用途": "サプライチェーン管理システム導入後の業務効率化と在庫最適化の実績評価",
+        "参照ステータス": "アクティブ",
+        "作成日時": "2024-11-15T10:30:00Z",
+        "更新日時": "2025-01-20T14:45:00Z",
+        "作成者": "rec-usr-0042",
+        "更新者": "rec-usr-0042"
+      },
+      {
+        "顧客ID": "rec-001",
+        "顧客名": "学校法人明光学園",
+        "業種": "教育機関",
+        "企業規模": "中堅企業",
+        "所在地": "東京都渋谷区",
+        "代表者名": "佐藤健一",
+        "連絡先電話番号": "03-XXXX-XXXX",
+        "連絡先メールアドレス": "info@meiko-gakuen.jp",
+        "参照用途": "同規模の学園法人によるLMS導入実績の確認。オンライン授業基盤構築における課題解決事例の参照。",
+        "参照ステータス": "アクティブ",
+        "作成日時": "2024-11-15T10:30:00Z",
+        "更新日時": "2025-01-20T14:45:00Z",
+        "作成者": "rec-u-0042",
+        "更新者": "rec-u-0042"
+      }
+    ],
+    "業界別適用事例": [
+      {
+        "事例ID": "rec-001",
+        "業界分類": "製造業",
+        "事例名": "大手自動車部品メーカーのERP導入によるサプライチェーン最適化",
+        "事例説明": "従来の複数システム運用から統合ERP（SAP S/4HANA）への移行により、部品調達から製造・出荷までの全プロセスを一元管理。リアルタイム在庫可視化と需要予測の精度向上を実現。",
+        "ベンダー候補企業ID": "rec-vendor-042",
+        "導入実績ID": "rec-impl-015",
+        "参照顧客ID": "rec-cust-008",
+        "適用効果": "在庫保有量を23%削減、部品調達リードタイムを平均18日短縮、生産計画精度が87%に向上。年間約2.8億円の運転資金改善を実現。",
+        "導入期間月数": 14,
+        "ROI達成度": "達成",
+        "推奨度": 5,
+        "作成日時": "2024-11-15T09:30:00+09:00",
+        "更新日時": "2025-01-20T14:15:00+09:00",
+        "作成者": "山田花子"
+      },
+      {
+        "事例ID": "rec-001",
+        "業界分類": "金融",
+        "事例名": "大手銀行向けコンプライアンス管理システム導入",
+        "事例説明": "金融庁の規制強化に対応するため、統合的なコンプライアンス管理システムを導入。顧客情報管理、取引監視、報告書自動生成機能により、規制対応業務を効率化。",
+        "ベンダー候補企業ID": "rec-vendor-042",
+        "導入実績ID": "rec-impl-0187",
+        "参照顧客ID": "rec-cust-5634",
+        "適用効果": "規制対応コスト年間2,800万円削減、報告書作成時間85%短縮、監査指摘事項99%削減",
+        "導入期間月数": 8,
+        "ROI達成度": "達成（初年度ROI 320%）",
+        "推奨度": 5,
+        "作成日時": "2024-06-15T09:30:00Z",
+        "更新日時": "2025-01-22T14:45:00Z",
+        "作成者": "佐藤美咲"
+      },
+      {
+        "事例ID": "rec-001",
+        "業界分類": "小売業",
+        "事例名": "食品スーパーチェーンのPOS・在庫管理統合システム導入",
+        "事例説明": "関東地域で50店舗を展開する食品スーパーチェーンが、レジ業務と在庫管理の分断を解消するため統合システムを導入。リアルタイム在庫把握と発注業務の自動化により、廃棄ロス削減と売上機会損失の改善を実現した事例。",
+        "ベンダー候補企業ID": "rec-vendor-047",
+        "導入実績ID": "rec-impl-089",
+        "参照顧客ID": "rec-cust-156",
+        "適用効果": "商品廃棄率12%削減、在庫回転率15%向上、レジ業務時間20%短縮、欠品率を8%から2%に低下",
+        "導入期間月数": 6,
+        "ROI達成度": "達成",
+        "推奨度": 5,
+        "作成日時": "2024-08-15T10:30:00+09:00",
+        "更新日時": "2025-01-22T14:15:00+09:00",
+        "作成者": "佐藤花子"
+      },
+      {
+        "事例ID": "rec-001",
+        "業界分類": "医療",
+        "事例名": "地域中核病院における電子カルテシステム導入",
+        "事例説明": "200床規模の地域中核病院が紙ベース診療記録から統合電子カルテシステムへ移行し、診療情報の一元管理と診療プロセスの効率化を実現した事例。",
+        "ベンダー候補企業ID": "rec-vendor-042",
+        "導入実績ID": "rec-impl-0187",
+        "参照顧客ID": "rec-cust-0056",
+        "適用効果": "診療時間短縮25%、カルテ検索時間90%削減、処方箋作成ミス70%低減、患者待機時間35%短縮により患者満足度が4.1→4.6に向上。",
+        "導入期間月数": 14,
+        "ROI達成度": "達成",
+        "推奨度": 5,
+        "作成日時": "2024-11-15T09:30:00+09:00",
+        "更新日時": "2025-01-22T14:15:00+09:00",
+        "作成者": "佐藤美咲"
+      },
+      {
+        "事例ID": "rec-001",
+        "業界分類": "建設業",
+        "事例名": "大型商業施設建設プロジェクトの工程・原価管理システム導入",
+        "事例説明": "延床面積50,000㎡の商業施設建設において、工程管理・原価管理システムを導入し、複数の下請業者との連携を効率化。リアルタイムの進捗管理と予算管理により納期遵守を実現。",
+        "ベンダー候補企業ID": "rec-vendor-042",
+        "導入実績ID": "rec-impl-015",
+        "参照顧客ID": "rec-cust-028",
+        "適用効果": "納期遵守率が78%から96%に向上、原価超過を月平均2.3%削減、工程遅延による追加費用3,200万円を回避",
+        "導入期間月数": 6,
+        "ROI達成度": "達成",
+        "推奨度": 5,
+        "作成日時": "2024-11-15T09:30:00+09:00",
+        "更新日時": "2025-01-22T14:45:00+09:00",
+        "作成者": "鈴木美咲"
+      },
+      {
+        "事例ID": "rec-001",
+        "業界分類": "不動産仲介",
+        "事例名": "大手不動産仲介企業のCRM・物件管理システム導入",
+        "事例説明": "営業担当者50名規模の不動産仲介企業が、顧客情報管理と物件情報の一元化を実現するCRM・物件管理システムを導入。営業プロセスの標準化と顧客接点の可視化により、営業生産性と顧客満足度の向上を達成。",
+        "ベンダー候補企業ID": "rec-vendor-012",
+        "導入実績ID": "rec-impl-045",
+        "参照顧客ID": "rec-cust-078",
+        "適用効果": "営業活動の効率化により1人当たり月間成約件数が平均2.3件から3.8件に向上。顧客情報の一元管理で重複営業が削減。物件検索時間が平均35分から12分に短縮。",
+        "導入期間月数": 6,
+        "ROI達成度": "達成（150%）",
+        "推奨度": 5,
+        "作成日時": "2024-11-15T09:30:00",
+        "更新日時": "2025-01-22T14:45:00",
+        "作成者": "山田花子"
+      },
+      {
+        "事例ID": "rec-001",
+        "業界分類": "食品製造業",
+        "事例名": "生鮮食品トレーサビリティシステムによる品質管理体制の構築",
+        "事例説明": "大手食品メーカーが原材料調達から製造・出荷までの全工程をデジタル化し、QRコード・ブロックチェーン技術を活用したトレーサビリティシステムを導入。食品安全基準への対応強化と流通過程の透明性を実現。",
+        "ベンダー候補企業ID": "rec-v-042",
+        "導入実績ID": "rec-impl-156",
+        "参照顧客ID": "rec-cust-089",
+        "適用効果": "品質問題発生時の原因特定期間を従来の5日から8時間に短縮。HACCP対応文書作成時間を月40時間削減。顧客からの問い合わせ対応率が98%に向上。",
+        "導入期間月数": 7,
+        "ROI達成度": "達成（135%）",
+        "推奨度": 5,
+        "作成日時": "2024-06-15T09:30:00+09:00",
+        "更新日時": "2025-01-22T14:15:00+09:00",
+        "作成者": "山田花子"
+      },
+      {
+        "事例ID": "rec-001",
+        "業界分類": "通信・電気通信",
+        "事例名": "大手通信キャリアの顧客管理・ビリング統合システム導入",
+        "事例説明": "複数システムに分散していた顧客情報とビリングデータを統合し、リアルタイム顧客管理と請求業務の効率化を実現した事例。",
+        "ベンダー候補企業ID": "rec-vendor-042",
+        "導入実績ID": "rec-impl-156",
+        "参照顧客ID": "rec-cust-089",
+        "適用効果": "顧客問い合わせ対応時間を平均35%削減、請求誤り率を0.8%から0.2%に低減、顧客満足度スコア向上（NPS +18ポイント）。",
+        "導入期間月数": 14,
+        "ROI達成度": "達成（目標比115%）",
+        "推奨度": 5,
+        "作成日時": "2024-11-15T09:30:00Z",
+        "更新日時": "2025-01-22T14:20:00Z",
+        "作成者": "山田花子"
+      },
+      {
+        "事例ID": "rec-001",
+        "業界分類": "流通・ロジスティクス",
+        "事例名": "配送最適化システムによる運送コスト削減",
+        "事例説明": "関東圏の食品流通企業が配送ルート最適化AIを導入し、配車計画の自動化と燃料効率改善を実現した事例",
+        "ベンダー候補企業ID": "rec-vendor-042",
+        "導入実績ID": "rec-impl-087",
+        "参照顧客ID": "rec-cust-156",
+        "適用効果": "配送コスト18%削減、配車時間50%短縮、CO2排出量22%削減を達成",
+        "導入期間月数": 4,
+        "ROI達成度": "達成（目標比120%）",
+        "推奨度": 5,
+        "作成日時": "2024-11-15T09:30:00Z",
+        "更新日時": "2025-01-22T14:15:00Z",
+        "作成者": "山田花子"
+      },
+      {
+        "事例ID": "rec-001",
+        "業界分類": "教育",
+        "事例名": "私立大学における学生管理・成績管理統合システム導入",
+        "事例説明": "従来は複数のシステムで分散管理されていた学生情報と成績データを統合し、事務業務の自動化と情報一元管理を実現した事例",
+        "ベンダー候補企業ID": "rec-vendor-042",
+        "導入実績ID": "rec-impl-015",
+        "参照顧客ID": "rec-cust-028",
+        "適用効果": "事務作業時間を月間80時間削減、成績集計の自動化により精度向上、学生ポータルによる情報アクセス利便性が大幅改善",
+        "導入期間月数": 6,
+        "ROI達成度": "達成（予定比110%）",
+        "推奨度": 5,
+        "作成日時": "2024-11-15T09:30:00+09:00",
+        "更新日時": "2025-01-20T14:45:00+09:00",
+        "作成者": "山田花子"
+      }
+    ],
+    "契約書": [
+      {
+        "契約書ID": "rec-001",
+        "ベンダーID": "rec-v-042",
+        "契約名": "基幹システム再構築プロジェクト開発委託契約",
+        "契約内容": "クラウド基盤への既存システム移行及び機能拡張開発。要件定義から本番運用開始まで一式対応。",
+        "契約開始日": "2024-04-01T00:00:00Z",
+        "契約終了日": "2025-03-31T23:59:59Z",
+        "契約金額": 850000000,
+        "契約ステータス": "有効",
+        "リスク評価レベル": "中",
+        "リスク評価詳細": "長期プロジェクトのため要件変更リスク及びベンダー体制リスクあり。ただし大手SIer実績豊富で軽減可能。",
+        "支払条件": "月次請求。初期費用30%、開発進捗50%、納品時20%の3段階。支払期日は請求月の翌月末。",
+        "納期条件": "要件定義完了2024年6月末、基本設計2024年9月末、開発完了2025年2月末、本番運用開始2025年3月31日。",
+        "SLA条項": "本番環境稼働率99.5%以上を保証。障害対応時間は緊急時30分以内、高優先度4時間以内。",
+        "ペナルティ条項": "SLA未達時は月額契約金の1%を減額。納期遅延は1日あたり0.1%の違約金。",
+        "秘密保持条項": true,
+        "知的財産権条項": true,
+        "解除条件": "重大な契約違反が30日以内に是正されない場合、又は一方が破産手続開始決定を受けた場合、相手方は書面通知により契約解除可能。",
+        "更新予定日": "2025-02-28T00:00:00Z",
+        "担当者ID": "rec-u-015",
+        "承認者ID": "rec-u-008",
+        "作成日時": "2024-03-15T10:30:00Z",
+        "作成者ID": "rec-u-015",
+        "更新日時": "2024-03-28T14:45:00Z",
+        "更新者ID": "rec-u-008"
+      },
+      {
+        "契約書ID": "rec-001",
+        "ベンダーID": "rec-vendor-042",
+        "契約名": "クラウドインフラストラクチャサービス利用契約",
+        "契約内容": "AWS互換のクラウドインフラサービス。コンピュート、ストレージ、ネットワーク機能を提供。月額従量課金制。",
+        "契約開始日": "2024-04-01T00:00:00Z",
+        "契約終了日": "2025-03-31T23:59:59Z",
+        "契約金額": 7200000,
+        "契約ステータス": "有効",
+        "リスク評価レベル": "低",
+        "リスク評価詳細": "大手ベンダーによる安定したサービス。SLA99.99%保証。セキュリティ認証ISO27001取得。",
+        "支払条件": "月次後払い。毎月25日に前月分請求。銀行振込による支払い。",
+        "納期条件": "サービス開通は契約日から5営業日以内。障害対応は24時間以内。",
+        "SLA条項": "可用性99.99%保証。月間ダウンタイム許容値4分36秒。超過時はサービス料金の10%を返金。",
+        "ペナルティ条項": "SLA未達成時は月額費用の10%返金。重大セキュリティ事故時は契約金額の20%相当の損害賠償。",
+        "秘密保持条項": true,
+        "知的財産権条項": true,
+        "解除条件": "書面による30日前通知で解除可能。重大な契約違反時は即時解除。",
+        "更新予定日": "2025-02-01T00:00:00Z",
+        "担当者ID": "rec-user-015",
+        "承認者ID": "rec-user-008",
+        "作成日時": "2024-03-15T10:30:00Z",
+        "作成者ID": "rec-user-015",
+        "更新日時": "2024-03-28T14:45:00Z",
+        "更新者ID": "rec-user-008"
+      },
+      {
+        "契約書ID": "rec-001",
+        "ベンダーID": "rec-vendor-042",
+        "契約名": "インド子会社システム保守・運用サービス契約",
+        "契約内容": "既存ERP・基幹システムの24時間監視、障害対応、定期メンテナンスを提供。月次レポート・四半期レビュー会議を実施。",
+        "契約開始日": "2024-04-01T00:00:00Z",
+        "契約終了日": "2025-03-31T23:59:59Z",
+        "契約金額": 24000000,
+        "契約ステータス": "有効",
+        "リスク評価レベル": "高",
+        "リスク評価詳細": "オフショア拠点のため情報セキュリティ・通信遅延リスク高。データ保護規制対応必須。タイムゾーン差による即応性課題。",
+        "支払条件": "月額200万円、毎月末締め翌月15日振込。初回支払は契約開始日から30日以内。",
+        "納期条件": "緊急障害は1時間以内の初期対応、通常案件は5営業日以内に完了。",
+        "SLA条項": "可用性99.5%、平均復旧時間4時間。月次SLA達成率が95%未満の場合は翌月金額の5%を減額。",
+        "ペナルティ条項": "SLA未達成時は月額契約金の5～10%を減額。重大セキュリティインシデント発生時は契約解除可能。",
+        "秘密保持条項": true,
+        "知的財産権条項": true,
+        "解除条件": "重大な契約違反が30日以内に是正されない場合、または重大セキュリティ事故発生時は即時解除可。3ヶ月前通知で期間満了時解除可。",
+        "更新予定日": "2025-01-31T00:00:00Z",
+        "担当者ID": "rec-user-015",
+        "承認者ID": "rec-user-008",
+        "作成日時": "2024-02-20T10:30:00Z",
+        "作成者ID": "rec-user-015",
+        "更新日時": "2024-03-25T14:15:00Z",
+        "更新者ID": "rec-user-015"
+      },
+      {
+        "契約書ID": "rec-001",
+        "ベンダーID": "rec-vendor-042",
+        "契約名": "2025年度セキュリティ監査サービス",
+        "契約内容": "システムインフラおよびアプリケーションの脆弱性診断、ペネトレーションテスト、セキュリティ体制評価を実施",
+        "契約開始日": "2025-04-01T00:00:00Z",
+        "契約終了日": "2025-09-30T23:59:59Z",
+        "契約金額": 2500000,
+        "契約ステータス": "有効",
+        "リスク評価レベル": "低",
+        "リスク評価詳細": "ベンダーは業界大手で実績豊富、秘密保持契約完備、監査スコープが明確で追加費用リスク低い",
+        "支払条件": "月額払い。初回は契約開始日の翌月末、以降毎月末日に前月分を請求。振込手数料は当社負担",
+        "納期条件": "各月の監査実施は毎月第2週から第4週に完了。レポート提出は実施月の翌月10日までに完了",
+        "SLA条項": "レポート品質基準を満たさない場合は再実施。対応時間は営業日8時間以内",
+        "ペナルティ条項": "納期遅延1日につき契約金額の0.5%。ただし上限は月額請求額の10%",
+        "秘密保持条項": true,
+        "知的財産権条項": true,
+        "解除条件": "30日前の書面通知により契約終了可。違約金なし。ただし実施済み監査に関する費用は請求対象",
+        "更新予定日": "2025-10-01T00:00:00Z",
+        "担当者ID": "rec-user-015",
+        "承認者ID": "rec-user-008",
+        "作成日時": "2025-02-15T10:30:00Z",
+        "作成者ID": "rec-user-015",
+        "更新日時": "2025-03-20T14:45:00Z",
+        "更新者ID": "rec-user-008"
+      },
+      {
+        "契約書ID": "rec-001-2024-staffing-001",
+        "ベンダーID": "rec-vendor-staffing-abc",
+        "契約名": "営業事務職派遣契約（2024年度）",
+        "契約内容": "営業事務職員3名の月次派遣。勤務地は東京本社。業務内容は営業サポート・事務処理。",
+        "契約開始日": "2024-04-01T00:00:00Z",
+        "契約終了日": "2025-03-31T23:59:59Z",
+        "契約金額": 8640000,
+        "契約ステータス": "有効",
+        "リスク評価レベル": "中",
+        "リスク評価詳細": "派遣スタッフの急な離職による業務継続リスク。代替手配の遅延が懸念される。",
+        "支払条件": "月末締め翌月15日払い。銀行振込。消費税別。月次請求書に基づき支払う。",
+        "納期条件": "毎月1日から月末まで。初月は4月1日から。最終月は3月31日まで。",
+        "SLA条項": "派遣スタッフの出勤率95%以上。急な欠員は24時間以内に代替手配。",
+        "ペナルティ条項": "出勤率95%未満の場合は月額費用の5%減額。代替手配遅延時は日額費用の10%減額。",
+        "秘密保持条項": true,
+        "知的財産権条項": false,
+        "解除条件": "契約期間中は相互に30日前通知で解除可能。ただし派遣スタッフの重大な非違行為がある場合は即時解除。",
+        "更新予定日": "2025-02-01T00:00:00Z",
+        "担当者ID": "rec-user-tanaka-01",
+        "承認者ID": "rec-user-suzuki-01",
+        "作成日時": "2024-03-15T10:30:00Z",
+        "作成者ID": "rec-user-yamada-01",
+        "更新日時": "2024-03-28T14:45:00Z",
+        "更新者ID": "rec-user-tanaka-01"
+      },
+      {
+        "契約書ID": "rec-001",
+        "ベンダーID": "rec-vendor-042",
+        "契約名": "サーバー機器保守・技術サポート契約",
+        "契約内容": "データセンター内のサーバー機器5台に対する24時間体制の保守・修理・技術サポート",
+        "契約開始日": "2024-04-01T00:00:00Z",
+        "契約終了日": "2026-03-31T23:59:59Z",
+        "契約金額": 3600000,
+        "契約ステータス": "有効",
+        "リスク評価レベル": "中",
+        "リスク評価詳細": "対応時間遅延による業務停止リスク、スペアパーツ調達遅延の可能性あり",
+        "支払条件": "月額300,000円、毎月末日請求、翌月15日までの銀行振込",
+        "納期条件": "緊急対応は報告から4時間以内、通常対応は営業日3日以内",
+        "SLA条項": "稼働率99.5%保証、障害復旧時間平均2時間以内、月間ダウンタイム3.6時間以下",
+        "ペナルティ条項": "SLA未達時は月額費用の5%を減額、連続3ヶ月未達で契約解除可能",
+        "秘密保持条項": true,
+        "知的財産権条項": true,
+        "解除条件": "30日前の書面通知により解除可能、重大な契約違反時は即座に解除可",
+        "更新予定日": "2026-01-31T00:00:00Z",
+        "担当者ID": "rec-user-015",
+        "承認者ID": "rec-user-008",
+        "作成日時": "2024-02-20T10:30:00Z",
+        "作成者ID": "rec-user-015",
+        "更新日時": "2024-03-28T14:15:00Z",
+        "更新者ID": "rec-user-008"
+      },
+      {
+        "契約書ID": "rec-001",
+        "ベンダーID": "rec-vendor-042",
+        "契約名": "Microsoft 365 Business Standard ライセンス年間購入契約",
+        "契約内容": "クラウドベースの生産性向上ツール（Word、Excel、Teams等）の100ユーザーライセンス提供",
+        "契約開始日": "2024-04-01T00:00:00Z",
+        "契約終了日": "2025-03-31T23:59:59Z",
+        "契約金額": 1200000,
+        "契約ステータス": "有効",
+        "リスク評価レベル": "中",
+        "リスク評価詳細": "ライセンス管理の煩雑性と年間更新時の価格改定リスク、ユーザー数変動への対応が課題",
+        "支払条件": "年1回一括払い。請求月の翌月末までに銀行振込で支払い",
+        "納期条件": "契約開始日より即座にライセンス付与。新規ユーザー追加は申請から5営業日以内",
+        "SLA条項": "月間稼働率99.9%以上を保証。以下の場合は月額費用の5%を返金",
+        "ペナルティ条項": "ライセンス無断転売時は契約金額の3倍の違約金。サポート対応遅延時は月額費用の2%返金",
+        "秘密保持条項": true,
+        "知的財産権条項": true,
+        "解除条件": "契約終了の60日前に書面通知で更新拒否。やむを得ない理由での中途解除は不可（年間契約のため）",
+        "更新予定日": "2025-02-01T00:00:00Z",
+        "担当者ID": "rec-user-018",
+        "承認者ID": "rec-user-005",
+        "作成日時": "2024-03-15T10:30:00Z",
+        "作成者ID": "rec-user-018",
+        "更新日時": "2024-03-28T14:15:00Z",
+        "更新者ID": "rec-user-005"
+      },
+      {
+        "契約書ID": "rec-001",
+        "ベンダーID": "rec-vendor-042",
+        "契約名": "デジタル変革推進コンサルティングサービス",
+        "契約内容": "経営戦略立案、業務プロセス改善、システム導入支援を含む総合コンサルティング",
+        "契約開始日": "2024-04-01T00:00:00Z",
+        "契約終了日": "2025-03-31T23:59:59Z",
+        "契約金額": 12500000,
+        "契約ステータス": "有効",
+        "リスク評価レベル": "低",
+        "リスク評価詳細": "ベンダーは業界大手で実績豊富。成果物納期は十分な余裕を確保。SLA条項で品質保証。",
+        "支払条件": "月額払い。毎月末請求、翌月20日までに銀行振込。消費税別途。",
+        "納期条件": "フェーズ1（計画書）6月末、フェーズ2（実装支援）12月末、フェーズ3（検証報告）3月末。各フェーズ5営業日前に納期。",
+        "SLA条項": "対応時間は営業時間内24時間以内。重大インシデント時は4時間以内に初期対応。月間稼働率99.5%以上を保証。",
+        "ペナルティ条項": "納期遅延1日につき月額料金の0.5%減額。SLA未達時は同様に減額。上限は月額料金の5%。",
+        "秘密保持条項": true,
+        "知的財産権条項": true,
+        "解除条件": "重大な契約違反が30日以内に改善されない場合、書面通知により即座に解除可能。",
+        "更新予定日": "2025-02-28T00:00:00Z",
+        "担当者ID": "rec-user-015",
+        "承認者ID": "rec-user-008",
+        "作成日時": "2024-03-15T09:30:00Z",
+        "作成者ID": "rec-user-015",
+        "更新日時": "2024-03-28T14:45:00Z",
+        "更新者ID": "rec-user-008"
+      },
+      {
+        "契約書ID": "rec-001-bpo-2024-11",
+        "ベンダーID": "rec-vendor-0847",
+        "契約名": "カスタマーサポート業務委託契約（2025年1月～2027年12月）",
+        "契約内容": "電話・メール・チャットによるカスタマーサポート業務の一括委託。月間平均5,000件の問い合わせ対応を想定。",
+        "契約開始日": "2025-01-01T00:00:00Z",
+        "契約終了日": "2027-12-31T23:59:59Z",
+        "契約金額": 180000000,
+        "契約ステータス": "承認待ち",
+        "リスク評価レベル": "高",
+        "リスク評価詳細": "長期契約による事業継続依存性が高く、ベンダー経営悪化時の影響大。個人情報取扱いリスク、サービス品質低下時の顧客満足度低下リスク。",
+        "支払条件": "月次後払い。請求月の翌月末日までに銀行振込。消費税別。",
+        "納期条件": "サービス提供は契約開始日より24時間体制で稼働。初期設定・教育期間は開始日より30日間。",
+        "SLA条項": "月間稼働率99.5%以上。平均応答時間は電話30秒以内、メール4時間以内。",
+        "ペナルティ条項": "SLA未達時は月額費用の2%を減額。3ヶ月連続未達で契約解除可能。個人情報漏洩時は違約金5,000万円。",
+        "秘密保持条項": true,
+        "知的財産権条項": true,
+        "解除条件": "①双方合意による即時解除。②SLA3ヶ月連続未達。③重大な契約違反で30日以内に改善されない場合。④ベンダー倒産・民事再生。⑤解除時は60日前通知が必要。",
+        "更新予定日": "2027-10-01T00:00:00Z",
+        "担当者ID": "rec-user-1234",
+        "承認者ID": "rec-user-5678",
+        "作成日時": "2024-11-15T10:30:00Z",
+        "作成者ID": "rec-user-1234",
+        "更新日時": "2024-11-20T14:15:00Z",
+        "更新者ID": "rec-user-9012"
+      },
+      {
+        "契約書ID": "rec-001-20250115-bugfix",
+        "ベンダーID": "rec-vendor-002",
+        "契約名": "緊急本番環境バグ修正対応契約",
+        "契約内容": "本番システムの重大バグに対する24時間体制での迅速な修正対応。初期対応4時間以内、修正完了48時間以内を要件とする。",
+        "契約開始日": "2025-01-15T09:00:00Z",
+        "契約終了日": "2025-03-15T23:59:59Z",
+        "契約金額": 3500000,
+        "契約ステータス": "有効",
+        "リスク評価レベル": "高",
+        "リスク評価詳細": "短納期・高額費用・システム停止時の事業影響大。ベンダー対応遅延時の損害賠償リスク。修正品質不備による二次障害のリスク。",
+        "支払条件": "納品完了から7日以内に全額支払い。追加対応は別途見積。",
+        "納期条件": "初期対応4時間以内、本修正48時間以内、緊急対応は24時間体制対応必須。",
+        "SLA条項": "初期応答時間4時間以内、修正完了48時間以内、稼働率99.5%以上を保証。",
+        "ペナルティ条項": "納期遅延1日につき契約金額の5%減額。SLA未達成時は違約金として契約金額の10%を請求。",
+        "秘密保持条項": true,
+        "知的財産権条項": true,
+        "解除条件": "ベンダーの重大な契約違反または48時間以上の対応遅延時は即時解除可能。解除時の既払金は返金なし。",
+        "更新予定日": "2025-03-15T23:59:59Z",
+        "担当者ID": "rec-user-015",
+        "承認者ID": "rec-user-008",
+        "作成日時": "2025-01-14T14:30:00Z",
+        "作成者ID": "rec-user-015",
+        "更新日時": "2025-01-15T09:00:00Z",
+        "更新者ID": "rec-user-008"
+      }
+    ],
+    "法務対応実績": [
+      {
+        "法務対応実績ID": "rec-001",
+        "ベンダー候補企業ID": "rec-002",
+        "契約書ID": "rec-003",
+        "対応種別": "契約審査",
+        "対応内容": "クラウドサービス提供契約の標準契約書について法務審査を実施。個人情報の取扱い、保管、削除に関する条項を重点的に確認した。",
+        "指摘事項": "個人情報保護方針に具体的な暗号化基準の記載がなく、データ削除時の手続きが曖昧。APPI対応の明記が不足している。",
+        "リスクレベル": "中",
+        "対応結果": "条件付き承認",
+        "対応担当者": "rec-004",
+        "対応日": "2024-11-15T14:30:00+09:00",
+        "作成日時": "2024-11-15T14:35:00+09:00",
+        "更新日時": "2024-11-15T14:35:00+09:00",
+        "作成者": "rec-004"
+      },
+      {
+        "法務対応実績ID": "rec-001",
+        "ベンダー候補企業ID": "rec-002",
+        "契約書ID": "rec-003",
+        "対応種別": "交渉対応",
+        "対応内容": "秘密保持契約における競業避止条項の範囲について、ベンダー側の要望を踏まえ、地域限定と期間短縮を含む修正案を提示し合意に至った。",
+        "指摘事項": "当初の競業避止条項は全国5年間の制限で、ベンダーの事業展開に過度な制約となる懸念があった。",
+        "リスクレベル": "中",
+        "対応結果": "条件付き承認",
+        "対応担当者": "rec-004",
+        "対応日": "2025-01-22T14:30:00Z",
+        "作成日時": "2025-01-22T14:35:00Z",
+        "更新日時": "2025-01-22T14:35:00Z",
+        "作成者": "rec-004"
+      },
+      {
+        "法務対応実績ID": "rec-001",
+        "ベンダー候補企業ID": "rec-vendor-047",
+        "契約書ID": "rec-contract-2024-0156",
+        "対応種別": "リスク評価",
+        "対応内容": "過去24ヶ月のSLA達成率データを分析し、システム可用性99.5%要件に対する未達成事例3件を確認。契約更新条件の見直しと罰則条項の強化を検討。",
+        "指摘事項": "2023年度のSLA未達成率が年間5.2%であり、特に月次メンテナンス時の対応遅延が顕著。サポート体制の人員不足が根本原因と判断。",
+        "リスクレベル": "中",
+        "対応結果": "条件付き承認",
+        "対応担当者": "rec-user-legal-012",
+        "対応日": "2025-01-22T14:30:00+09:00",
+        "作成日時": "2025-01-22T14:35:00+09:00",
+        "更新日時": "2025-01-22T14:35:00+09:00",
+        "作成者": "rec-user-legal-012"
+      },
+      {
+        "法務対応実績ID": "rec-001",
+        "ベンダー候補企業ID": "rec-vc-042",
+        "契約書ID": "rec-contract-158",
+        "対応種別": "リスク評価",
+        "対応内容": "複数ベンダー候補3社の契約条件、知財条項、紛争解決条項を比較審査し法的リスク評価を実施",
+        "指摘事項": "A社は知財帰属が曖昧、B社は高額違約金条項あり、C社は条項が標準的で懸念事項なし",
+        "リスクレベル": "低",
+        "対応結果": "条件付き承認",
+        "対応担当者": "rec-user-089",
+        "対応日": "2024-11-15T14:30:00+09:00",
+        "作成日時": "2024-11-15T14:35:00+09:00",
+        "更新日時": "2024-11-16T09:20:00+09:00",
+        "作成者": "rec-user-089"
+      },
+      {
+        "法務対応実績ID": "rec-001",
+        "ベンダー候補企業ID": "rec-vendor-047",
+        "契約書ID": "rec-contract-089",
+        "対応種別": "交渉対応",
+        "対応内容": "海外ベンダーとの準拠法および紛争解決条項について複数回の交渉を実施。初期案ではシンガポール法・仲裁条項でしたが、日本法適用および東京地裁での訴訟管轄に変更することで合意。",
+        "指摘事項": "初期提案の準拠法がシンガポール法であり、当社の法務リスクが高かった。紛争発生時の費用負担が不明確だったため明記を要求。",
+        "リスクレベル": "中",
+        "対応結果": "条件付き承認",
+        "対応担当者": "rec-user-legal-012",
+        "対応日": "2025-01-15T14:30:00Z",
+        "作成日時": "2025-01-15T14:35:00Z",
+        "更新日時": "2025-01-15T16:20:00Z",
+        "作成者": "rec-user-legal-012"
+      },
+      {
+        "法務対応実績ID": "rec-001",
+        "ベンダー候補企業ID": "rec-v-0047",
+        "契約書ID": "rec-c-0523",
+        "対応種別": "契約審査",
+        "対応内容": "ベンダー提示の瑕疵担保責任条項について、過去3年間の類似紛争事例（納入物の隠れた瑕疵発見時の責任範囲、対応期間の制限）を参照し、現条項の法的リスクを評価した。",
+        "指摘事項": "瑕疵担保責任の免責期間が6ヶ月に限定されており、業界標準の12ヶ月より短い。過去の紛争事例では1年以上経過後の不具合発見が複数件あり、当社の損害賠償請求が困難になるリスクが高い。",
+        "リスクレベル": "高",
+        "対応結果": "却下",
+        "対応担当者": "rec-u-0156",
+        "対応日": "2025-01-15T10:30:00Z",
+        "作成日時": "2025-01-15T10:45:00Z",
+        "更新日時": "2025-01-15T10:45:00Z",
+        "作成者": "rec-u-0156"
+      },
+      {
+        "法務対応実績ID": "rec-001",
+        "ベンダー候補企業ID": "rec-vendor-047",
+        "契約書ID": "rec-contract-089",
+        "対応種別": "リスク評価",
+        "対応内容": "CloudBase Inc.のデータセンター所在地（シンガポール・東京）と個人情報保護方針の法令適合性を調査。APPI、GDPR、FISC基準との整合性を確認し、データ移転契約の必要性を検討。",
+        "指摘事項": "シンガポール拠点でのデータ保管について、日本の個人情報保護委員会への届出手続きが未実施。APPI第28条の国外移転制限に関する確認書が不足。",
+        "リスクレベル": "中",
+        "対応結果": "条件付き承認",
+        "対応担当者": "rec-user-legal-012",
+        "対応日": "2024-11-15T14:30:00Z",
+        "作成日時": "2024-11-15T14:35:00Z",
+        "更新日時": "2024-11-16T09:20:00Z",
+        "作成者": "rec-user-legal-012"
+      },
+      {
+        "法務対応実績ID": "rec-001",
+        "ベンダー候補企業ID": "rec-vendor-047",
+        "契約書ID": "rec-contract-156",
+        "対応種別": "契約審査",
+        "対応内容": "既存ベンダーからの契約変更依頼に伴う追加条項の法的妥当性を審査。データ保護条項、知的財産権帰属、損害賠償責任制限について検討。",
+        "指摘事項": "損害賠償責任の上限が契約金額の2倍に設定されており、当社リスク基準を超過。また機密情報の定義範囲が曖昧で実務運用上の齟齬懸念あり。",
+        "リスクレベル": "中",
+        "対応結果": "保留",
+        "対応担当者": "rec-user-089",
+        "対応日": "2024-11-15T14:30:00",
+        "作成日時": "2024-11-15T14:35:00",
+        "更新日時": "2024-11-15T14:35:00",
+        "作成者": "rec-user-089"
+      },
+      {
+        "法務対応実績ID": "rec-001",
+        "ベンダー候補企業ID": "rec-vendor-0847",
+        "契約書ID": "rec-contract-2024-0312",
+        "対応種別": "交渉対応",
+        "対応内容": "ベンダー破産時の債務履行継続を担保するため、親会社保証条項の追加と保証金額の上限設定について交渉し、合意に至った。",
+        "指摘事項": "初期契約では破産時の債務継続性が不明確であり、当社の事業継続リスクが存在していた。",
+        "リスクレベル": "中",
+        "対応結果": "条件付き承認",
+        "対応担当者": "rec-user-lawyer-0521",
+        "対応日": "2024-11-28T14:30:00+09:00",
+        "作成日時": "2024-11-28T15:45:00+09:00",
+        "更新日時": "2024-11-28T15:45:00+09:00",
+        "作成者": "rec-user-lawyer-0521"
+      },
+      {
+        "法務対応実績ID": "rec-001",
+        "ベンダー候補企業ID": "rec-vendor-047",
+        "契約書ID": "rec-contract-283",
+        "対応種別": "リスク評価",
+        "対応内容": "複数年契約における中途解除条件の法的妥当性を検証し、解除違約金の算定根拠と業界慣行との整合性を評価",
+        "指摘事項": "中途解除時の違約金が売上高の30%と過度に高く、不公正条項に該当する可能性あり。また解除事由の定義が曖昧で紛争リスク存在",
+        "リスクレベル": "高",
+        "対応結果": "条件付き承認",
+        "対応担当者": "rec-user-legal-012",
+        "対応日": "2024-11-15T14:30:00Z",
+        "作成日時": "2024-11-15T14:35:00Z",
+        "更新日時": "2024-11-20T09:45:00Z",
+        "作成者": "rec-user-legal-012"
+      }
+    ],
+    "知的財産権リスク項目": [
+      {
+        "ip_risk_item_id": "rec-001",
+        "risk_category": "特許侵害",
+        "risk_item_name": "ベンダー開発ソフトウェアの既存特許侵害リスク",
+        "risk_description": "外部ベンダーから調達したソフトウェアが、国内外の既登録特許の技術範囲に抵触する可能性があり、使用継続時に特許権者から差止請求や損害賠償請求を受けるリスク",
+        "severity_level": "高",
+        "evaluation_criteria": "特許検索結果との合致度、ベンダー提供の特許クリアランス証明の有無、技術的類似性の程度、対象特許の有効性と権利者の訴訟履歴を総合的に評価",
+        "mitigation_measures": "導入前の包括的な特許調査実施、ベンダーとの特許保証条項の契約化、代替技術への置き換え検討、特許ライセンス取得の交渉",
+        "applicable_industries": "ソフトウェア開発、情報通信、製造業、金融システム",
+        "is_active": true,
+        "created_at": "2024-11-15T09:30:00+09:00",
+        "updated_at": "2025-01-22T14:45:00+09:00",
+        "created_by": "rec-user-0847"
+      },
+      {
+        "ip_risk_item_id": "rec-001",
+        "risk_category": "ライセンス違反",
+        "risk_item_name": "オープンソースライセンス違反（GPL等）",
+        "risk_description": "GPLやAGPLなどのコピーレフト型ライセンスを持つオープンソースソフトウェアを、ライセンス条項に違反して商用製品に組み込み、ソースコード開示義務を果たさない場合の法的リスク",
+        "severity_level": "高",
+        "evaluation_criteria": "組み込まれたOSSの種類、ライセンス条項の重要度、ソースコード非開示期間、商用利用の規模、権利者からの警告有無を総合的に評価",
+        "mitigation_measures": "OSSライセンス管理ツール導入、ライセンス監査の定期実施、法務部門との事前確認、ライセンス互換性マトリックスの整備、ソースコード開示体制の構築",
+        "applicable_industries": "ソフトウェア開発、IoT機器製造、SaaS提供事業",
+        "is_active": true,
+        "created_at": "2024-06-15T09:30:00Z",
+        "updated_at": "2025-01-20T14:15:00Z",
+        "created_by": "rec-usr-0047"
+      },
+      {
+        "ip_risk_item_id": "rec-001",
+        "risk_category": "営業秘密漏洩",
+        "risk_item_name": "ベンダー保有技術情報の不正アクセス・持ち出し",
+        "risk_description": "委託先ベンダーが保有する製品開発技術、顧客リスト、価格情報等の営業秘密が、従業員の不正持ち出しや外部への無断開示により漏洩するリスク",
+        "severity_level": "高",
+        "evaluation_criteria": "機密情報の分類レベル、アクセス権限者数、過去の漏洩事例の有無、情報保管体制の整備状況を総合評価",
+        "mitigation_measures": "アクセス制御の厳格化、定期的なセキュリティ監査、秘密保持契約の更新、従業員教育の実施、監視ログの記録と定期確認",
+        "applicable_industries": "製造業、ソフトウェア開発、電子機器製造",
+        "is_active": true,
+        "created_at": "2024-04-15T09:30:00+09:00",
+        "updated_at": "2025-01-20T14:45:00+09:00",
+        "created_by": "rec-user-0847"
+      },
+      {
+        "ip_risk_item_id": "rec-001",
+        "risk_category": "著作権侵害",
+        "risk_item_name": "納入物の第三者著作権コンテンツ無断使用",
+        "risk_description": "システム開発やコンテンツ制作の納入物に、ライセンス取得なしの画像・音声・ソースコードなど第三者著作権保護物が混在するリスク",
+        "severity_level": "高",
+        "evaluation_criteria": "著作権者からの警告状受領、侵害コンテンツの検出数、納入物全体に占める割合、使用期間の長さで判定",
+        "mitigation_measures": "納入前チェックリスト導入、外部ツール（画像逆検索・コード類似度検査）活用、ベンダー契約に著作権保証条項追加、社内教育実施",
+        "applicable_industries": "ソフトウェア開発、Web制作、デジタルマーケティング、出版・メディア",
+        "is_active": true,
+        "created_at": "2024-04-15T09:30:00Z",
+        "updated_at": "2025-01-20T14:15:00Z",
+        "created_by": "rec-user-0847"
+      },
+      {
+        "ip_risk_item_id": "rec-001",
+        "risk_category": "ライセンス違反",
+        "risk_item_name": "ベンダーライセンス適用範囲逸脱リスク",
+        "risk_description": "導入ソフトウェアやコンポーネントのライセンス保有状況が不明確であり、契約範囲外の利用や子会社への無許可適用により違反となるリスク",
+        "severity_level": "高",
+        "evaluation_criteria": "ライセンス契約書との照合による適用範囲確認、保有ライセンス数と実運用ユーザー数の乖離、サブライセンス許可の有無確認",
+        "mitigation_measures": "ライセンス管理台帳の整備、定期的な棚卸し実施、ベンダー契約書の明確化、コンプライアンス監査の実施",
+        "applicable_industries": "製造業、金融業、情報通信業",
+        "is_active": true,
+        "created_at": "2024-04-15T09:30:00Z",
+        "updated_at": "2025-01-20T14:15:00Z",
+        "created_by": "rec-user-0847"
+      },
+      {
+        "ip_risk_item_id": "rec-001",
+        "risk_category": "データ所有権・利用権紛争",
+        "risk_item_name": "クラウドサービス利用時のデータ所有権紛争",
+        "risk_description": "クラウドサービス提供者との契約において、アップロードしたデータの所有権や利用権が曖昧な場合、サービス終了時やトラブル時にデータ返却・削除が適切に行われず、法的紛争に発展するリスク。",
+        "severity_level": "高",
+        "evaluation_criteria": "契約書にデータ所有権条項が明記されているか、利用規約でベンダーによる二次利用が制限されているか、データ移行・削除時の手続きが定義されているか。",
+        "mitigation_measures": "クラウド契約書に明確な所有権条項を追加、定期的な利用規約確認、データ分類と暗号化の実施、ベンダー監査の実施。",
+        "applicable_industries": "金融・保険、製造、医療、情報通信",
+        "is_active": true,
+        "created_at": "2024-06-15T09:30:00Z",
+        "updated_at": "2025-01-20T14:45:00Z",
+        "created_by": "rec-user-0042"
+      },
+      {
+        "ip_risk_item_id": "rec-001",
+        "risk_category": "知的財産権帰属",
+        "risk_item_name": "カスタマイズ開発における成果物帰属の不明確化",
+        "risk_description": "受託開発プロジェクトにおいて、顧客との契約で成果物の知的財産権帰属が明確に定義されていない場合、開発成果物（ソースコード、設計書、カスタマイズ機能等）の所有権をめぐる紛争が発生するリスク",
+        "severity_level": "高",
+        "evaluation_criteria": "契約書に知的財産権帰属条項が存在するか、既存ライブラリ・フレームワークの混在時の扱いが明記されているか、納品物の範囲と権利が対応しているか",
+        "mitigation_measures": "受託契約時に知的財産権帰属条項を明記し、顧客資産と開発者資産の区分を文書化する。納品物チェックリストに権利帰属情報を含める。紛争時の仲裁条項を事前に合意する。",
+        "applicable_industries": "ソフトウェア開発、システムインテグレーション、Webアプリケーション開発",
+        "is_active": true,
+        "created_at": "2024-04-15T09:30:00+09:00",
+        "updated_at": "2025-01-20T14:45:00+09:00",
+        "created_by": "rec-user-0847"
+      },
+      {
+        "ip_risk_item_id": "rec-001",
+        "risk_category": "営業秘密漏洩",
+        "risk_item_name": "ベンダー従業員による前職の機密情報持ち込み",
+        "risk_description": "新規採用されたベンダー従業員が、前職で取得した顧客リスト、技術仕様書、ソースコードなどの機密情報を持ち込み、意図的または無意識に当社プロジェクトで活用・開示するリスク",
+        "severity_level": "高",
+        "evaluation_criteria": "入社時の誓約書署名状況、前職との競合関係の有無、アクセス権限設定の適切性、情報漏洩の発見までの期間",
+        "mitigation_measures": "入社時の厳格な誓約書取得、前職企業との競合調査、初期段階での機密情報アクセス制限、定期的な情報セキュリティ研修の実施、持ち込み物品検査の実施",
+        "applicable_industries": "ソフトウェア開発、システムインテグレーション、コンサルティング、製造業",
+        "is_active": true,
+        "created_at": "2024-11-15T09:30:00Z",
+        "updated_at": "2025-01-20T14:15:00Z",
+        "created_by": "rec-user-0847"
+      },
+      {
+        "ip_risk_item_id": "rec-001",
+        "risk_category": "ライセンス違反",
+        "risk_item_name": "ライセンス数超過及びサブライセンス禁止条項違反",
+        "risk_description": "ソフトウェアライセンスの購入数を超える使用またはエンドユーザーへの再ライセンス行為",
+        "severity_level": "高",
+        "evaluation_criteria": "ライセンス管理台帳との実装台数の乖離確認、ライセンス契約書のサブライセンス禁止条項の確認、監査ログによる不正使用の検出",
+        "mitigation_measures": "定期的なライセンス数監査、ライセンス管理ツールの導入、契約条項の遵守教育、過剰使用時の即座な対応体制構築",
+        "applicable_industries": "情報通信業、製造業、金融業、医療業",
+        "is_active": true,
+        "created_at": "2024-04-15T09:30:00Z",
+        "updated_at": "2025-01-20T14:15:00Z",
+        "created_by": "rec-user-042"
+      },
+      {
+        "ip_risk_item_id": "rec-001",
+        "risk_category": "著作権侵害",
+        "risk_item_name": "AI学習モデル・データセットの知的財産権所有権確認",
+        "risk_description": "AI学習に使用するデータセットやモデルの著作権所有者が不明確または第三者の権利が含まれている場合、著作権侵害リスクが発生する可能性がある。",
+        "severity_level": "高",
+        "evaluation_criteria": "学習データの出所確認状況、ライセンス契約の有無、第三者コンテンツの混在率、商用利用許諾の確認状況を総合判断",
+        "mitigation_measures": "データセット購入時に著作権譲渡契約を取得、学習データの出所管理台帳を整備、定期的な権利確認監査を実施",
+        "applicable_industries": "IT・ソフトウェア、金融、医療、製造業",
+        "is_active": true,
+        "created_at": "2024-06-15T09:30:00Z",
+        "updated_at": "2025-01-20T14:45:00Z",
+        "created_by": "rec-user-0847"
+      }
+    ],
+    "セキュリティリスク項目": [
+      {
+        "セキュリティリスク項目ID": "rec-001",
+        "リスク項目名": "クラウドストレージの保存データ暗号化",
+        "リスク項目説明": "クラウドストレージサービスに保存される顧客データが適切な暗号化方式により保護されているか、また暗号化キーの管理が適切に実施されているかを評価する対象範囲",
+        "リスクカテゴリ": "データ保護",
+        "重要度レベル": "高",
+        "評価基準": "AES-256以上の暗号化方式の採用、暗号化キーの定期的なローテーション、キー管理システムの多要素認証導入状況、暗号化の適用範囲が全保存データに対応しているか",
+        "評価スケール": "1-5",
+        "参照標準": "ISO27001、NIST SP 800-53、クラウドセキュリティガイドライン",
+        "是正期限日数": 30,
+        "有効フラグ": true,
+        "作成日時": "2024-11-15T09:30:00+09:00",
+        "更新日時": "2024-12-10T14:20:00+09:00",
+        "作成者": "山田花子",
+        "更新者": "佐藤次郎"
+      },
+      {
+        "セキュリティリスク項目ID": "rec-001",
+        "リスク項目名": "SaaS提供ベンダーのアクセス制御・認証機構の評価",
+        "リスク項目説明": "SaaS提供ベンダーが提供するクラウドサービスにおけるユーザー認証、アクセス制御、権限管理の実装状況を評価する。多要素認証の導入、ロールベースアクセス制御の適切性、管理者権限の分離と監視を対象とする。",
+        "リスクカテゴリ": "アクセス制御",
+        "重要度レベル": "高",
+        "評価基準": "多要素認証の実装状況、ロールベースアクセス制御の設計妥当性、特権アカウント管理の適切性、アクセスログの記録と監視体制の有無を総合評価する。",
+        "評価スケール": "1-5",
+        "参照標準": "ISO27001、NIST SP 800-53、CIS Controls",
+        "是正期限日数": 30,
+        "有効フラグ": true,
+        "作成日時": "2024-11-15T09:30:00+09:00",
+        "更新日時": "2025-01-08T14:20:00+09:00",
+        "作成者": "山田花子",
+        "更新者": "佐藤次郎"
+      },
+      {
+        "セキュリティリスク項目ID": "rec-001",
+        "リスク項目名": "外部委託先のインシデント対応体制評価",
+        "リスク項目説明": "委託先におけるインシデント検知・報告・対応プロセスの整備状況、連絡体制の確立、対応時間目標の設定状況を評価",
+        "リスクカテゴリ": "インシデント対応",
+        "重要度レベル": "高",
+        "評価基準": "インシデント対応計画の有無、24時間以内の初期報告体制、対応チームの配置、定期的な訓練実施の確認",
+        "評価スケール": "1-5",
+        "参照標準": "ISO27035、NIST Cybersecurity Framework",
+        "是正期限日数": 30,
+        "有効フラグ": true,
+        "作成日時": "2024-10-15T09:30:00+09:00",
+        "更新日時": "2025-01-20T14:15:00+09:00",
+        "作成者": "山田花子",
+        "更新者": "佐藤次郎"
+      },
+      {
+        "セキュリティリスク項目ID": "rec-001",
+        "リスク項目名": "カード情報の暗号化と保護",
+        "リスク項目説明": "決済処理時の顧客カード情報の暗号化状況、保存期間管理、アクセス制御の適切性を評価",
+        "リスクカテゴリ": "データ保護",
+        "重要度レベル": "高",
+        "評価基準": "カード情報の暗号化方式がAES-256以上であること、保存期間が最小限に制限されていること、アクセスログが記録されていることを確認",
+        "評価スケール": "1-5",
+        "参照標準": "PCI-DSS v3.2.1",
+        "是正期限日数": 30,
+        "有効フラグ": true,
+        "作成日時": "2024-10-15T09:30:00+09:00",
+        "更新日時": "2025-01-20T14:15:00+09:00",
+        "作成者": "山田花子",
+        "更新者": "鈴木健一"
+      },
+      {
+        "セキュリティリスク項目ID": "rec-001",
+        "リスク項目名": "個人情報の暗号化管理",
+        "リスク項目説明": "人事給与システムに保存される従業員の個人情報（氏名、マイナンバー、給与情報等）が適切に暗号化されているか、また暗号化キーの管理体制が確立されているかを評価する。",
+        "リスクカテゴリ": "データ保護",
+        "重要度レベル": "高",
+        "評価基準": "転送中・保存中のデータ暗号化実装状況、暗号化アルゴリズムの強度、キー管理体制の整備度合いにより判定。",
+        "評価スケール": "1-5",
+        "参照標準": "ISO27001、個人情報保護方針ガイドライン",
+        "是正期限日数": 30,
+        "有効フラグ": true,
+        "作成日時": "2024-11-15T09:30:00",
+        "更新日時": "2025-01-10T14:45:00",
+        "作成者": "山田花子",
+        "更新者": "佐藤次郎"
+      },
+      {
+        "セキュリティリスク項目ID": "rec-001",
+        "リスク項目名": "マネージドセキュリティサービスの検知応答時間",
+        "リスク項目説明": "MSS提供者がセキュリティインシデントを検知してから初期対応を開始するまでの時間が業務要件を満たしているかを評価する",
+        "リスクカテゴリ": "インシデント対応",
+        "重要度レベル": "高",
+        "評価基準": "検知から初期対応開始までが30分以内で合格、30分超過で不合格。月間平均応答時間を測定",
+        "評価スケール": "合格/不合格",
+        "参照標準": "ISO27035、NIST Cybersecurity Framework",
+        "是正期限日数": 30,
+        "有効フラグ": true,
+        "作成日時": "2024-10-15T09:30:00",
+        "更新日時": "2025-01-20T14:45:00",
+        "作成者": "山田花子",
+        "更新者": "佐藤次郎"
+      },
+      {
+        "セキュリティリスク項目ID": "rec-001",
+        "リスク項目名": "クラウドバックアップの復旧時間目標（RTO）達成確認",
+        "リスク項目説明": "クラウドバックアップサービスにおいて、災害発生時に定められたRTO内でのデータ復旧が可能か、定期的な復旧テストにより検証する必要がある。",
+        "リスクカテゴリ": "事業継続性・災害復旧",
+        "重要度レベル": "高",
+        "評価基準": "年2回以上の復旧テストを実施し、目標RTO（4時間以内）での復旧成功率が95%以上であること。テスト記録とログの保管。",
+        "評価スケール": "1-5",
+        "参照標準": "ISO27001、ISO22301",
+        "是正期限日数": 30,
+        "有効フラグ": true,
+        "作成日時": "2024-06-15T09:30:00+09:00",
+        "更新日時": "2025-01-20T14:15:00+09:00",
+        "作成者": "山田花子",
+        "更新者": "佐藤健一"
+      },
+      {
+        "セキュリティリスク項目ID": "rec-001",
+        "リスク項目名": "API連携パートナーの脆弱性管理・セキュリティパッチ対応",
+        "リスク項目説明": "外部API連携パートナーのシステムにおける脆弱性検出時の対応状況、セキュリティパッチの適用状況、及び脆弱性管理プロセスの実装度合いを評価する。パートナー企業との連携契約に基づく対応期限遵守状況も含む。",
+        "リスクカテゴリ": "サプライチェーンセキュリティ",
+        "重要度レベル": "高",
+        "評価基準": "脆弱性検出から是正完了までの平均対応日数、CVSS 8.0以上の脆弱性への対応率、セキュリティパッチの自動配布体制の有無、及び対応状況の可視化体制が評価対象",
+        "評価スケール": "1-5",
+        "参照標準": "ISO27001、NIST CSF",
+        "是正期限日数": 30,
+        "有効フラグ": true,
+        "作成日時": "2024-04-15T09:30:00+09:00",
+        "更新日時": "2025-01-20T14:15:00+09:00",
+        "作成者": "山田花子",
+        "更新者": "佐藤次郎"
+      },
+      {
+        "セキュリティリスク項目ID": "rec-001",
+        "リスク項目名": "データセンター出入管理の不備",
+        "リスク項目説明": "オンプレミス施設への物理的アクセス制御が適切に実施されているか、入退室記録の管理体制を評価対象とする。",
+        "リスクカテゴリ": "物理セキュリティ",
+        "重要度レベル": "高",
+        "評価基準": "入退室管理システムの導入状況、アクセス権限の適切性、出入記録の保持期間が基準を満たしているか判定。",
+        "評価スケール": "1-5",
+        "参照標準": "ISO27001、FISC安全対策基準",
+        "是正期限日数": 30,
+        "有効フラグ": true,
+        "作成日時": "2024-10-15T09:30:00+09:00",
+        "更新日時": "2025-01-20T14:15:00+09:00",
+        "作成者": "山田花子",
+        "更新者": "佐藤次郎"
+      },
+      {
+        "セキュリティリスク項目ID": "rec-001",
+        "リスク項目名": "監査ログの長期保持とデータ完全性の確保",
+        "リスク項目説明": "SIEM導入環境におけるログデータの保持期間設定、暗号化保存、改ざん防止機構の実装状況を評価対象とする",
+        "リスクカテゴリ": "データ保護",
+        "重要度レベル": "高",
+        "評価基準": "ログ保持期間が法令要件（最低1年）を満たし、暗号化・タイムスタンプ・ハッシュ検証による改ざん防止が実装されているか",
+        "評価スケール": "1-5",
+        "参照標準": "ISO27001、個人情報保護方針ガイドライン",
+        "是正期限日数": 30,
+        "有効フラグ": true,
+        "作成日時": "2024-10-15T09:30:00Z",
+        "更新日時": "2025-01-20T14:15:00Z",
+        "作成者": "山田花子",
+        "更新者": "佐藤次郎"
+      }
+    ],
+    "業界標準パターン": [
+      {
+        "業界標準パターンID": "rec-001",
+        "業界区分": "製造業",
+        "パターン名": "部品サプライヤー品質・納期リスク評価パターン",
+        "パターン説明": "自動車・電機産業の部品サプライヤーを対象とした品質管理能力と納期遵守能力の総合評価。ISO9001認証状況、不良率実績、納期達成率、生産能力を中心に多角的にリスク判定する。",
+        "推奨評価項目数": 12,
+        "リスク重要度レベル": "高",
+        "契約条件テンプレートID": "tmpl-0047",
+        "チェックリスト項目数": 28,
+        "適用開始日": "2024-04-01T00:00:00Z",
+        "適用終了日": null,
+        "ステータス": "有効",
+        "作成日時": "2024-03-15T09:30:00Z",
+        "更新日時": "2024-12-10T14:20:00Z",
+        "作成者": "山田花子",
+        "更新者": "佐藤次郎"
+      },
+      {
+        "業界標準パターンID": "rec-001",
+        "業界区分": "金融",
+        "パターン名": "金融機関システムベンダー情報セキュリティ評価パターン",
+        "パターン説明": "金融機関が基幹システムやクラウドサービスを提供するベンダー選定時に、情報セキュリティ・個人情報保護・金融規制への対応能力を総合評価するためのパターン。",
+        "推奨評価項目数": 28,
+        "リスク重要度レベル": "高",
+        "契約条件テンプレートID": "tmpl-fin-001",
+        "チェックリスト項目数": 42,
+        "適用開始日": "2024-04-01T00:00:00Z",
+        "適用終了日": null,
+        "ステータス": "有効",
+        "作成日時": "2024-03-15T09:30:00Z",
+        "更新日時": "2024-12-10T14:45:00Z",
+        "作成者": "山田花子",
+        "更新者": "佐藤次郎"
+      },
+      {
+        "業界標準パターンID": "rec-001",
+        "業界区分": "医療",
+        "パターン名": "医療機器ベンダー選定評価パターン",
+        "パターン説明": "医療機関が医療機器ベンダーを選定する際の規制対応状況、保守体制、技術サポート体制を総合的に評価するためのパターン。医療法・薬機法等の法令遵守と長期的な保守継続性を重視。",
+        "推奨評価項目数": 18,
+        "リスク重要度レベル": "高",
+        "契約条件テンプレートID": "tpl-med-001",
+        "チェックリスト項目数": 42,
+        "適用開始日": "2024-04-01T00:00:00Z",
+        "適用終了日": null,
+        "ステータス": "有効",
+        "作成日時": "2024-03-15T10:30:00Z",
+        "更新日時": "2024-11-20T14:45:00Z",
+        "作成者": "山田花子",
+        "更新者": "佐藤次郎"
+      },
+      {
+        "業界標準パターンID": "rec-001",
+        "業界区分": "小売業",
+        "パターン名": "小売POS・決済インフラ事業継続性評価パターン",
+        "パターン説明": "POSシステムおよび決済インフラベンダーを対象とした事業継続性評価。システム稼働率、決済処理の可用性、災害時の復旧体制、顧客データ保護を重点評価項目とする。",
+        "推奨評価項目数": 18,
+        "リスク重要度レベル": "高",
+        "契約条件テンプレートID": "tpl-2024-retail-pos",
+        "チェックリスト項目数": 42,
+        "適用開始日": "2024-04-01T00:00:00Z",
+        "適用終了日": null,
+        "ステータス": "有効",
+        "作成日時": "2024-03-15T10:30:00Z",
+        "更新日時": "2024-12-10T14:45:00Z",
+        "作成者": "山田花子",
+        "更新者": "佐藤次郎"
+      },
+      {
+        "業界標準パターンID": "rec-001",
+        "業界区分": "建設業",
+        "パターン名": "下請け業者労務安全管理体制評価",
+        "パターン説明": "建設業における下請け業者選定時の労務管理体制と安全管理体制を総合的に評価するパターン。労働基準法遵守状況、安全衛生管理体制の整備状況、事故歴等を確認し、リスク軽減を図る。",
+        "推奨評価項目数": 18,
+        "リスク重要度レベル": "高",
+        "契約条件テンプレートID": "tmpl-0047",
+        "チェックリスト項目数": 42,
+        "適用開始日": "2024-04-01T00:00:00Z",
+        "適用終了日": null,
+        "ステータス": "有効",
+        "作成日時": "2024-03-15T09:30:00Z",
+        "更新日時": "2024-12-10T14:20:00Z",
+        "作成者": "山田花子",
+        "更新者": "佐藤次郎"
+      },
+      {
+        "業界標準パターンID": "rec-001",
+        "業界区分": "食品製造業",
+        "パターン名": "食品原材料サプライヤーHACCP・トレーサビリティ評価パターン",
+        "パターン説明": "食品製造業における原材料サプライヤーのHACCP認証取得状況、衛生管理体制、原材料の追跡可能性確保に関する評価基準。食品安全法令対応と顧客要求事項への適合性を総合的に審査する。",
+        "推奨評価項目数": 18,
+        "リスク重要度レベル": "高",
+        "契約条件テンプレートID": "tpl-0042",
+        "チェックリスト項目数": 42,
+        "適用開始日": "2024-04-01T00:00:00Z",
+        "適用終了日": null,
+        "ステータス": "有効",
+        "作成日時": "2024-03-15T10:30:00Z",
+        "更新日時": "2024-12-10T14:45:00Z",
+        "作成者": "山田花子",
+        "更新者": "佐藤次郎"
+      },
+      {
+        "業界標準パターンID": "rec-001",
+        "業界区分": "通信・インフラ",
+        "パターン名": "通信インフラ構築パートナー技術力評価パターン",
+        "パターン説明": "通信事業者が5G/光ファイバー網構築の協力企業を選定する際の技術力・実績・リスク管理能力を総合評価するパターン。施工品質、工程管理、安全管理、技術者資格保有状況等を重点評価。",
+        "推奨評価項目数": 18,
+        "リスク重要度レベル": "高",
+        "契約条件テンプレートID": "tpl-0042",
+        "チェックリスト項目数": 42,
+        "適用開始日": "2024-04-01T00:00:00Z",
+        "適用終了日": null,
+        "ステータス": "有効",
+        "作成日時": "2024-03-15T10:30:00Z",
+        "更新日時": "2024-12-20T14:45:00Z",
+        "作成者": "山田太郎",
+        "更新者": "佐藤花子"
+      },
+      {
+        "業界標準パターンID": "rec-001",
+        "業界区分": "医療・製薬",
+        "パターン名": "CRO信頼性評価パターン（GCP準拠）",
+        "パターン説明": "製薬企業が臨床試験受託機関を選定する際のGCP準拠状況と信頼性を総合評価するパターン。規制要件適合性、品質管理体制、過去の実績、人員体制を中心に審査。",
+        "推奨評価項目数": 28,
+        "リスク重要度レベル": "高",
+        "契約条件テンプレートID": "tmpl-cro-001",
+        "チェックリスト項目数": 42,
+        "適用開始日": "2024-04-01T00:00:00Z",
+        "適用終了日": null,
+        "ステータス": "有効",
+        "作成日時": "2024-03-15T10:30:00Z",
+        "更新日時": "2024-12-10T14:45:00Z",
+        "作成者": "山田花子",
+        "更新者": "佐藤次郎"
+      },
+      {
+        "業界標準パターンID": "rec-001",
+        "業界区分": "自動車・電装部品",
+        "パターン名": "電装部品ベンダー品質・IP保護評価",
+        "パターン説明": "自動車電装部品メーカー向けの品質管理体制と知的財産保護レベルを総合評価するパターン。部品の安全性認証、製造プロセス管理、設計情報の機密性確保が主要評価対象。",
+        "推奨評価項目数": 18,
+        "リスク重要度レベル": "高",
+        "契約条件テンプレートID": "tpl-0047",
+        "チェックリスト項目数": 42,
+        "適用開始日": "2024-04-01T00:00:00Z",
+        "適用終了日": null,
+        "ステータス": "有効",
+        "作成日時": "2024-03-15T10:30:00Z",
+        "更新日時": "2024-12-20T14:15:00Z",
+        "作成者": "佐藤花子",
+        "更新者": "鈴木次郎"
+      },
+      {
+        "業界標準パターンID": "rec-001",
+        "業界区分": "エネルギー",
+        "パターン名": "発電所保守委託先安全環境評価パターン",
+        "パターン説明": "発電所・変電所の保守・運用委託先に対する安全管理体制と環境対応能力の総合評価基準。労働安全衛生マネジメント、環境汚染防止、緊急対応体制を中心に審査。",
+        "推奨評価項目数": 18,
+        "リスク重要度レベル": "高",
+        "契約条件テンプレートID": "tmpl-047",
+        "チェックリスト項目数": 42,
+        "適用開始日": "2024-04-01T00:00:00Z",
+        "適用終了日": null,
+        "ステータス": "有効",
+        "作成日時": "2024-02-15T10:30:00Z",
+        "更新日時": "2024-12-10T14:45:00Z",
+        "作成者": "山田花子",
+        "更新者": "佐藤次郎"
+      }
+    ],
+    "リスク対比分析結果": [
+      {
+        "分析結果ID": "rec-001",
+        "分析セッションID": "sess-2024-11-15-001",
+        "ベンダー候補企業ID": "vendor-aws-jp-001",
+        "セキュリティリスク総合スコア": 28,
+        "知的財産権リスク総合スコア": 35,
+        "法務リスク総合スコア": 22,
+        "業界適合性スコア": 92,
+        "総合リスクスコア": 32,
+        "推奨判定": "推奨",
+        "主要リスク摘要": "データセンター所在地が米国であることによる個人情報保護方針の相違が要注意。金融庁への事前相談完了済み。",
+        "対比分析コメント": "他の2候補と比較して、セキュリティ認証数が最多で金融機関向けの実装事例が豊富。ただしコスト面では中堅ベンダーより割高。",
+        "分析実施者ID": "user-2024-yamada-001",
+        "作成日時": "2024-11-15T14:32:00+09:00",
+        "更新日時": "2024-11-15T14:32:00+09:00"
+      },
+      {
+        "分析結果ID": "rec-001",
+        "分析セッションID": "rec-sess-2024-001",
+        "ベンダー候補企業ID": "rec-vendor-002",
+        "セキュリティリスク総合スコア": 32,
+        "知的財産権リスク総合スコア": 28,
+        "法務リスク総合スコア": 35,
+        "業界適合性スコア": 78,
+        "総合リスクスコア": 38,
+        "推奨判定": "条件付き推奨",
+        "主要リスク摘要": "医療情報の暗号化対応が他社比で弱く、個人情報保護方針の更新実績が不足。ただし医療業界での導入事例が豊富。",
+        "対比分析コメント": "A社と比較して総合リスクで5ポイント低いが、セキュリティ要件への対応度は劣る。C社より業界適合性は高く、コスト面で優位。",
+        "分析実施者ID": "rec-user-2024-015",
+        "作成日時": "2024-11-15T14:30:00+09:00",
+        "更新日時": "2024-11-15T14:30:00+09:00"
+      },
+      {
+        "分析結果ID": "rec-001",
+        "分析セッションID": "ses-024",
+        "ベンダー候補企業ID": "vnd-087",
+        "セキュリティリスク総合スコア": 35,
+        "知的財産権リスク総合スコア": 28,
+        "法務リスク総合スコア": 42,
+        "業界適合性スコア": 78,
+        "総合リスクスコア": 38,
+        "推奨判定": "条件付き推奨",
+        "主要リスク摘要": "契約書テンプレートの国内法対応が部分的。データセンター監査実績が限定的。",
+        "対比分析コメント": "現行ベンダーと比較して総合リスク5ポイント低減。業界適合性は同等だが、セキュリティ認証取得予定により今後改善見込み。",
+        "分析実施者ID": "usr-156",
+        "作成日時": "2024-11-15T09:30:00+09:00",
+        "更新日時": "2024-11-15T09:30:00+09:00"
+      },
+      {
+        "分析結果ID": "rec-001",
+        "分析セッションID": "ses-2024-1127-001",
+        "ベンダー候補企業ID": "vnd-2024-0856",
+        "セキュリティリスク総合スコア": 42,
+        "知的財産権リスク総合スコア": 68,
+        "法務リスク総合スコア": 55,
+        "業界適合性スコア": 76,
+        "総合リスクスコア": 58,
+        "推奨判定": "条件付き推奨",
+        "主要リスク摘要": "中国拠点での特許出願プロセスが不透明。技術流出防止契約の強化が必須。",
+        "対比分析コメント": "同セッション内の他2社比較で知的財産権リスクは中程度だが、業界適合性が高い。法務体制の整備により総合評価は改善可能。",
+        "分析実施者ID": "usr-2024-0234",
+        "作成日時": "2024-11-27T14:35:22Z",
+        "更新日時": "2024-11-27T14:35:22Z"
+      },
+      {
+        "分析結果ID": "rec-001",
+        "分析セッションID": "rec-sess-2025-001",
+        "ベンダー候補企業ID": "rec-vendor-042",
+        "セキュリティリスク総合スコア": 72,
+        "知的財産権リスク総合スコア": 45,
+        "法務リスク総合スコア": 58,
+        "業界適合性スコア": 82,
+        "総合リスクスコア": 64,
+        "推奨判定": "条件付き推奨",
+        "主要リスク摘要": "2024年11月のセキュリティインシデントに関連する脆弱性対応の遅延が懸念される。ただし改善計画が提出されている。",
+        "対比分析コメント": "他の候補企業と比較して業界適合性は高いが、セキュリティ対応体制の強化が契約継続の前提条件となる。",
+        "分析実施者ID": "rec-user-156",
+        "作成日時": "2025-01-15T10:30:00Z",
+        "更新日時": "2025-01-15T10:30:00Z"
+      },
+      {
+        "分析結果ID": "rec-001",
+        "分析セッションID": "ses-2024-0847",
+        "ベンダー候補企業ID": "vnd-0312",
+        "セキュリティリスク総合スコア": 28,
+        "知的財産権リスク総合スコア": 35,
+        "法務リスク総合スコア": 22,
+        "業界適合性スコア": 82,
+        "総合リスクスコア": 32,
+        "推奨判定": "条件付き推奨",
+        "主要リスク摘要": "データセンター冗長化対応が限定的。国内拠点のみで海外バックアップ体制が未整備。",
+        "対比分析コメント": "他の2候補と比較して総合リスクは最も低いが、セキュリティ体制の強化が条件。金融系大型案件の実績が豊富で業界適合性は高い。",
+        "分析実施者ID": "usr-0156",
+        "作成日時": "2024-11-15T14:32:00+09:00",
+        "更新日時": "2024-11-15T14:32:00+09:00"
+      },
+      {
+        "分析結果ID": "rec-001",
+        "分析セッションID": "ses-2024-1205-iot",
+        "ベンダー候補企業ID": "vnd-0847",
+        "セキュリティリスク総合スコア": 32,
+        "知的財産権リスク総合スコア": 28,
+        "法務リスク総合スコア": 41,
+        "業界適合性スコア": 78,
+        "総合リスクスコア": 38,
+        "推奨判定": "条件付き推奨",
+        "主要リスク摘要": "エッジデバイス暗号化機能の仕様書不備、標準契約書の日本法準拠条項が未整備",
+        "対比分析コメント": "業界実績では他社比で優位性あり（自動車部品メーカー導入12社）。セキュリティ体制は競合比で堅牢だが、契約交渉に時間要する可能性",
+        "分析実施者ID": "usr-5621",
+        "作成日時": "2024-12-05T14:23:00+09:00",
+        "更新日時": "2024-12-05T14:23:00+09:00"
+      },
+      {
+        "分析結果ID": "rec-001",
+        "分析セッションID": "sess-2024-1127-vendor-renewal",
+        "ベンダー候補企業ID": "vendor-045",
+        "セキュリティリスク総合スコア": 28,
+        "知的財産権リスク総合スコア": 35,
+        "法務リスク総合スコア": 22,
+        "業界適合性スコア": 82,
+        "総合リスクスコア": 32,
+        "推奨判定": "条件付き推奨",
+        "主要リスク摘要": "データセンター所在地の海外移転計画に伴う規制対応が課題。知的財産権侵害事例の過去2件は既に解決済みだが監視継続必要。",
+        "対比分析コメント": "既存ベンダーと比較して総合リスクは5ポイント低いが、業界適合性で8ポイント上回る。法務対応実績は同等だが、セキュリティ体制強化の進捗確認が契約更新の条件。",
+        "分析実施者ID": "user-2847",
+        "作成日時": "2024-11-27T14:32:00+09:00",
+        "更新日時": "2024-11-27T14:32:00+09:00"
+      },
+      {
+        "分析結果ID": "rec-001",
+        "分析セッションID": "rec-sess-2025-001",
+        "ベンダー候補企業ID": "rec-vendor-047",
+        "セキュリティリスク総合スコア": 42,
+        "知的財産権リスク総合スコア": 35,
+        "法務リスク総合スコア": 58,
+        "業界適合性スコア": 72,
+        "総合リスクスコア": 51,
+        "推奨判定": "条件付き推奨",
+        "主要リスク摘要": "法務体制の整備途上であり契約書レビュー期間を要する。セキュリティ認証取得予定は2025年Q2。",
+        "対比分析コメント": "既存ベンダーと比較して業界適合性が高く、価格競争力に優位性あり。ただし体制構築中のため移行期間の密接な支援体制構築が必須。",
+        "分析実施者ID": "rec-user-156",
+        "作成日時": "2025-01-15T09:30:00+09:00",
+        "更新日時": "2025-01-15T09:30:00+09:00"
+      }
+    ],
+    "ベンダー評価スコア": [
+      {
+        "評価スコアID": "rec-001",
+        "ベンダー候補企業ID": "vendor-0847",
+        "評価実施日": "2024-11-15T10:30:00Z",
+        "総合スコア": 72,
+        "財務健全性スコア": 85,
+        "技術力スコア": 82,
+        "セキュリティスコア": 58,
+        "法務コンプライアンススコア": 76,
+        "導入実績スコア": 79,
+        "業界適合性スコア": 71,
+        "リスク評価スコア": 68,
+        "評価者ID": "user-2341",
+        "評価コメント": "大手SIerとして財務基盤と技術実績は優秀。ただしセキュリティ体制の整備が不十分で、特にインシデント対応手順の明確化が必要。",
+        "推奨判定": "条件付き推奨",
+        "作成日時": "2024-11-15T10:35:22Z",
+        "更新日時": "2024-11-15T10:35:22Z",
+        "作成者ID": "user-2341"
+      },
+      {
+        "評価スコアID": "rec-001",
+        "ベンダー候補企業ID": "vendor-047",
+        "評価実施日": "2024-11-15T10:30:00Z",
+        "総合スコア": 78,
+        "財務健全性スコア": 75,
+        "技術力スコア": 85,
+        "セキュリティスコア": 82,
+        "法務コンプライアンススコア": 73,
+        "導入実績スコア": 81,
+        "業界適合性スコア": 76,
+        "リスク評価スコア": 22,
+        "評価者ID": "user-156",
+        "評価コメント": "前回評価比で導入実績が大幅向上。大規模金融機関での実績追加により信頼性が向上。ただし法務体制の強化が課題。",
+        "推奨判定": "条件付き推奨",
+        "作成日時": "2024-11-15T10:35:00Z",
+        "更新日時": "2024-11-15T10:35:00Z",
+        "作成者ID": "user-156"
+      },
+      {
+        "評価スコアID": "rec-001",
+        "ベンダー候補企業ID": "vendor-047",
+        "評価実施日": "2024-11-15T10:30:00Z",
+        "総合スコア": 62,
+        "財務健全性スコア": 38,
+        "技術力スコア": 85,
+        "セキュリティスコア": 72,
+        "法務コンプライアンススコア": 45,
+        "導入実績スコア": 52,
+        "業界適合性スコア": 68,
+        "リスク評価スコア": 58,
+        "評価者ID": "user-082",
+        "評価コメント": "技術力は業界水準以上だが、創業3年目で財務基盤が脆弱。コンプライアンス体制の整備が急務。",
+        "推奨判定": "条件付き推奨",
+        "作成日時": "2024-11-15T10:35:22Z",
+        "更新日時": "2024-11-15T10:35:22Z",
+        "作成者ID": "user-082"
+      },
+      {
+        "評価スコアID": "rec-001",
+        "ベンダー候補企業ID": "rec-vendor-042",
+        "評価実施日": "2024-11-15T10:30:00Z",
+        "総合スコア": 78,
+        "財務健全性スコア": 82,
+        "技術力スコア": 85,
+        "セキュリティスコア": 72,
+        "法務コンプライアンススコア": 80,
+        "導入実績スコア": 88,
+        "業界適合性スコア": 75,
+        "リスク評価スコア": 28,
+        "評価者ID": "rec-user-156",
+        "評価コメント": "3年間の継続取引で実績は良好。セキュリティ対応強化が課題。来期改善計画の確認が必要。",
+        "推奨判定": "条件付き推奨",
+        "作成日時": "2024-11-15T10:35:22Z",
+        "更新日時": "2024-11-15T10:35:22Z",
+        "作成者ID": "rec-user-156"
+      },
+      {
+        "評価スコアID": "rec-001",
+        "ベンダー候補企業ID": "rec-vendor-002",
+        "評価実施日": "2024-11-15T14:30:00Z",
+        "総合スコア": 78,
+        "財務健全性スコア": 82,
+        "技術力スコア": 85,
+        "セキュリティスコア": 72,
+        "法務コンプライアンススコア": 76,
+        "導入実績スコア": 81,
+        "業界適合性スコア": 79,
+        "リスク評価スコア": 28,
+        "評価者ID": "rec-user-045",
+        "評価コメント": "技術力と導入実績は優秀だが、セキュリティ体制の強化が課題。他2社との比較で中位の評価。",
+        "推奨判定": "条件付き推奨",
+        "作成日時": "2024-11-15T14:35:00Z",
+        "更新日時": "2024-11-16T09:20:00Z",
+        "作成者ID": "rec-user-045"
+      },
+      {
+        "評価スコアID": "rec-001",
+        "ベンダー候補企業ID": "vendor-042",
+        "評価実施日": "2024-11-15T14:30:00Z",
+        "総合スコア": 82,
+        "財務健全性スコア": 78,
+        "技術力スコア": 85,
+        "セキュリティスコア": 88,
+        "法務コンプライアンススコア": 86,
+        "導入実績スコア": 79,
+        "業界適合性スコア": 91,
+        "リスク評価スコア": 18,
+        "評価者ID": "user-015",
+        "評価コメント": "金融機関向けシステム導入実績が豊富で、PCI-DSS対応や規制要件への理解が深い。業界標準への適合度は優秀だが、中堅企業規模のため大規模案件対応の実績が限定的。",
+        "推奨判定": "条件付き推奨",
+        "作成日時": "2024-11-15T14:30:00Z",
+        "更新日時": "2024-11-15T14:30:00Z",
+        "作成者ID": "user-015"
+      },
+      {
+        "評価スコアID": "rec-001",
+        "ベンダー候補企業ID": "rec-vendor-042",
+        "評価実施日": "2025-01-15T10:30:00Z",
+        "総合スコア": 72,
+        "財務健全性スコア": 78,
+        "技術力スコア": 81,
+        "セキュリティスコア": 68,
+        "法務コンプライアンススコア": 65,
+        "導入実績スコア": 75,
+        "業界適合性スコア": 70,
+        "リスク評価スコア": 35,
+        "評価者ID": "rec-user-015",
+        "評価コメント": "金融機関向けシステム対応実績は豊富だが、個人情報保護方針の更新が遅れており、ISO27001認証取得予定が2025年Q2。セキュリティ監査で軽微な指摘あり。",
+        "推奨判定": "条件付き推奨",
+        "作成日時": "2025-01-15T10:35:00Z",
+        "更新日時": "2025-01-15T10:35:00Z",
+        "作成者ID": "rec-user-015"
+      },
+      {
+        "評価スコアID": "rec-001",
+        "ベンダー候補企業ID": "rec-vendor-047",
+        "評価実施日": "2024-11-15T10:30:00Z",
+        "総合スコア": 72,
+        "財務健全性スコア": 75,
+        "技術力スコア": 88,
+        "セキュリティスコア": 79,
+        "法務コンプライアンススコア": 81,
+        "導入実績スコア": 58,
+        "業界適合性スコア": 76,
+        "リスク評価スコア": 28,
+        "評価者ID": "rec-user-012",
+        "評価コメント": "技術スタックと実装能力は業界トップレベルだが、国内導入事例が3件のみで参照顧客が限定的。POC実施と段階的導入で初期リスク軽減可能。",
+        "推奨判定": "条件付き推奨",
+        "作成日時": "2024-11-15T10:35:22Z",
+        "更新日時": "2024-11-15T10:35:22Z",
+        "作成者ID": "rec-user-012"
+      },
+      {
+        "評価スコアID": "rec-001",
+        "ベンダー候補企業ID": "rec-vendor-047",
+        "評価実施日": "2025-01-15T10:30:00Z",
+        "総合スコア": 72,
+        "財務健全性スコア": 68,
+        "技術力スコア": 78,
+        "セキュリティスコア": 71,
+        "法務コンプライアンススコア": 75,
+        "導入実績スコア": 70,
+        "業界適合性スコア": 73,
+        "リスク評価スコア": 28,
+        "評価者ID": "rec-user-156",
+        "評価コメント": "前回指摘の財務改善と体制強化が確認できた。セキュリティ認証取得も完了し、条件付き推奨の基準を満たした。",
+        "推奨判定": "条件付き推奨",
+        "作成日時": "2025-01-15T10:35:22Z",
+        "更新日時": "2025-01-15T10:35:22Z",
+        "作成者ID": "rec-user-156"
+      }
+    ]
+  },
+  "shellHtml": "<!doctype html>\n<html lang=\"ja\">\n<head>\n  <meta charset=\"UTF-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n  <title>作業管理システム - ベンダー選定・契約リスク評価支援システム</title>\n  <style>\n:root {\n  --primary: #f59e0b;\n  --primary-hover: #d97706;\n  --bg-main: #fefdf8;\n  --bg-card: #faf8f3;\n  --bg-sidebar: #f5f1e8;\n  --top-bar-bg: #fffbf0;\n  --top-bar-border: #f3e8d8;\n  --top-bar-text: #1f2937;\n  --text: #1f2937;\n  --text-muted: #6b7280;\n  --border: #e5ddd0;\n  --border-width: 1px;\n  --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;\n  --space-unit: 8px;\n  --control-height: 40px;\n  --radius-card: 12px;\n  --radius-control: 8px;\n  --shadow-card: 0 2px 8px rgba(31, 41, 55, 0.08), 0 1px 3px rgba(31, 41, 55, 0.04);\n  --motion-duration: 200ms;\n  --surface-texture: linear-gradient(90deg, transparent 0%, rgba(245, 158, 11, 0.02) 50%, transparent 100%), repeating-linear-gradient(0deg, transparent 0px, rgba(245, 158, 11, 0.01) 1px, transparent 2px, transparent 4px);\n  --surface-texture-size: 100% 100%;\n  --surface-texture-position: 0 0;\n}\n\n* {\n  margin: 0;\n  padding: 0;\n  box-sizing: border-box;\n}\n\nhtml, body {\n  height: 100%;\n  font-family: var(--font-family);\n  color: var(--text);\n  background-color: var(--bg-main);\n}\n\nbody {\n  display: flex;\n  flex-direction: column;\n}\n\n[data-aivic-shell-pattern] {\n  display: flex;\n  flex-direction: column;\n  height: 100vh;\n  overflow: hidden;\n}\n\n.shell-header {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  height: 56px;\n  background-color: var(--top-bar-bg);\n  border-bottom: var(--border-width) solid var(--top-bar-border);\n  padding: 0 calc(var(--space-unit) * 3);\n  flex-shrink: 0;\n  gap: calc(var(--space-unit) * 2);\n}\n\n.shell-header-left {\n  display: flex;\n  align-items: center;\n  gap: calc(var(--space-unit) * 3);\n  flex: 1;\n}\n\n.shell-logo-group {\n  display: flex;\n  flex-direction: column;\n  gap: 2px;\n}\n\n.shell-logo {\n  font-size: 16px;\n  font-weight: 600;\n  color: var(--text);\n  letter-spacing: -0.3px;\n}\n\n.shell-logo-system {\n  font-size: 11px;\n  color: var(--text-muted);\n  font-weight: 400;\n  line-height: 1.2;\n}\n\n.shell-nav-top {\n  display: flex;\n  gap: calc(var(--space-unit) * 0.5);\n  align-items: center;\n}\n\n.shell-nav-item {\n  display: inline-flex;\n  align-items: center;\n  height: 32px;\n  padding: 0 calc(var(--space-unit) * 2);\n  font-size: 13px;\n  font-weight: 500;\n  color: var(--top-bar-text);\n  background: transparent;\n  border: none;\n  cursor: pointer;\n  border-radius: var(--radius-control);\n  transition: background-color var(--motion-duration), color var(--motion-duration);\n  white-space: nowrap;\n}\n\n.shell-nav-item:hover {\n  background-color: rgba(245, 158, 11, 0.1);\n}\n\n.shell-nav-item.aivic-active {\n  background-color: var(--primary);\n  color: #fff;\n}\n\n.shell-header-right {\n  display: flex;\n  align-items: center;\n  gap: calc(var(--space-unit) * 2);\n}\n\n.shell-user-area {\n  display: flex;\n  align-items: center;\n  gap: calc(var(--space-unit) * 1.5);\n}\n\n.shell-user-avatar {\n  width: 32px;\n  height: 32px;\n  border-radius: 50%;\n  background-color: var(--primary);\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  color: #fff;\n  font-size: 13px;\n  font-weight: 600;\n  flex-shrink: 0;\n}\n\n.shell-user-name {\n  font-size: 13px;\n  color: var(--top-bar-text);\n  font-weight: 500;\n}\n\n.shell-user-logout {\n  font-size: 12px;\n  color: var(--text-muted);\n  text-decoration: none;\n  transition: color var(--motion-duration);\n  cursor: pointer;\n}\n\n.shell-user-logout:hover {\n  color: var(--primary);\n  text-decoration: underline;\n}\n\n.shell-body {\n  display: flex;\n  flex: 1;\n  overflow: hidden;\n}\n\n.content-area {\n  flex: 1;\n  overflow-y: auto;\n  overflow-x: hidden;\n  background-color: var(--bg-main);\n  background-image: var(--surface-texture);\n  background-size: var(--surface-texture-size);\n  background-position: var(--surface-texture-position);\n}\n\n[data-aivic-panel] {\n  display: block;\n  min-height: 100%;\n}\n\n.shell-footer {\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  height: 40px;\n  background-color: var(--bg-card);\n  border-top: var(--border-width) solid var(--border);\n  font-size: 12px;\n  color: var(--text-muted);\n  flex-shrink: 0;\n}\n\n@media (max-width: 1024px) {\n  .shell-header {\n    padding: 0 calc(var(--space-unit) * 2);\n  }\n\n  .shell-nav-item {\n    padding: 0 calc(var(--space-unit) * 1.5);\n    font-size: 12px;\n  }\n}\n\n@media (max-width: 768px) {\n  .shell-header {\n    padding: 0 calc(var(--space-unit) * 1.5);\n  }\n\n  .shell-header-left {\n    gap: calc(var(--space-unit) * 1.5);\n  }\n\n  .shell-logo {\n    font-size: 14px;\n  }\n\n  .shell-nav-top {\n    display: none;\n  }\n\n  .shell-user-name {\n    display: none;\n  }\n}\n  </style>\n  <!--AIVIC_GLOBALS-->\n</head>\n<body>\n  <div data-aivic-shell-pattern=\"command_center\" data-aivic-nav-position=\"top\" data-aivic-density=\"balanced\">\n    <header class=\"shell-header\">\n      <div class=\"shell-header-left\">\n        <div class=\"shell-logo-group\">\n          <div class=\"shell-logo\">作業管理システム</div>\n          <div class=\"shell-logo-system\">ベンダー選定・契約リスク評価支援</div>\n        </div>\n        <nav class=\"shell-nav-top\">\n          <button class=\"shell-nav-item aivic-active\" data-aivic-nav=\"scr-1789462725117\" onclick=\"window.showScreen('scr-1789462725117')\">ベンダー評価ワークスペース</button>\n        </nav>\n      </div>\n      <div class=\"shell-header-right\">\n        <div class=\"shell-user-area\">\n          <div class=\"shell-user-avatar\">U</div>\n          <div class=\"shell-user-name\">ユーザー</div>\n          <a class=\"shell-user-logout\" href=\"./login.html\">ログアウト</a>\n        </div>\n      </div>\n    </header>\n    <div class=\"shell-body\">\n      <main class=\"content-area\">\n        <div data-aivic-panel=\"scr-1789462725117\"></div>\n      </main>\n    </div>\n    <footer class=\"shell-footer\">\n      © 2025 作業管理システム. All rights reserved.\n    </footer>\n  </div>\n  <!--AIVIC_RUNTIME-->\n</body>\n</html>",
+  "screenTaste": "明るい色使い"
+}
