@@ -1,0 +1,10 @@
+{
+  "name": "aivic-backend-lambda",
+  "version": "1.0.0",
+  "description": "AIVIC Backend Lambda — 作業進捗・人員配置最適化エンジン",
+  "main": "handler.js",
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.0.0",
+    "@aws-sdk/lib-dynamodb": "^3.0.0"
+  }
+}
